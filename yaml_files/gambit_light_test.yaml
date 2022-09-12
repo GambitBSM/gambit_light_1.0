@@ -1,0 +1,133 @@
+#####################################
+## GAMBIT_light configuration example
+#####################################
+
+
+Parameters:
+
+  GenericModel20:
+    p1:
+      prior_type: flat
+      range: [0.0, 1.0]
+    p2:
+      prior_type: flat
+      range: [0.0, 1.0]
+    p3: 0.0
+    p4: 0.0
+    p5: 0.0
+    p6: 0.0
+    p7: 0.0
+    p8: 0.0
+    p9: 0.0
+    p10: 0.0
+    p11: 0.0
+    p12: 0.0
+    p13: 0.0
+    p14: 0.0
+    p15: 0.0
+    p16: 0.0
+    p17: 0.0
+    p18: 0.0
+    p19: 0.0
+    p20: 0.0
+
+
+
+Priors:
+
+  # None needed: all priors are simple and defined in the Parameters section above
+
+
+Printer:
+
+  # printer: cout 
+
+  # printer: hdf5_v1
+  # options:
+  #   output_file: "results.hdf5"
+  #   group: "/data"
+  #   delete_file_on_restart: true
+  #   disable_combine_routines: true
+
+  printer: ascii
+  options:
+    output_file: "results.dat"
+    buffer_length: 10
+    delete_file_on_restart: true
+
+
+Scanner:
+
+  use_scanner: de
+  # use_scanner: multinest
+  # use_scanner: random
+
+  scanners:
+
+    random:
+      plugin: random
+      point_number: 10
+      like: LogLike
+
+    de:
+      plugin: diver
+      like: LogLike
+      NP: 500
+      convthresh: 1e-4
+      verbosity: 1
+      lambdajDE: false
+
+
+    multinest:
+      plugin: multinest
+      like:  LogLike
+      nlive: 1000
+      tol: 0.01
+
+    mcmc:
+      plugin: great
+      like: LogLike
+      nTrialLists: 5
+      nTrials: 10000
+
+    twalk:
+      plugin: twalk
+
+
+ObsLikes:
+
+  - purpose:      LogLike
+    capability:   ExternalLogLike
+    module:       JustALittleBit
+    type:         double
+
+
+Rules:
+
+  # None required, since no module dependencies to be resolved.
+
+
+Logger:
+
+  redirection:
+    [Default]        : "default.log"
+    [JustALittleBit] : "JustALittleBit.log"
+    [Scanner]        : "Scanner.log"
+
+
+KeyValues:
+
+  default_output_path: "runs/gambit_light_test"
+
+  rng:
+    generator: ranlux48
+    seed: -1
+
+  likelihood:
+    model_invalid_for_lnlike_below: -5e5
+    model_invalid_for_lnlike_below_alt: -5e5
+    print_invalid_points: false
+
+  print_timing_data: true
+
+  debug: false
