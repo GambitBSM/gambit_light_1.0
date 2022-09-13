@@ -97,9 +97,10 @@ Scanner:
 ObsLikes:
 
   - purpose:      LogLike
-    capability:   ExternalLogLike
-    module:       JustALittleBit
-    type:         double
+    capability:   dummy_loglike
+
+  - purpose:      LogLike
+    capability:   cpp_loglike
 
 
 Rules:

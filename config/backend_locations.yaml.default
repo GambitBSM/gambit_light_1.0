@@ -189,3 +189,6 @@ libMathematicaTest:
 # Work in progress:
 # salami:
 #   0.1.0:       ./Backends/examples/salami/0.1.0/salami_gambit.py
+
+light_cpp_interface:
+  0.1:         ./Backends/light_interfaces/light_cpp_interface/light_cpp_interface.so

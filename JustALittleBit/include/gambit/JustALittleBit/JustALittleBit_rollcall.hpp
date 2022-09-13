@@ -19,17 +19,26 @@
 
 #include "gambit/cmake/cmake_variables.hpp"
 #include "gambit/Elements/shared_types.hpp"
+#include "gambit/Utils/util_types.hpp"
 
 
 #define MODULE JustALittleBit
 START_MODULE
 
-  #define CAPABILITY ExternalLogLike
+  #define CAPABILITY dummy_loglike
   START_CAPABILITY
-    #define FUNCTION getExternalLogLike
+    #define FUNCTION get_dummy_loglike
     START_FUNCTION(double)
     ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
-    // BACKEND_REQ(pylike_get_loglike, (), double, (parameterMap&))
+    #undef FUNCTION
+  #undef CAPABILITY
+
+  #define CAPABILITY cpp_loglike
+  START_CAPABILITY
+    #define FUNCTION get_cpp_loglike
+    START_FUNCTION(double)
+    ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
+    BACKEND_REQ(run_light_cpp_interface, (light_cpp_interface), void, (const map_str_dbl &, map_str_dbl &))
     #undef FUNCTION
   #undef CAPABILITY
 
