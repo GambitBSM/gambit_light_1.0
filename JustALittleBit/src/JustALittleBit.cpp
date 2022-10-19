@@ -85,6 +85,46 @@ namespace Gambit
       result = loglike;
     }
 
+
+    void get_light_loglike(double &result)
+    {
+      using namespace Pipes::get_light_loglike;
+
+      std::map<std::string,double> input;
+      std::map<std::string,double> output;
+
+      // Construct input map from GAMBIT parameter map:
+      for (auto& kv : Param) 
+      {
+        input[kv.first] = *kv.second;
+      }
+
+      // Call the cpp interface library, which will fill the result map
+      cout << endl;
+      cout << "get_light_loglike: Will now call light_interface.";
+      BEreq::run_light_interface(input, output);
+
+      // Print the output map:
+      cout << "get_light_loglike: Got output:";
+      for (auto& kv : output) 
+      {
+        cout << "  " << kv.first << ":" << kv.second;
+      }
+      cout << endl;
+
+      // Check that the output map has a "loglike" entry, 
+      // and return this as the result.
+      if (output.count("loglike") == 0)
+      {
+        JustALittleBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
+      }
+
+      double loglike = output.at("loglike");
+      cout << "get_light_loglike: Will return result: " << loglike << endl;
+
+      result = loglike;
+    }
+
     /// @}
 
   }

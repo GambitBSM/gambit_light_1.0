@@ -96,17 +96,18 @@ Scanner:
 
 ObsLikes:
 
-  - purpose:      LogLike
-    capability:   dummy_loglike
+#  - purpose:      LogLike
+#    capability:   dummy_loglike
 
   - purpose:      LogLike
     capability:   cpp_loglike
 
+  - purpose:      LogLike
+    capability:   light_loglike
 
 Rules:
 
   # None required, since no module dependencies to be resolved.
-
 
 Logger:
 

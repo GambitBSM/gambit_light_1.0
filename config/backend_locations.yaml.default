@@ -192,3 +192,6 @@ libMathematicaTest:
 
 light_cpp_interface:
   0.1:         ./Backends/light_interfaces/light_cpp_interface/light_cpp_interface.so
+
+light_interface:
+  0.1:         ./Backends/light_interfaces/light_interface/light_interface.so
