@@ -44,8 +44,8 @@ contains
 
     ! registered function name (c-compatible, null-terminated)
     fcn_name = "fuser_like"
-    fcn_name(len(fcn_name):) = c_null_char
-    
+    fcn_name(len(fcn_name):) = c_null_char 
+   
     ! convert c function to fortran function, and call
     call c_f_procpointer(rf, frf)
     call frf(c_loc(fcn_name), c_funloc(user_like))

@@ -41,7 +41,9 @@ LOAD_LIBRARY
  */
 
 BE_FUNCTION(run, void, (const map_str_dbl &, map_str_dbl &), "run", "run_light_interface")
-BE_FUNCTION(light_interface_register, int, (const char *, const void *), "light_interface_register", "light_interface_register")
+BE_FUNCTION(light_interface_register_fortran, int, (const char *, const void *), "light_interface_register_fortran", "light_interface_register_fortran")
+BE_FUNCTION(light_interface_register_c, int, (const char *, const void *), "light_interface_register_c", "light_interface_register_c")
+BE_FUNCTION(light_interface_register_cpp, int, (const char *, const void *), "light_interface_register_cpp", "light_interface_register_cpp")
 
 /* Syntax for BE_VARIABLE:
  * BE_VARIABLE([name], [type], "[exact symbol name]", "[choose capability name]")
@@ -107,8 +109,17 @@ BE_NAMESPACE
             return;
         }
 
+        void *reg_fun;
+        if (lang == "fortran")  reg_fun = (void*)light_interface_register_fortran;
+        else if (lang == "c")   reg_fun = (void*)light_interface_register_c;
+        else if (lang == "c++") reg_fun = (void*)light_interface_register_cpp;
+        else {
+            printf("ligth_interface: could not load dynamic library: unsupported plugin language '%s'\n", lang.c_str());
+            return;        
+        }
+
         // call user init function
-        (*user_init_function)((void*)light_interface_register);
+        (*user_init_function)(reg_fun);
                 
         // TODO: cleanup in the destructor
         // dlclose(handle);

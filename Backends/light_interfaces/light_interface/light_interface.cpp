@@ -21,7 +21,9 @@ namespace Gambit {
         namespace light_interface_0_1 {
             // NOTE: init_priority attribute is needed to make sure that the map is initialized
             // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
-            std::map<std::string, user_like_fcn> user_likes __attribute__ ((init_priority (128)));
+            std::map<std::string, user_like_fcn_fortran> user_likes_fortran __attribute__ ((init_priority (128)));
+            std::map<std::string, user_like_fcn_cpp> user_likes_cpp __attribute__ ((init_priority (128)));
+            std::map<std::string, user_like_fcn_c> user_likes_c __attribute__ ((init_priority (128)));
         }
     }
 }
@@ -44,10 +46,15 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
     }
 
     // call user functions
-    // TODO: what to do when there are multiple functions?
-    for (const auto& fn : Gambit::Backends::light_interface_0_1::user_likes) {
+    // TODO: 
+    //  - what to do when there are multiple functions?
+    //  - what if there are multiple backend languages? which is first? does it matter
+    for (const auto& fn : Gambit::Backends::light_interface_0_1::user_likes_c)
         loglike = fn.second(input.size(), iparams, oparams);
-    }
+    for (const auto& fn : Gambit::Backends::light_interface_0_1::user_likes_cpp)
+        loglike = fn.second(input, output);
+    for (const auto& fn : Gambit::Backends::light_interface_0_1::user_likes_fortran)
+        loglike = fn.second(input.size(), iparams, oparams);
 
     // translate the output back to a map
     iparam = 0;
@@ -61,19 +68,32 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
                 
     // Add the expected "loglike" entry
     output["loglike"] = loglike;
-
 }
 
 
 // user-callable function to register the user likelyhood functions
 extern "C"
-int light_interface_register(const char *fcn_name, const void *arg)
+int light_interface_register_fortran(const char *fcn_name, const void *arg)
 {
-    // TODO: remove this cast with proper GAMBIT type definitions
-    const user_like_fcn user_like = (const user_like_fcn)(arg);
-    printf("light_interface: registering user function '%s', address %p\n", fcn_name, user_like);
-    Gambit::Backends::light_interface_0_1::user_likes.insert({fcn_name, user_like});
-    return 1;
+    Gambit::Backends::light_interface_0_1::user_likes_c.insert({fcn_name, (user_like_fcn_c)(arg)});
+    printf("light_interface: registering fortran function '%s'\n", fcn_name);
+    return 0;
+}
+
+extern "C"
+int light_interface_register_c(const char *fcn_name, const void *arg)
+{
+    Gambit::Backends::light_interface_0_1::user_likes_c.insert({fcn_name, (user_like_fcn_c)(arg)});
+    printf("light_interface: registering C function '%s'\n", fcn_name);
+    return 0;
+}
+
+extern "C"
+int light_interface_register_cpp(const char *fcn_name, const void *arg)
+{
+    Gambit::Backends::light_interface_0_1::user_likes_cpp.insert({fcn_name, (user_like_fcn_cpp)(arg)});
+    printf("light_interface: registering C++ function '%s'\n", fcn_name);
+    return 0;
 }
 
 
@@ -135,8 +155,17 @@ void light_interface_init() {
         return;
     }
 
+    void *reg_fun;
+    if (lang == "fortran")  reg_fun = (void*)light_interface_register_fortran;
+    else if (lang == "c")   reg_fun = (void*)light_interface_register_c;
+    else if (lang == "c++") reg_fun = (void*)light_interface_register_cpp;
+    else {
+        printf("ligth_interface: could not load dynamic library: unsupported plugin language '%s'\n", lang.c_str());
+        return;        
+    }
+
     // call user init function
-    (*user_init_function)((void*)light_interface_register);
+    (*user_init_function)(reg_fun);
                 
     // TODO: cleanup in the destructor
     // dlclose(handle);

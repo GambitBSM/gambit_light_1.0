@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "light_interface.h"
 
-// user-side likelyhood function, registered in gambit by init_like
+// user-side likelihood function, registered in gambit by init_like
 double user_like(const int nparams, const double *iparams, double *oparams)
 {
     printf("libuser.c: user_like: computing loglike.\n");
