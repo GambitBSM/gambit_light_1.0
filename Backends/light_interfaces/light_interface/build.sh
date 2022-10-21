@@ -1,8 +1,9 @@
 gfortran -c light_interface_mod.f90
+
 g++ light_interface.cpp -shared -fPIC -o light_interface.so
 
 # stand-alone test program, without the need to run gambit
-g++ light_interface.cpp -ldl -DDEBUG_MAIN
+g++ light_interface.cpp -ldl -DDEBUG_MAIN -I../../../contrib/yaml-cpp-0.6.2/include/ ./libyaml-cpp.a
 
 # compile fotran user-side library
 gfortran -shared -fPIC libuser.f90 -o libuser.so
