@@ -160,13 +160,6 @@ int light_interface_register(const char *fcn_name, void *fcn)
 
 
 extern "C"
-void lightLibrary_Test()
-{
-    printf("lightLibrary_Test called\n");
-}
-
-
-extern "C"
 void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
                                 const std::string &lang, const std::string &function_name,
                                 std::vector<std::string> &inputs, std::vector<std::string> &outputs)

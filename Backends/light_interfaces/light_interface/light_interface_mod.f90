@@ -3,9 +3,9 @@ module light_interface_mod
   implicit none
 
   interface
-     real(c_double) function light_interface_user_like(nparams, iparams, oparams) bind(c)
+     real(c_double) function light_interface_user_like(niparams, iparams, noparams, oparams) bind(c)
        use iso_c_binding
-       integer(c_int), value, intent(in) :: nparams
+       integer(c_int), value, intent(in) :: niparams, noparams
        type(c_ptr), intent(in), value :: iparams
        type(c_ptr), intent(in), value :: oparams
      end function light_interface_user_like
