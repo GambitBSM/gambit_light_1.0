@@ -2,7 +2,7 @@
 //   *********************************************
 ///  \file
 ///
-///  GAMBIT_light interface library for C++ codes
+///  GAMBIT_light interface library (C/C++, Fortra, Python backends)
 ///
 ///  *********************************************
 ///
@@ -10,6 +10,8 @@
 ///
 ///  \author Anders Kvellestad
 ///          (anders.kvellestad@fys.uio.no)
+///  \author Marcin Krotkiewski
+///          (marcin.krotkiewski@usit.uio.no)
 ///  \date 2022 Sep
 ///
 ///  *********************************************
@@ -41,9 +43,9 @@ LOAD_LIBRARY
  */
 
 BE_FUNCTION(run, void, (const map_str_dbl &, map_str_dbl &), "run", "run_light_interface")
-BE_FUNCTION(light_interface_register_fortran, int, (const char *, const void *), "light_interface_register_fortran", "light_interface_register_fortran")
-BE_FUNCTION(light_interface_register_c, int, (const char *, const void *), "light_interface_register_c", "light_interface_register_c")
-BE_FUNCTION(light_interface_register_cpp, int, (const char *, const void *), "light_interface_register_cpp", "light_interface_register_cpp")
+BE_FUNCTION(lightLibrary_C_CXX_Fortran, void, (const std::string &, const std::string &, const std::string &, const std::string &, std::vector<std::string> &, std::vector<std::string> &), "lightLibrary_C_CXX_Fortran", "lightLibrary_C_CXX_Fortran")
+BE_FUNCTION(lightLibrary_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, std::vector<std::string> &, std::vector<std::string> &), "lightLibrary_Python", "lightLibrary_Python")
+
 
 /* Syntax for BE_VARIABLE:
  * BE_VARIABLE([name], [type], "[exact symbol name]", "[choose capability name]")
@@ -60,71 +62,89 @@ BE_NAMESPACE
 
     void light_interface_init() {
 
+        using namespace Gambit::Backends::light_interface_0_1;
         YAML::Node root;
         std::string user_lib;
+        std::string function_name;
         std::string init_fun;
         std::string lang;
+        std::vector<std::string> inputs, outputs;
 
         root = YAML::LoadFile("light_interface.yaml");
-        YAML::Node lightNode = root["LightInterface"];
-    
-        if (not lightNode["user_lib"].IsDefined()) {
-            printf("ligth_interface: could not load dynamic library: 'user_lib' not specified in config file\n");
-            return;
+        YAML::Node lightRootNode = root["LightInterface"];
+
+        for (std::size_t fi = 0; fi < lightRootNode.size(); fi++) {
+            const YAML::Node& lightNode = lightRootNode[fi];
+
+            if (not lightNode["function_name"].IsDefined()) {
+                printf("ligth_interface: could not load dynamic library: 'function_name' not specified in config file\n");
+                continue;
+            }
+            function_name = lightNode["function_name"].as<std::string>();
+
+            if (not lightNode["user_lib"].IsDefined()) {
+                printf("ligth_interface: could not load dynamic library: 'user_lib' not specified in config file\n");
+                continue;
+            }
+            user_lib = lightNode["user_lib"].as<std::string>();
+
+            if (not lightNode["init_fun"].IsDefined())
+                init_fun = "init_like";
+            else
+                init_fun = lightNode["init_fun"].as<std::string>();
+
+            if (not lightNode["lang"].IsDefined()) {
+                printf("ligth_interface: could not load dynamic library: 'lang' not specified in config file\n");
+                continue;
+            }
+            lang = lightNode["lang"].as<std::string>();
+            if (lang != "fortran" and
+                lang != "c" and
+#ifdef HAVE_PYBIND11
+                lang != "python" and
+#endif
+                lang != "c++") {
+                printf("ligth_interface: could not load dynamic library: unsupported plugin language '%s'\n", lang.c_str());
+                continue;
+            }
+
+            if (not lightNode["input"].IsDefined()) {
+                printf("ligth_interface: could not load dynamic library: 'input' not specified in config file\n");
+                continue;
+            }
+            const YAML::Node& node_input = lightNode["input"];
+            for (std::size_t i = 0; i < node_input.size(); i++) {
+                inputs.push_back(node_input[i].as<std::string>());
+            }
+
+            if (lightNode["output"].IsDefined()) {
+                const YAML::Node& node_output = lightNode["output"];
+                for (std::size_t i = 0; i < node_output.size(); i++) {
+                    outputs.push_back(node_output[i].as<std::string>());
+                }
+            }
+
+            printf("-- LIGHT CONFIG for function '%s'\n", function_name.c_str());
+            printf("user_lib: %s\n", user_lib.c_str());
+            printf("init_fun: %s\n", init_fun.c_str());
+            printf("lang:     %s\n", lang.c_str());
+            printf("-- ----- ------\n");
+
+            if (lang == "c" or
+                lang == "c++" or
+                lang == "fortran")
+                lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, function_name, inputs, outputs);
+
+#ifdef HAVE_PYBIND11
+            if (lang == "python")
+                lightLibrary_Python(user_lib, init_fun, lang, function_name, inputs, outputs);
+#endif
         }
-        user_lib = lightNode["user_lib"].as<std::string>();
 
-        if (not lightNode["init_fun"].IsDefined())
-            init_fun = "init_like";
-        else
-            init_fun = lightNode["init_fun"].as<std::string>();
-
-        if (not lightNode["lang"].IsDefined()) {
-            printf("ligth_interface: could not load dynamic library: 'lang' not specified in config file\n");
-            return;
-        }
-        lang = lightNode["lang"].as<std::string>();
-
-        printf("-- LIGHT CONFIG\n");
-        printf("user_lib: %s\n", user_lib.c_str());
-        printf("init_fun: %s\n", init_fun.c_str());
-        printf("lang:     %s\n", lang.c_str());
-        printf("-- ----- ------\n");
-
-        // load the init symbol from the user library (should be added to the config file)
-        void *handle = dlopen(user_lib.c_str(), RTLD_LAZY);
-        if(!handle){
-            printf("ligth_interface: could not load dynamic library: %s\n", dlerror());
-            return;
-        }
-    
-        dlerror();
-
-        char *error;
-        void (*user_init_function)(void *);
-        *(void**) (&user_init_function) = dlsym(handle, init_fun.c_str());
-
-        if ((error = dlerror()) != NULL)  {
-            printf("light_interface: could not load init function: %s\n", error);
-            return;
-        }
-
-        void *reg_fun;
-        if (lang == "fortran")  reg_fun = (void*)light_interface_register_fortran;
-        else if (lang == "c")   reg_fun = (void*)light_interface_register_c;
-        else if (lang == "c++") reg_fun = (void*)light_interface_register_cpp;
-        else {
-            printf("ligth_interface: could not load dynamic library: unsupported plugin language '%s'\n", lang.c_str());
-            return;        
-        }
-
-        // call user init function
-        (*user_init_function)(reg_fun);
-                
         // TODO: cleanup in the destructor
         // dlclose(handle);
     }
-} 
+}
 END_BE_NAMESPACE
 
 // this is called for every point, not once for backend

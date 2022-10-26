@@ -12,10 +12,6 @@
 
 #include "light_interface.h"
 
-#ifdef DEBUG_MAIN
-#include "yaml-cpp/yaml.h"
-#endif
-
 #ifdef HAVE_PYBIND11
 #include <map>
 #include <pybind11/pybind11.h>
@@ -36,9 +32,11 @@ namespace Gambit {
     namespace Backends {
         namespace light_interface_0_1 {
 
+#ifdef DEBUG_MAIN
 #ifdef HAVE_PYBIND11
             /// Pointer to the Python interpreter
             pybind11::scoped_interpreter* python_interpreter = nullptr;
+#endif
 #endif
 
             typedef enum {
@@ -161,12 +159,20 @@ int light_interface_register(const char *fcn_name, void *fcn)
 }
 
 
+extern "C"
+void lightLibrary_Test()
+{
+    printf("lightLibrary_Test called\n");
+}
+
+
+extern "C"
 void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
                                 const std::string &lang, const std::string &function_name,
                                 std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-
+    
     // load the init symbol from the user library (should be added to the config file)
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle){
@@ -207,6 +213,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 
 
 #ifdef HAVE_PYBIND11
+extern "C"
 void lightLibrary_Python(const std::string &path, const std::string &init_fun,
                          const std::string &lang, const std::string &function_name,
                          std::vector<std::string> &inputs, std::vector<std::string> &outputs)
@@ -220,6 +227,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         return;
     }
 
+#ifdef DEBUG_MAIN
     if (nullptr == python_interpreter) {
         // Fire up the Python interpreter if it hasn't been started yet.
 
@@ -227,6 +235,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         python_interpreter = new pybind11::scoped_interpreter;
         printf("Python interpreter successfully started.\n");
     }
+#endif
 
     // Add the path to the backend to the Python system path
     pybind11::object sys_path = pybind11::module::import("sys").attr("path");
@@ -279,6 +288,8 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
 // NOTE: BE_INI_FUNCTION function cannot be used for this, as it's called
 // for each sampled point, not only once for the module
 #ifdef DEBUG_MAIN
+
+#include "yaml-cpp/yaml.h"
 
 static void light_interface_init() __attribute__((constructor));
 void light_interface_init() {

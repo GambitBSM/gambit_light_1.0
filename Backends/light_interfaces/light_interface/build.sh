@@ -7,7 +7,7 @@ fi
 
 if false; then
     # gambit-specific version
-    g++ light_interface.cpp -shared -fPIC -o light_interface.so
+    g++ light_interface.cpp -ldl -I../../../contrib/yaml-cpp-0.6.2/include/ ./libyaml-cpp.a `python3-config --includes` `python3-config --ldflags` -lpython3.8 -fPIC -DHAVE_PYBIND11 -shared -o light_interface.so
     gfortran -c light_interface_mod.f90
 
     # compile fotran user-side library
