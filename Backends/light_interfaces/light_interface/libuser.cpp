@@ -5,9 +5,9 @@
 double user_like(const std::map<std::string,double>& input, std::map<std::string,double>& output)
 {
     std::cout << "libuser.cpp: user_like: computing loglike." << std::endl;
-    output["oname1"] = 1;
-    output["oname2"] = 2;
-    output["oname3"] = 3;
+    output["oname1_cpp"] = 1;
+    output["oname2_cpp"] = 2;
+    output["oname3_cpp"] = 3;
     return input.at("p1") + input.at("p2");
 }
 

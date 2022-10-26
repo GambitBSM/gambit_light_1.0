@@ -31,3 +31,14 @@ LightInterface:
      - p6
    output:
      - oname1_fortran
+ - function_name: pyuser_like
+   user_lib: /cluster/home/marcink/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser.py
+   init_fun: init_like
+   lang:     python
+   input:
+     - p1
+     - p2
+   output:
+     - oname1_py
+     - oname2_py
+     - oname3_py
