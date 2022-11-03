@@ -123,7 +123,10 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
     //  - what if there are multiple backend languages? which is first? does it matter
     using namespace Gambit::Backends::light_interface_0_1;
     for (const auto& fn : user_likes){
-        loglike += call_user_function(input, output, fn.second);
+        double user_like = call_user_function(input, output, fn.second);
+        // Add each separate loglike contribution to the output map
+        output[fn.first] = user_like;
+        loglike += user_like;
     }
 
     // Add the expected "loglike" entry

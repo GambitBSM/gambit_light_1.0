@@ -86,12 +86,14 @@ namespace Gambit
     }
 
 
-    void get_light_loglike(double &result)
+    // This function will run the light_interface library 
+    // and collect all the results from all the connected user libraries
+    // in one map<string,double>.
+    void get_light_output(std::map<std::string,double> &result)
     {
-      using namespace Pipes::get_light_loglike;
+      using namespace Pipes::get_light_output;
 
       std::map<std::string,double> input;
-      std::map<std::string,double> output;
 
       // Construct input map from GAMBIT parameter map:
       for (auto& kv : Param) 
@@ -102,15 +104,25 @@ namespace Gambit
       // Call the cpp interface library, which will fill the result map
       cout << endl;
       cout << "get_light_loglike: Will now call light_interface.";
-      BEreq::run_light_interface(input, output);
+      BEreq::run_light_interface(input, result);
 
       // Print the output map:
       cout << "get_light_loglike: Got output:";
-      for (auto& kv : output) 
+      for (auto& kv : result) 
       {
         cout << "  " << kv.first << ":" << kv.second;
       }
       cout << endl;
+    }
+
+    // This function will extract the expected 'loglike' entry
+    // from the light_interface output map.
+    void get_light_loglike(double &result)
+    {
+      using namespace Pipes::get_light_loglike;
+
+      // Grab a reference the output map from our dependecy "light_output"
+      const std::map<std::string,double> &output = *Dep::light_output;
 
       // Check that the output map has a "loglike" entry, 
       // and return this as the result.
@@ -124,6 +136,7 @@ namespace Gambit
 
       result = loglike;
     }
+
 
     /// @}
 

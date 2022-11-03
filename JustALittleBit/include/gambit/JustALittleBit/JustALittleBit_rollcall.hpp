@@ -42,12 +42,21 @@ START_MODULE
     #undef FUNCTION
   #undef CAPABILITY
 
+
+  #define CAPABILITY light_output
+  START_CAPABILITY
+    #define FUNCTION get_light_output
+    START_FUNCTION(map_str_dbl)
+    ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
+    BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl &, map_str_dbl &))
+    #undef FUNCTION
+  #undef CAPABILITY
+
   #define CAPABILITY light_loglike
   START_CAPABILITY
     #define FUNCTION get_light_loglike
     START_FUNCTION(double)
-    ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
-    BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl &, map_str_dbl &))
+    DEPENDENCY(light_output, map_str_dbl)
     #undef FUNCTION
   #undef CAPABILITY
 
