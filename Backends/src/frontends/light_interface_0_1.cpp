@@ -26,7 +26,6 @@ BE_INI_FUNCTION
     static bool _so_initialized = false;
     if(_so_initialized) return;
 
-    // using namespace Gambit::Backends::light_interface_0_1;
     std::string user_lib;
     std::string function_name;
     std::string init_fun;
@@ -39,12 +38,12 @@ BE_INI_FUNCTION
         const YAML::Node& lightNode = lightRootNode[fi];
 
         if (not lightNode["function_name"].IsDefined()) {
-            backend_error().raise(LOCAL_INFO, "ligth_interface: could not load dynamic library: 'function_name' not specified in config file");
+            backend_error().raise(LOCAL_INFO, "light_interface: could not load dynamic library: 'function_name' not specified in config file");
         }
         function_name = lightNode["function_name"].as<std::string>();
 
         if (not lightNode["user_lib"].IsDefined()) {
-            backend_error().raise(LOCAL_INFO, "ligth_interface: could not load dynamic library: 'user_lib' not specified in config file");
+            backend_error().raise(LOCAL_INFO, "light_interface: could not load dynamic library: 'user_lib' not specified in config file");
         }
         user_lib = lightNode["user_lib"].as<std::string>();
 
@@ -54,7 +53,7 @@ BE_INI_FUNCTION
             init_fun = lightNode["init_fun"].as<std::string>();
 
         if (not lightNode["lang"].IsDefined()) {
-            backend_error().raise(LOCAL_INFO, "ligth_interface: could not load dynamic library: 'lang' not specified in config file");
+            backend_error().raise(LOCAL_INFO, "light_interface: could not load dynamic library: 'lang' not specified in config file");
         }
         lang = lightNode["lang"].as<std::string>();
         if (lang != "fortran" and
@@ -63,12 +62,12 @@ BE_INI_FUNCTION
             lang != "python" and
 #endif
             lang != "c++") {
-            backend_error().raise(LOCAL_INFO, "ligth_interface: could not load dynamic library: unsupported plugin language 'INSERT LANGUAGE'");
+            backend_error().raise(LOCAL_INFO, "light_interface: could not load dynamic library: unsupported plugin language 'INSERT LANGUAGE'");
             continue;
         }
 
         if (not lightNode["input"].IsDefined()) {
-            backend_error().raise(LOCAL_INFO, "ligth_interface: could not load dynamic library: 'input' not specified in config file");
+            backend_error().raise(LOCAL_INFO, "light_interface: could not load dynamic library: 'input' not specified in config file");
             continue;
         }
         const YAML::Node& node_input = lightNode["input"];

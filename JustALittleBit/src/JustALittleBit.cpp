@@ -115,13 +115,14 @@ namespace Gambit
       cout << endl;
     }
 
+
     // This function will extract the expected 'loglike' entry
     // from the light_interface output map.
     void get_light_loglike(double &result)
     {
       using namespace Pipes::get_light_loglike;
 
-      // Grab a reference the output map from our dependecy "light_output"
+      // Get the output map from dependency "light_output"
       const std::map<std::string,double> &output = *Dep::light_output;
 
       // Check that the output map has a "loglike" entry, 

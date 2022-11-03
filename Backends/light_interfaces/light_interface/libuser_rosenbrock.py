@@ -26,7 +26,7 @@ def user_like(iparams, oparams):
   print("libuser.py: user_like: computing loglike.");
 
   x = np.array([iparams['p1'], iparams['p2']])
-  oparams['oname1_py'] = 10;
+  oparams['rosenbrock_oname1_py'] = 10;
   result = loglike(x)
   return result
 
