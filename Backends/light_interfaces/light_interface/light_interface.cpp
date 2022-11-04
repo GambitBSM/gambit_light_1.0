@@ -31,11 +31,9 @@ namespace Gambit {
     namespace Backends {
         namespace light_interface_0_1 {
 
-#ifdef DEBUG_MAIN
 #ifdef HAVE_PYBIND11
             /// Pointer to the Python interpreter
             pybind11::scoped_interpreter* python_interpreter = nullptr;
-#endif
 #endif
 
             typedef enum {
@@ -214,44 +212,39 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
                          std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-    fprintf(stderr, "HERE %d\n", __LINE__);
+    
     // Bail now if the backend is not present.
     std::ifstream f(path.c_str());
     if(!f.good()) {
         printf("Failed loading Python backend; source file not found at %s\n", path.c_str());
         return;
     }
-    fprintf(stderr, "HERE %d\n", __LINE__);
 
-#ifdef DEBUG_MAIN
     if (nullptr == python_interpreter) {
         // Fire up the Python interpreter if it hasn't been started yet.
 
         // Create an instance of the interpreter.
-        python_interpreter = new pybind11::scoped_interpreter;
-        printf("Python interpreter successfully started.\n");
+        try{
+            python_interpreter = new pybind11::scoped_interpreter;
+            printf("Python interpreter successfully started.\n");
+        }
+        catch (std::runtime_error e){
+            printf("Did not start python interpreter: %s\n", e.what());
+        }
     }
-#endif
-    fprintf(stderr, "HERE %d\n", __LINE__);
 
     // Add the path to the backend to the Python system path
     pybind11::object sys_path = pybind11::module::import("sys").attr("path");
-    fprintf(stderr, "HERE %d\n", __LINE__);
     pybind11::object sys_path_insert = sys_path.attr("insert");
-    fprintf(stderr, "HERE %d\n", __LINE__);
     pybind11::object sys_path_remove = sys_path.attr("remove");
-    fprintf(stderr, "HERE %d\n", __LINE__);
     const std::string module_path = std::filesystem::path(path).remove_filename();
     const std::string name = std::filesystem::path(path).stem();
     sys_path_insert(0,module_path);
-    fprintf(stderr, "HERE %d\n", __LINE__);
 
     // Attempt to import the user module
     pybind11::module user_module;
     try {
-        fprintf(stderr, "-- importing %s\n", name.c_str());
         user_module = pybind11::module::import(name.c_str());
-        fprintf(stderr, "-- importing %s DONE\n", name.c_str());
         // needed if opaque str_dbl_map type defined in another file?
         // pybind11::module::import("light_interface");
     }
