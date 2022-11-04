@@ -15,7 +15,7 @@ typedef double (*user_like_fcn_cpp)(const std::map<std::string,double>&, std::ma
 typedef pybind11::object *user_like_fcn_python;
 #endif
 
-// gambit-side function to register user likelyhood functions
+// gambit-side callback to register user likelyhood functions
 typedef int (*light_interface_register_fcn)(const char *, void *);
 
 // user-side library initialization function

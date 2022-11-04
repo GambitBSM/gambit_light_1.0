@@ -13,7 +13,6 @@
 #include "light_interface.h"
 
 #ifdef HAVE_PYBIND11
-#include <map>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
@@ -135,7 +134,7 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
 
 
 #ifdef HAVE_PYBIND11
-// function to register the user likelyhood functions from Python: pass function name as string
+// callback to register the user likelyhood functions from Python: pass function name as string
 extern "C"
 int light_interface_register_python(const char *fcn_name, const char *python_fcn)
 {
@@ -149,7 +148,7 @@ int light_interface_register_python(const char *fcn_name, const char *python_fcn
 #endif
 
 
-// user-callable function to register the user likelyhood functions: pass function address
+// callback to register the user likelyhood functions: pass function address
 extern "C"
 int light_interface_register(const char *fcn_name, void *fcn)
 {
@@ -180,7 +179,6 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 
     char *error;
     user_init_fcn user_init_function;
-    // void (*user_init_function)(void *);
     *(void**) (&user_init_function) = dlsym(handle, init_fun.c_str());
 
     if ((error = dlerror()) != NULL)  {
@@ -191,6 +189,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     // call user init function
     (*user_init_function)(function_name.c_str(), light_interface_register);
 
+    // at this point function_name should be a key in user_likes, registered by the user
     if(user_likes.find(function_name) != user_likes.end()) {
 
         // add parameter and output information to user function description
@@ -245,7 +244,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     pybind11::module user_module;
     try {
         user_module = pybind11::module::import(name.c_str());
-        // needed if defined in another file?
+        // needed if opaque str_dbl_map type defined in another file?
         // pybind11::module::import("light_interface");
     }
     catch (std::exception& e) {
@@ -259,6 +258,8 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     // call user init function
     pybind11::object user_init_function = user_module.attr(init_fun.c_str());
     user_init_function(function_name.c_str(), "light_interface_register_python");
+
+    // at this point function_name should be a key in user_likes, registered by the user
     if(user_likes.find(function_name) != user_likes.end()) {
 
         // add parameter and output information to user function description
