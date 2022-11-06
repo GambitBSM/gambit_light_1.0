@@ -2,7 +2,7 @@
 //   *********************************************
 ///  \file
 ///
-///  Functions of module JustALittleBit
+///  Functions of module LightBit
 ///
 ///  *********************************************
 ///
@@ -15,12 +15,12 @@
 ///  *********************************************
 
 #include "gambit/Elements/gambit_module_headers.hpp"
-#include "gambit/JustALittleBit/JustALittleBit_rollcall.hpp"
+#include "gambit/LightBit/LightBit_rollcall.hpp"
 
 namespace Gambit
 {
 
-  namespace JustALittleBit
+  namespace LightBit
   {
     using namespace LogTags;
 
@@ -76,7 +76,7 @@ namespace Gambit
       // and return this as the result.
       if (output.count("loglike") == 0)
       {
-        JustALittleBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
+        LightBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
       }
 
       double loglike = output.at("loglike");
@@ -129,7 +129,7 @@ namespace Gambit
       // and return this as the result.
       if (output.count("loglike") == 0)
       {
-        JustALittleBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
+        LightBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
       }
 
       double loglike = output.at("loglike");
