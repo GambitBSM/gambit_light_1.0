@@ -2,7 +2,7 @@
 //   *********************************************
 ///  \file
 ///
-///  Rollcall header for JustALittleBit module.
+///  Rollcall header for LightBit module.
 ///
 ///  *********************************************
 ///
@@ -14,15 +14,15 @@
 ///
 ///  *********************************************
 
-#ifndef __JustALittleBit_rollcall_hpp__
-#define __JustALittleBit_rollcall_hpp__
+#ifndef __LightBit_rollcall_hpp__
+#define __LightBit_rollcall_hpp__
 
 #include "gambit/cmake/cmake_variables.hpp"
 #include "gambit/Elements/shared_types.hpp"
 #include "gambit/Utils/util_types.hpp"
 
 
-#define MODULE JustALittleBit
+#define MODULE LightBit
 START_MODULE
 
   #define CAPABILITY dummy_loglike
@@ -52,4 +52,4 @@ START_MODULE
 
 #undef MODULE
 
-#endif /* defined __JustALittleBit_rollcall_hpp__ */
+#endif /* defined __LightBit_rollcall_hpp__ */
