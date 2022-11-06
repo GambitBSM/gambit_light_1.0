@@ -109,8 +109,6 @@ Printer:
 
 Scanner:
 
-  # use_scanner: de
-  # use_scanner: multinest
   use_scanner: random
 
   scanners:
@@ -158,7 +156,6 @@ Logger:
 
   redirection:
     [Default]        : "default.log"
-    [JustALittleBit] : "JustALittleBit.log"
     [Scanner]        : "Scanner.log"
 
 
