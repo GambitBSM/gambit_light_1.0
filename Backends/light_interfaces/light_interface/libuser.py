@@ -5,6 +5,9 @@ def user_like(iparams, oparams):
   oparams['oname3_py'] = 3;
   return iparams['p1'] + iparams['p2'];
 
+  # error handling: throw an exception
+  # raise Exception("Date provided can't be in the past")
+
 def init_like(fcn_name, rf_name):
   # light_interface passes the registration function (rf) as string (rf_name)
   import importlib

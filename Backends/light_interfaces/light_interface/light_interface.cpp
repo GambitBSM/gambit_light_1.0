@@ -31,6 +31,9 @@ namespace Gambit {
     namespace Backends {
         namespace light_interface_0_1 {
 
+            // used for error reporting from C and Fortran interfaces
+            static char *str_error = NULL;
+
 #ifdef HAVE_PYBIND11
             /// Pointer to the Python interpreter
             pybind11::scoped_interpreter* python_interpreter = nullptr;
@@ -83,6 +86,14 @@ namespace Gambit {
                     if(desc.lang == LANG_FORTRAN) retval = desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
                     if(desc.lang == LANG_C) retval = desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
 
+                    // check if there was any errors
+                    if (str_error){
+                        std::string s(str_error);
+                        free(str_error);
+                        str_error = nullptr;
+                        throw std::runtime_error(s);
+                    }
+
                     // translate the input to a C array
                     iparam = 0;
                     for (auto& pname : desc.outputs) {
@@ -104,6 +115,16 @@ namespace Gambit {
             }
         }
     }
+}
+
+
+extern "C"
+void light_interface_error(const char *error)
+{
+    using namespace Gambit::Backends::light_interface_0_1;
+    if(str_error)
+        free(str_error);
+    str_error = strdup(error);
 }
 
 

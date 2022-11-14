@@ -32,6 +32,11 @@ contains
     end do
 
     user_like = fiparams(1) + fiparams(2)
+
+    ! error handling: report a string error using light_interface_error
+    ! call light_interface_error('Invalid input arguments.'//c_null_char)
+    ! return
+
   end function user_like
 
   ! user-side initialization function, called by gambit at init

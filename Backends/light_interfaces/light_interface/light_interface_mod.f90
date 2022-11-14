@@ -3,6 +3,11 @@ module light_interface_mod
   implicit none
 
   interface
+     subroutine light_interface_error(str_error) bind(c)
+       use iso_c_binding
+       character(kind=c_char), dimension(*) :: str_error
+     end subroutine light_interface_error
+
      real(c_double) function light_interface_user_like(niparams, iparams, noparams, oparams) bind(c)
        use iso_c_binding
        integer(c_int), value, intent(in) :: niparams, noparams

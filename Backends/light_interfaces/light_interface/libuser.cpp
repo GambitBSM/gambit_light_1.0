@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <iostream>
 #include "light_interface.h"
 
@@ -9,6 +10,9 @@ double user_like(const std::map<std::string,double>& input, std::map<std::string
     output["oname2_cpp"] = 2;
     output["oname3_cpp"] = 3;
     return input.at("p1") + input.at("p2");
+
+    // error handling: throw an exception
+    // throw std::runtime_error("test error");
 }
 
 // user-side initialization function, called by gambit at init
