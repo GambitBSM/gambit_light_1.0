@@ -63,7 +63,23 @@ namespace Gambit
       // Call the cpp interface library, which will fill the result map
       cout << endl;
       cout << "get_light_loglike: Will now call light_interface.";
-      BEreq::run_light_interface(input, result);
+      try
+      {
+        BEreq::run_light_interface(input, result);
+      }
+      catch (const std::runtime_error& e)
+      {
+        std::string errmsg(e.what());
+        std::string errmsg_lowercase = Utils::strtolower(errmsg);
+        if (errmsg_lowercase.substr(0,13) == "invalid point")
+        {
+          invalid_point().raise("Caught an 'invalid point' message via the light_interface library: " + errmsg);          
+        }
+        else
+        {
+          LightBit_error().raise(LOCAL_INFO, "Caught a runtime error via the light_interface library: " + std::string(e.what()));
+        }
+      }
 
       // Print the output map:
       cout << "get_light_loglike: Got output:";

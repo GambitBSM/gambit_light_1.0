@@ -107,8 +107,22 @@ namespace Gambit {
                     return desc.fcn.cpp(input, output);
 
 #ifdef HAVE_PYBIND11
-                if(desc.lang == LANG_PYTHON)
-                    return pybind11::cast<double>((*desc.fcn.python)(input, &output));
+                if(desc.lang == LANG_PYTHON){
+                    // if a python exception is caught (via pybind11), re-throw it 
+                    // as a std::runtime_error without the leading "Exception: " 
+                    // part of the error message
+                    try{
+                        return pybind11::cast<double>((*desc.fcn.python)(input, &output));
+                    }
+                    catch (pybind11::error_already_set& e)
+                    {
+                        std::string errmsg(e.what());
+                        if(errmsg.substr(0,11) == "Exception: "){
+                            errmsg.erase(0,11);
+                        }
+                        throw std::runtime_error(errmsg);
+                    }
+                }
 #endif
                 // unknown language
                 return 0.0;
