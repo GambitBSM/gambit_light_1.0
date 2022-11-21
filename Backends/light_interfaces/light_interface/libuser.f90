@@ -33,9 +33,16 @@ contains
 
     user_like = fiparams(1) + fiparams(2)
 
+    ! error handling: return a value denoting an invalid point
+    ! user_like = light_interface_invalid_point()
+
+    ! error handling: report a string warning using light_interface_warning
+    ! call light_interface_warning('Some warning.'//c_null_char)
+    ! user_like = fiparams(1) + fiparams(2)
+    
     ! error handling: report a string error using light_interface_error
     ! call light_interface_error('Invalid input arguments.'//c_null_char)
-    ! return
+    ! user_like = light_interface_invalid_point()
 
   end function user_like
 

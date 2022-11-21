@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <limits>
 
 #include <stdio.h>
 #include <errno.h>
@@ -22,6 +23,9 @@ int light_interface_register_python(const char *fcn_name, const char *python_fcn
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(light_interface, m) {
     m.def("light_interface_register_python", &light_interface_register_python, "register a python user likelihood function");
+    m.def("invalid_point", &light_interface_invalid_point, "return a value signifying an invalid point");
+    m.def("warning", &light_interface_warning, "report user warning");
+    m.def("error", &light_interface_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
 }
 #endif
@@ -33,6 +37,7 @@ namespace Gambit {
 
             // used for error reporting from C and Fortran interfaces
             static char *str_error = NULL;
+            static char *str_warning = NULL;
 
 #ifdef HAVE_PYBIND11
             /// Pointer to the Python interpreter
@@ -71,11 +76,12 @@ namespace Gambit {
             double call_user_function(const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                       const t_user_like_desc &desc)
             {
+                double retval = 0.0;
+                
                 if(desc.lang == LANG_FORTRAN ||
                    desc.lang == LANG_C) {
                     double *iparams = (double*)alloca(sizeof(double)*desc.inputs.size());
                     double *oparams = (double*)alloca(sizeof(double)*desc.outputs.size());
-                    double retval;
 
                     // translate the input to a C array
                     int iparam = 0;
@@ -86,33 +92,25 @@ namespace Gambit {
                     if(desc.lang == LANG_FORTRAN) retval = desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
                     if(desc.lang == LANG_C) retval = desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
 
-                    // check if there was any errors
-                    if (str_error){
-                        std::string s(str_error);
-                        free(str_error);
-                        str_error = nullptr;
-                        throw std::runtime_error(s);
-                    }
-
                     // translate the input to a C array
                     iparam = 0;
                     for (auto& pname : desc.outputs) {
                         output[pname] = oparams[iparam++];
                     }
-
-                    return retval;
                 }
 
-                if(desc.lang == LANG_CPP)
-                    return desc.fcn.cpp(input, output);
+                // this part can throw anything - this will be handled in Gambit
+                if(desc.lang == LANG_CPP){
+                    retval = desc.fcn.cpp(input, output);
+                }
 
 #ifdef HAVE_PYBIND11
                 if(desc.lang == LANG_PYTHON){
-                    // if a python exception is caught (via pybind11), re-throw it 
-                    // as a std::runtime_error without the leading "Exception: " 
+                    // if a python exception is caught (via pybind11), re-throw it
+                    // as a std::runtime_error without the leading "Exception: "
                     // part of the error message
                     try{
-                        return pybind11::cast<double>((*desc.fcn.python)(input, &output));
+                        retval = pybind11::cast<double>((*desc.fcn.python)(input, &output));
                     }
                     catch (pybind11::error_already_set& e)
                     {
@@ -124,13 +122,37 @@ namespace Gambit {
                     }
                 }
 #endif
-                // unknown language
-                return 0.0;
+
+                // check if there were any errors
+                if (str_error){
+                    std::string s(str_error);
+                    free(str_error);
+                    str_error = nullptr;
+                    throw std::runtime_error(s);
+                }
+
+                // check if there were any warnings
+                if (str_warning){
+                    // TODO: how do we report a warning to GAMBIT?
+                    printf("LIGHT INTERFACE WARNING: %s\n", str_warning);
+                    std::string s(str_warning);
+                    free(str_warning);
+                    str_warning = nullptr;
+                    // throw std::runtime_error(s);
+                }
+                
+                return retval;
             }
         }
     }
 }
 
+
+extern "C"
+double light_interface_invalid_point()
+{
+    return  std::numeric_limits<double>::quiet_NaN();
+}
 
 extern "C"
 void light_interface_error(const char *error)
@@ -139,6 +161,16 @@ void light_interface_error(const char *error)
     if(str_error)
         free(str_error);
     str_error = strdup(error);
+}
+
+
+extern "C"
+void light_interface_warning(const char *warning)
+{
+    using namespace Gambit::Backends::light_interface_0_1;
+    if(str_warning)
+        free(str_warning);
+    str_warning = strdup(warning);
 }
 
 
@@ -200,7 +232,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
                                 std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-    
+
     // load the init symbol from the user library (should be added to the config file)
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle){
@@ -247,7 +279,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
                          std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-    
+
     // Bail now if the backend is not present.
     std::ifstream f(path.c_str());
     if(!f.good()) {

@@ -2,9 +2,14 @@
 
 // report an error from C and Fortran interfaces
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
-void light_interface_error(const char *);
+    double light_interface_invalid_point();
+    void light_interface_error(const char *);
+    void light_interface_warning(const char *);
+#ifdef __cplusplus
+}
+#endif
 
 // user-side likelyhood function
 typedef double (*user_like_fcn_fortran)(const int, const double *, const int, double *);

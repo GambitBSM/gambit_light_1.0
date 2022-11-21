@@ -8,10 +8,17 @@ double user_like(const int niparams, const double *iparams, const int noparams, 
     if(!niparams) return 0.0;
     for(int i=0; i<noparams; i++) oparams[i] = i;
     return iparams[0] + iparams[1];
+    
+    // error handling: return a value denoting an invalid point
+    // return light_interface_invalid_point();
+
+    // error handling: report a string warning using light_interface_warning
+    // light_interface_warning("Some warning");
+    // return iparams[0] + iparams[1];
 
     // error handling: report a string error using light_interface_error
     // light_interface_error("Invalid input parameters");
-    // return <ignored number>;
+    // return light_interface_invalid_point();
 }
 
 // user-side initialization function, called by gambit at init

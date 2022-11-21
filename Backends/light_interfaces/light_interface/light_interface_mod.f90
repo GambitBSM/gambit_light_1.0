@@ -3,10 +3,19 @@ module light_interface_mod
   implicit none
 
   interface
+     real(c_double) function light_interface_invalid_point() bind(c)
+       use iso_c_binding
+     end function light_interface_invalid_point
+     
      subroutine light_interface_error(str_error) bind(c)
        use iso_c_binding
        character(kind=c_char), dimension(*) :: str_error
      end subroutine light_interface_error
+
+     subroutine light_interface_warning(str_warning) bind(c)
+       use iso_c_binding
+       character(kind=c_char), dimension(*) :: str_warning
+     end subroutine light_interface_warning
 
      real(c_double) function light_interface_user_like(niparams, iparams, noparams, oparams) bind(c)
        use iso_c_binding
