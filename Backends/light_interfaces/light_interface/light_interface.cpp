@@ -51,30 +51,30 @@ namespace Gambit {
                 LANG_FORTRAN,
                 LANG_CPP,
                 LANG_C
-            } t_user_like_fcn_language;
+            } t_user_loglike_fcn_language;
 
             typedef struct {
-                t_user_like_fcn_language lang;
+                t_user_loglike_fcn_language lang;
                 std::string name;
                 union {
                     void *typeless_ptr;
-                    user_like_fcn_fortran fortran;
-                    user_like_fcn_cpp cpp;
-                    user_like_fcn_c c;
+                    user_loglike_fcn_fortran fortran;
+                    user_loglike_fcn_cpp cpp;
+                    user_loglike_fcn_c c;
 #ifdef HAVE_PYBIND11
-                    user_like_fcn_python python;
+                    user_loglike_fcn_python python;
 #endif
                 } fcn;
                 std::vector<std::string> inputs;
                 std::vector<std::string> outputs;
-            } t_user_like_desc;
+            } t_user_loglike_desc;
 
             // NOTE: init_priority attribute is needed to make sure that the map is initialized
             // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
-            std::map<std::string, t_user_like_desc> user_likes __attribute__ ((init_priority (128)));
+            std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
             double call_user_function(const std::map<std::string,double>& input, std::map<std::string,double>& output,
-                                      const t_user_like_desc &desc)
+                                      const t_user_loglike_desc &desc)
             {
                 double retval = 0.0;
                 
@@ -186,11 +186,11 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
     //  - what to do when there are multiple functions?
     //  - what if there are multiple backend languages? which is first? does it matter
     using namespace Gambit::Backends::light_interface_0_1;
-    for (const auto& fn : user_likes){
-        double user_like = call_user_function(input, output, fn.second);
+    for (const auto& fn : user_loglikes){
+        double user_loglike = call_user_function(input, output, fn.second);
         // Add each separate loglike contribution to the output map
-        output[fn.first] = user_like;
-        loglike += user_like;
+        output[fn.first] = user_loglike;
+        loglike += user_loglike;
     }
 
     // Add the expected "loglike" entry
@@ -204,9 +204,9 @@ extern "C"
 int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-    t_user_like_desc desc;
+    t_user_loglike_desc desc;
     desc.name = std::string(python_fcn);
-    user_likes.insert({fcn_name, desc});
+    user_loglikes.insert({fcn_name, desc});
     printf("light_interface: registering Python function '%s'\n", fcn_name);
     return 0;
 }
@@ -218,9 +218,9 @@ extern "C"
 int gambit_light_register(const char *fcn_name, void *fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
-    t_user_like_desc desc;
+    t_user_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
-    user_likes.insert({fcn_name, desc});
+    user_loglikes.insert({fcn_name, desc});
     printf("light_interface: registering function '%s'\n", fcn_name);
     return 0;
 }
@@ -254,11 +254,11 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     // call user init function
     (*user_init_function)(function_name.c_str(), gambit_light_register);
 
-    // at this point function_name should be a key in user_likes, registered by the user
-    if(user_likes.find(function_name) != user_likes.end()) {
+    // at this point function_name should be a key in user_loglikes, registered by the user
+    if(user_loglikes.find(function_name) != user_loglikes.end()) {
 
         // add parameter and output information to user function description
-        t_user_like_desc &desc = user_likes[function_name];
+        t_user_loglike_desc &desc = user_loglikes[function_name];
 
         if (lang == "fortran")  desc.lang = LANG_FORTRAN;
         else if (lang == "c")   desc.lang = LANG_C;
@@ -327,11 +327,11 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     pybind11::object user_init_function = user_module.attr(init_fun.c_str());
     user_init_function(function_name.c_str(), "register_loglike");
 
-    // at this point function_name should be a key in user_likes, registered by the user
-    if(user_likes.find(function_name) != user_likes.end()) {
+    // at this point function_name should be a key in user_loglikes, registered by the user
+    if(user_loglikes.find(function_name) != user_loglikes.end()) {
 
         // add parameter and output information to user function description
-        t_user_like_desc &desc = user_likes[function_name];
+        t_user_loglike_desc &desc = user_loglikes[function_name];
 
         desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
         desc.lang = LANG_PYTHON;

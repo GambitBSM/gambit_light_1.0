@@ -22,8 +22,8 @@ def loglike(x):
     return -rosenbrock_general(x)
 
 
-def user_like(iparams, oparams):
-  print("libuser.py: user_like: computing loglike.");
+def user_loglike(iparams, oparams):
+  print("libuser.py: user_loglike: computing loglike.");
 
   x = np.array([iparams['p1'], iparams['p2']])
   oparams['rosenbrock_oname1_py'] = 10;
@@ -35,4 +35,4 @@ def init_like(fcn_name, rf_name):
   import importlib
   li = importlib.import_module('gambit_light')
   rf = getattr(li, rf_name)
-  rf(fcn_name, "user_like")
+  rf(fcn_name, "user_loglike")

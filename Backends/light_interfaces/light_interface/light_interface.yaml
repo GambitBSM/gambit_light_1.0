@@ -1,6 +1,6 @@
 LightInterface:
- - function_name: cuser_like
-   user_lib: /cluster/home/marcink/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_c.so
+ - function_name: cuser_loglike
+   user_lib: /home/angainor/work/institution/usit/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_c.so
    init_fun: init_like
    lang:     c
    input:
@@ -10,8 +10,8 @@ LightInterface:
      - oname1_c
      - oname2_c
      - oname3_c
- - function_name: cppuser_like
-   user_lib: /cluster/home/marcink/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_cpp.so
+ - function_name: cppuser_loglike
+   user_lib: /home/angainor/work/institution/usit/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_cpp.so
    init_fun: _Z9init_likePKcPFiS0_PvE
    lang:     c++
    input:
@@ -21,8 +21,8 @@ LightInterface:
    output:
      - oname1_cpp
      - oname2_cpp
- - function_name: fortranuser_like
-   user_lib: /cluster/home/marcink/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_fortran.so
+ - function_name: fortranuser_loglike
+   user_lib: /home/angainor/work/institution/usit/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser_fortran.so
    init_fun: init_like
    lang:     fortran
    input:
@@ -31,8 +31,8 @@ LightInterface:
      - p6
    output:
      - oname1_fortran
- - function_name: pyuser_like
-   user_lib: /cluster/home/marcink/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser.py
+ - function_name: pyuser_loglike
+   user_lib: /home/angainor/work/institution/usit/aus/kvellestad/gambit_light/Backends/light_interfaces/light_interface/libuser.py
    init_fun: init_like
    lang:     python
    input:

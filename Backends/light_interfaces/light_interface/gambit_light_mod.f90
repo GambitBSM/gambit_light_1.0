@@ -17,17 +17,17 @@ module gambit_light_mod
        character(kind=c_char), dimension(*) :: str_warning
      end subroutine gambit_light_warning
 
-     real(c_double) function gambit_light_user_like(niparams, iparams, noparams, oparams) bind(c)
+     real(c_double) function gambit_light_user_loglike(niparams, iparams, noparams, oparams) bind(c)
        use iso_c_binding
        integer(c_int), value, intent(in) :: niparams, noparams
        type(c_ptr), intent(in), value :: iparams
        type(c_ptr), intent(in), value :: oparams
-     end function gambit_light_user_like
+     end function gambit_light_user_loglike
 
-     subroutine gambit_light_register_fcn(fcn_name, fcn_user_like) bind(c)
+     subroutine gambit_light_register_fcn(fcn_name, fcn_user_loglike) bind(c)
        use iso_c_binding
        type(c_ptr), value :: fcn_name
-       type(c_funptr), value :: fcn_user_like
+       type(c_funptr), value :: fcn_user_loglike
      end subroutine gambit_light_register_fcn
   end interface
 end module gambit_light_mod

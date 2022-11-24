@@ -35,7 +35,7 @@ Parameters:
 Rules:
   - options:
       LightInterface:
-        - function_name: cuser_like
+        - function_name: cuser_loglike
           user_lib: Backends/light_interfaces/light_interface/libuser_c.so
           init_fun: init_like
           lang:     c
@@ -46,7 +46,7 @@ Rules:
             - oname1_c
             - oname2_c
             - oname3_c
-        - function_name: cppuser_like
+        - function_name: cppuser_loglike
           user_lib: Backends/light_interfaces/light_interface/libuser_cpp.so
           init_fun: _Z9init_likePKcPFiS0_PvE
           lang:     c++
@@ -57,7 +57,7 @@ Rules:
           output:
             - oname1_cpp
             - oname2_cpp
-        - function_name: fortranuser_like
+        - function_name: fortranuser_loglike
           user_lib: Backends/light_interfaces/light_interface/libuser_fortran.so
           init_fun: init_like
           lang:     fortran
@@ -67,7 +67,7 @@ Rules:
             - p6
           output:
             - oname1_fortran
-        - function_name: pyuser_like
+        - function_name: pyuser_loglike
           user_lib: Backends/light_interfaces/light_interface/libuser.py
           init_fun: init_like
           lang:     python
@@ -78,7 +78,7 @@ Rules:
             - oname1_py
             - oname2_py
             - oname3_py
-        - function_name: pyuser_like_rosenbrock
+        - function_name: pyuser_loglike_rosenbrock
           user_lib: Backends/light_interfaces/light_interface/libuser_rosenbrock.py
           init_fun: init_like
           lang:     python

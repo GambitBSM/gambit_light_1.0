@@ -2,9 +2,9 @@
 #include "gambit_light.h"
 
 // user-side likelihood function, registered in gambit by init_like
-double user_like(const int niparams, const double *iparams, const int noparams, double *oparams)
+double user_loglike(const int niparams, const double *iparams, const int noparams, double *oparams)
 {
-    printf("libuser.c: user_like: computing loglike.\n");
+    printf("libuser.c: user_loglike: computing loglike.\n");
     if(!niparams) return 0.0;
     for(int i=0; i<noparams; i++) oparams[i] = i;
     return iparams[0] + iparams[1];
@@ -25,5 +25,5 @@ double user_like(const int niparams, const double *iparams, const int noparams, 
 void init_like(const char *fcn_name, gambit_light_register_loglike_fcn rf)
 {
     printf("libuser.c: init_like: initializing user library.\n");
-    rf(fcn_name, user_like);
+    rf(fcn_name, user_loglike);
 }
