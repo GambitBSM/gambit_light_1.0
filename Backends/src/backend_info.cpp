@@ -419,7 +419,7 @@ namespace Gambit
     needsPython[be+ver] = false;
 
     if (with_BOSS) classes_OK[be+ver] = true;
-    void* pHandle = dlopen(path.c_str(), RTLD_LAZY);
+    void* pHandle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (pHandle)
     {
       // If dlinfo is available, use it to verify the path of the backend that was just loaded.
