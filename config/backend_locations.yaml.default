@@ -191,4 +191,4 @@ libMathematicaTest:
 #   0.1.0:       ./Backends/examples/salami/0.1.0/salami_gambit.py
 
 light_interface:
-  0.1:         ./Backends/light_interfaces/light_interface/light_interface.so
+  0.1:         ./Backends/light_interfaces/light_interface/gambit_light.so

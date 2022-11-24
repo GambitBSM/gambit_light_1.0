@@ -1,6 +1,6 @@
 module user_mod
   use iso_c_binding
-  use light_interface_mod
+  use gambit_light_mod
   implicit none
 
 contains
@@ -34,15 +34,15 @@ contains
     user_like = fiparams(1) + fiparams(2)
 
     ! error handling: return a value denoting an invalid point
-    ! user_like = light_interface_invalid_point()
+    ! user_like = gambit_light_invalid_point()
 
-    ! error handling: report a string warning using light_interface_warning
-    ! call light_interface_warning('Some warning.'//c_null_char)
+    ! error handling: report a string warning using gambit_light_warning
+    ! call gambit_light_warning('Some warning.'//c_null_char)
     ! user_like = fiparams(1) + fiparams(2)
     
-    ! error handling: report a string error using light_interface_error
-    ! call light_interface_error('Invalid input arguments.'//c_null_char)
-    ! user_like = light_interface_invalid_point()
+    ! error handling: report a string error using gambit_light_error
+    ! call gambit_light_error('Invalid input arguments.'//c_null_char)
+    ! user_like = gambit_light_invalid_point()
 
   end function user_like
 
@@ -50,7 +50,7 @@ contains
   subroutine init_like(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
-    procedure(light_interface_register_fcn), pointer :: frf
+    procedure(gambit_light_register_fcn), pointer :: frf
 
     print *, "libuser.f90: init_like: initializing user library."
 

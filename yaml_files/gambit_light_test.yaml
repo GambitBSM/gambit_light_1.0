@@ -91,7 +91,7 @@ Rules:
 
 Printer:
 
-  # printer: cout 
+  # printer: cout
 
   # printer: hdf5_v1
   # options:

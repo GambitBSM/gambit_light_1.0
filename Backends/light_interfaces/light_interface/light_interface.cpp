@@ -11,21 +11,21 @@
 #include <string.h>
 #include <dlfcn.h>
 
-#include "light_interface.h"
+#include "gambit_light.h"
 
 #ifdef HAVE_PYBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
 extern "C"
-int light_interface_register_python(const char *fcn_name, const char *python_fcn);
+int gambit_light_register_python(const char *fcn_name, const char *python_fcn);
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
-PYBIND11_MODULE(light_interface, m) {
-    m.def("light_interface_register_python", &light_interface_register_python, "register a python user likelihood function");
-    m.def("invalid_point", &light_interface_invalid_point, "return a value signifying an invalid point");
-    m.def("warning", &light_interface_warning, "report user warning");
-    m.def("error", &light_interface_error, "report user error");
+PYBIND11_MODULE(gambit_light, m) {
+    m.def("register_loglike", &gambit_light_register_python, "register a python user likelihood function");
+    m.def("invalid_point", &gambit_light_invalid_point, "return a value signifying an invalid point");
+    m.def("warning", &gambit_light_warning, "report user warning");
+    m.def("error", &gambit_light_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
 }
 #endif
@@ -149,13 +149,13 @@ namespace Gambit {
 
 
 extern "C"
-double light_interface_invalid_point()
+double gambit_light_invalid_point()
 {
-    return  std::numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
 }
 
 extern "C"
-void light_interface_error(const char *error)
+void gambit_light_error(const char *error)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     if(str_error)
@@ -165,7 +165,7 @@ void light_interface_error(const char *error)
 
 
 extern "C"
-void light_interface_warning(const char *warning)
+void gambit_light_warning(const char *warning)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     if(str_warning)
@@ -201,7 +201,7 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
 #ifdef HAVE_PYBIND11
 // callback to register the user likelyhood functions from Python: pass function name as string
 extern "C"
-int light_interface_register_python(const char *fcn_name, const char *python_fcn)
+int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     t_user_like_desc desc;
@@ -215,7 +215,7 @@ int light_interface_register_python(const char *fcn_name, const char *python_fcn
 
 // callback to register the user likelyhood functions: pass function address
 extern "C"
-int light_interface_register(const char *fcn_name, void *fcn)
+int gambit_light_register(const char *fcn_name, void *fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     t_user_like_desc desc;
@@ -252,7 +252,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     }
 
     // call user init function
-    (*user_init_function)(function_name.c_str(), light_interface_register);
+    (*user_init_function)(function_name.c_str(), gambit_light_register);
 
     // at this point function_name should be a key in user_likes, registered by the user
     if(user_likes.find(function_name) != user_likes.end()) {
@@ -313,7 +313,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     try {
         user_module = pybind11::module::import(name.c_str());
         // needed if opaque str_dbl_map type defined in another file?
-        // pybind11::module::import("light_interface");
+        // pybind11::module::import("gambit_light");
     }
     catch (std::exception& e) {
         printf("Failed to import Python module from %s.\n", name.c_str());
@@ -325,7 +325,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
 
     // call user init function
     pybind11::object user_init_function = user_module.attr(init_fun.c_str());
-    user_init_function(function_name.c_str(), "light_interface_register_python");
+    user_init_function(function_name.c_str(), "register_loglike");
 
     // at this point function_name should be a key in user_likes, registered by the user
     if(user_likes.find(function_name) != user_likes.end()) {

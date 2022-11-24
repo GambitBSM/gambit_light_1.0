@@ -4,9 +4,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    double light_interface_invalid_point();
-    void light_interface_error(const char *);
-    void light_interface_warning(const char *);
+    double gambit_light_invalid_point();
+    void gambit_light_error(const char *);
+    void gambit_light_warning(const char *);
 #ifdef __cplusplus
 }
 #endif
@@ -27,8 +27,8 @@ typedef pybind11::object *user_like_fcn_python;
 #endif
 
 // gambit-side callback to register user likelyhood functions
-typedef int (*light_interface_register_fcn)(const char *, void *);
+typedef int (*gambit_light_register_loglike_fcn)(const char *, void *);
 
 // user-side library initialization function
-typedef void (*user_init_fcn)(const char *, light_interface_register_fcn);
+typedef void (*user_init_fcn)(const char *, gambit_light_register_loglike_fcn);
 

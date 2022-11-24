@@ -31,8 +31,8 @@ def user_like(iparams, oparams):
   return result
 
 def init_like(fcn_name, rf_name):
-  # light_interface passes the registration function (rf) as string (rf_name)
+  # gambit_light passes the registration function (rf) as string (rf_name)
   import importlib
-  li = importlib.import_module('light_interface')
+  li = importlib.import_module('gambit_light')
   rf = getattr(li, rf_name)
   rf(fcn_name, "user_like")
