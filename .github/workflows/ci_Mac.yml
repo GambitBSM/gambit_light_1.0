@@ -53,3 +53,6 @@ jobs:
     - name: Build standalones
       run: |
         echo "Here I would test the building of the standalones"
+    - name: Build and Run GUM
+ 54       run: |
+ 55         echo "Here I would test GUM"
