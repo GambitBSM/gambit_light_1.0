@@ -1,0 +1,55 @@
+name: Gambit CI
+
+on:
+  push:
+    branches: [ NewRunners ]
+  pull_request:
+    branches: [ NewRunners ]
+  schedule:
+    - cron:  '0 5 * * *'
+
+jobs:
+  gambit_build:
+    runs-on: [self-hosted, macOS, X64]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64] #, fedora
+    #defaults:
+    #  run:
+    #    shell: bash -eo pipefail {0}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Hello World
+      run: |
+        echo "Hello World"
+    - name: Set up build environment
+      run: |
+        echo "Here I would set up the build environment"
+        mkdir -p BUILD
+        cd BUILD
+    - name: Configure with cmake
+      run: |
+        echo "Here I would configure with cmake ..."
+    - name: Build scanners
+      run: |
+        echo "Here I would build the scanners"
+    - name: Build Gambit
+      run: |
+        echo "Here I would build GAMBIT"
+    - name: Build backends
+      run: |
+         echo "Here I would build all the backends (in serial)"
+    - name: CLI test
+      run: |
+        echo "Here I would run the test of gambit help"
+    - name: WC test
+      run: |
+        echo "Here I would test the run of the WC_lite yaml"
+    - name: ColliderBit test
+      run: |
+        echo "Here I would test the ColliderBit CMSSM yaml file"
+    - name: Build standalones
+      run: |
+        echo "Here I would test the building of the standalones"
