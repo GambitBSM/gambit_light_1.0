@@ -21,9 +21,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Hello World
-      run: |
-        echo "Hello World"
     - name: Set up build environment
       run: |
         echo "Here I would set up the build environment"
@@ -31,13 +28,23 @@ jobs:
         cd BUILD
     - name: Configure with cmake
       run: |
-        echo "Here I would configure with cmake ..."
+        echo "First Testing with a ditched ColliderBit"
+        cd BUILD
+        cmake -Ditch="ColliderBit" ..
     - name: Build scanners
       run: |
         echo "Here I would build the scanners"
+        #cd BUILD
+        #make scanners
+        #cmake ..
     - name: Build Gambit
       run: |
-        echo "Here I would build GAMBIT"
+        echo "Here I would build GAMBIT. Hard coding some stuff for now"
+        cd BUILD
+        make -j8 gambit
+    - name: Test spartan yaml
+      run: |
+        ./gambit -rf yaml_files/spartan.yaml 
     - name: Build backends
       run: |
          echo "Here I would build all the backends (in serial)"
