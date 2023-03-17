@@ -39,7 +39,7 @@ jobs:
         #cmake ..
     - name: Build Gambit
       run: |
-        echo "Here I would build GAMBIT. Hard coding some stuff for now"
+        echo "Here I would build GAMBIT."
         cd BUILD
         make -j8 gambit
     - name: Test spartan yaml
