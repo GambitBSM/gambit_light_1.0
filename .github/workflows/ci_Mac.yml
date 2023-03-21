@@ -44,6 +44,8 @@ jobs:
         make -j8 gambit
     - name: Test spartan yaml
       run: |
+        echo "Testing spartan.yaml with the cout printer since hdf5 isn't yet working on this system"
+        sed -i "" 's/ hdf5/ cout/g' yaml_files/spartan.yaml
         ./gambit -rf yaml_files/spartan.yaml 
     - name: Build backends
       run: |
