@@ -29,8 +29,9 @@ jobs:
     - name: Configure with cmake
       run: |
         echo "Configure with cmake"
+        echo "Ditching plc and plc_data due to a known Issue (Issue 399)"
         cd BUILD
-        cmake -DWITH_MPI=ON -DWITH_HEPMC=ON -DWITH_YODA=ON -DBUILD_FS_MODELS="CMSSM;MSSM;MDM" ..
+        cmake -Ditch="plc;plc_data" -DWITH_MPI=ON -DWITH_HEPMC=ON -DWITH_YODA=ON -DBUILD_FS_MODELS="CMSSM;MSSM;MDM" ..
     - name: Build scanners
       run: |
         echo "Build scanners"
