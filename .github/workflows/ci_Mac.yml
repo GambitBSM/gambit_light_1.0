@@ -23,23 +23,29 @@ jobs:
       uses: actions/checkout@v2
     - name: Set up build environment
       run: |
-        echo "Here I would set up the build environment"
+        echo "Set up the build environment"
         mkdir -p BUILD
         cd BUILD
     - name: Configure with cmake
       run: |
-        echo "First Testing with a ditched ColliderBit"
+        echo "Configure with cmake"
         cd BUILD
-        cmake -Ditch="ColliderBit" ..
+        cmake -DWITH_MPI=ON -DWITH_HEPMC=ON -DWITH_YODA=ON -DBUILD_FS_MODELS="CMSSM;MSSM;MDM" ..
     - name: Build scanners
       run: |
-        echo "Here I would build the scanners"
-        #cd BUILD
-        #make scanners
-        #cmake ..
+        echo "Build scanners"
+        cd BUILD
+        make scanners
+        cmake ..
+    - name: Build pythia
+      run: |
+        echo "Building pythia"
+        cd BUILD
+        make pythia
+        cmake ..
     - name: Build Gambit
       run: |
-        echo "Here I would build GAMBIT."
+        echo "Build GAMBIT."
         cd BUILD
         make -j8 gambit
     - name: Test spartan yaml
@@ -49,19 +55,26 @@ jobs:
         ./gambit -rf yaml_files/spartan.yaml 
     - name: Build backends
       run: |
-         echo "Here I would build all the backends (in serial)"
+         echo "Build all the backends (in serial)"
+         cd BUILD
+         make backends
     - name: CLI test
       run: |
-        echo "Here I would run the test of gambit help"
+        echo "Run the test of gambit help"
+        ./gambit -h
     - name: WC test
       run: |
-        echo "Here I would test the run of the WC_lite yaml"
+        echo "Test WC_lite yaml (no printing)"
+        sed -i "" 's/ hdf5/ none/g' yaml_files/WC_lite.yaml
+        ./gambit -f yaml_files/WC_lite.yaml
     - name: ColliderBit test
       run: |
-        echo "Here I would test the ColliderBit CMSSM yaml file"
+        echo "Test the ColliderBit CMSSM yaml file"
+        ./gambit -f yaml_files/ColliderBit_CMSSM.yaml
     - name: Build standalones
       run: |
-        echo "Here I would test the building of the standalones"
+        echo "Test the building of the standalones"
+        make standalones
     - name: Build and Run GUM
       run: |
         echo "Here I would test GUM"
