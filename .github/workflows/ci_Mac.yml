@@ -38,11 +38,19 @@ jobs:
         cd BUILD
         make scanners
         cmake ..
-    - name: Build pythia
+    - name: Build Backends
       run: |
-        echo "Building pythia"
+        echo "Building Backends"
         cd BUILD
         make pythia
+        make higgssignals
+        make nulike
+        make ATLAS_FullLikes
+        make susyhit
+        make heplike
+        make superiso
+        make contur
+        echo "Running cmake again, since this is required for ColliderBit/pythia"
         cmake ..
     - name: Build Gambit
       run: |
@@ -51,14 +59,9 @@ jobs:
         make -j8 gambit
     - name: Test spartan yaml
       run: |
-        echo "Testing spartan.yaml with the cout printer since hdf5 isn't yet working on this system"
+        echo "Testing spartan.yaml (with cout printer)"
         sed -i "" 's/ hdf5/ cout/g' yaml_files/spartan.yaml
         ./gambit -rf yaml_files/spartan.yaml 
-    - name: Build backends
-      run: |
-         echo "Build all the backends (in serial)"
-         cd BUILD
-         make backends
     - name: CLI test
       run: |
         echo "Run the test of gambit help"
