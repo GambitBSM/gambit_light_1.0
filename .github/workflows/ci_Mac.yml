@@ -10,11 +10,11 @@ on:
 
 jobs:
   gambit_build:
-    runs-on: [self-hosted, macOS, X64]
+    runs-on: [self-hosted, macOS]
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64] #, fedora
+        arch: [x64,Arm64] #, fedora
     #defaults:
     #  run:
     #    shell: bash -eo pipefail {0}
