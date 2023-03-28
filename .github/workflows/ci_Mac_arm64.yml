@@ -10,11 +10,11 @@ on:
 
 jobs:
   gambit_build:
-    runs-on: [self-hosted, macOS]
+    runs-on: [self-hosted, macOS, Arm64]
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64,Arm64] #, fedora
+        arch: [Arm64] #, fedora
     #defaults:
     #  run:
     #    shell: bash -eo pipefail {0}
@@ -78,7 +78,5 @@ jobs:
     - name: Build standalones
       run: |
         echo "Test the building of the standalones"
+        cd BUILD
         make standalones
-    - name: Build and Run GUM
-      run: |
-        echo "Here I would test GUM"
