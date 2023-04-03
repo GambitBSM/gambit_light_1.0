@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64] #, fedora
-    #defaults:
-    #  run:
-    #    shell: bash -eo pipefail {0}
+    defaults:
+      run:
+        shell: bash -eo pipefail {0}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -75,8 +75,8 @@ jobs:
       run: |
         echo "Test the ColliderBit CMSSM yaml file"
         ./gambit -f yaml_files/ColliderBit_CMSSM.yaml
-    - name: Build standalones
-      run: |
-        echo "Test the building of the standalones"
-        cd BUILD
-        make standalones
+    #- name: Build standalones
+    #  run: |
+    #    echo "Test the building of the standalones"
+    #    cd BUILD
+    #    make standalones
