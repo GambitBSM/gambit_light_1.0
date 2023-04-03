@@ -2,9 +2,9 @@ name: Gambit CI
 
 on:
   push:
-    branches: [ NewRunners ]
+    branches: [ master, ci-* ]
   pull_request:
-    branches: [ NewRunners ]
+    branches: [ master ]
   schedule:
     - cron:  '0 5 * * *'
 
@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [Arm64] #, fedora
+        arch: [Arm64]
     defaults:
       run:
         shell: bash -eo pipefail {0}
@@ -29,9 +29,8 @@ jobs:
     - name: Configure with cmake
       run: |
         echo "Configure with cmake"
-        echo "Ditching plc and plc_data due to a known Issue (Issue 399)"
         cd BUILD
-        cmake -Ditch="plc;plc_data" -DWITH_MPI=ON -DWITH_HEPMC=ON -DWITH_YODA=ON -DBUILD_FS_MODELS="CMSSM;MSSM;MDM" ..
+        cmake -DWITH_MPI=ON -DWITH_HEPMC=ON -DWITH_YODA=ON -DBUILD_FS_MODELS="CMSSM;MSSM;MDM" ..
     - name: Build scanners
       run: |
         echo "Build scanners"
