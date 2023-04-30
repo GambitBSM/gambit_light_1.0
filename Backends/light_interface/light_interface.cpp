@@ -200,7 +200,7 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
 
 
 #ifdef HAVE_PYBIND11
-// callback to register the user likelyhood functions from Python: pass function name as string
+// callback to register the user log-likelihood functions from Python: pass function name as string
 extern "C"
 int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
 {
@@ -214,7 +214,7 @@ int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
 #endif
 
 
-// callback to register the user likelyhood functions: pass function address
+// callback to register the user log-likelihood functions: pass function address
 extern "C"
 int gambit_light_register(const char *fcn_name, void *fcn)
 {

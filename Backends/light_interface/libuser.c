@@ -7,14 +7,16 @@ double user_loglike(const int niparams, const double *iparams, const int noparam
     printf("libuser.c: user_loglike: computing loglike.\n");
     if(!niparams) return 0.0;
     for(int i=0; i<noparams; i++) oparams[i] = i;
-    return iparams[0] + iparams[1];
+
+    // return iparams[0] + iparams[1];
     
-    // error handling: return a value denoting an invalid point
+    // // error handling: return a value denoting an invalid point
+    // printf("libuser.c: calling gambit_light_invalid_point().\n");
     // return gambit_light_invalid_point();
 
     // error handling: report a string warning using gambit_light_warning
-    // gambit_light_warning("Some warning");
-    // return iparams[0] + iparams[1];
+    gambit_light_warning("Some warning");
+    return iparams[0] + iparams[1];
 
     // error handling: report a string error using gambit_light_error
     // gambit_light_error("Invalid input parameters");

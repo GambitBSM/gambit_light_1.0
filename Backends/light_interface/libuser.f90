@@ -5,7 +5,7 @@ module user_mod
 
 contains
   
-  ! user-side likelyhood function, registered in gambit by init_like
+  ! User-side log-likelihood function, registered in gambit by init_like
   real(c_double) function user_loglike(niparams, iparams, noparams, oparams) bind(c)
     integer(c_int), value, intent(in) :: niparams, noparams
     type(c_ptr), intent(in), value :: iparams
@@ -31,14 +31,14 @@ contains
       pi = pi + 1
     end do
 
-    user_loglike = fiparams(1) + fiparams(2)
+    ! user_loglike = fiparams(1) + fiparams(2)
 
     ! error handling: return a value denoting an invalid point
     ! user_loglike = gambit_light_invalid_point()
 
     ! error handling: report a string warning using gambit_light_warning
-    ! call gambit_light_warning('Some warning.'//c_null_char)
-    ! user_loglike = fiparams(1) + fiparams(2)
+    call gambit_light_warning('Some warning.'//c_null_char)
+    user_loglike = fiparams(1) + fiparams(2)
     
     ! error handling: report a string error using gambit_light_error
     ! call gambit_light_error('Invalid input arguments.'//c_null_char)

@@ -6,7 +6,7 @@ def user_loglike(iparams, oparams):
   oparams['oname2_py'] = 2;
   oparams['oname3_py'] = 3;
 
-  return iparams['p1'] + iparams['p2'];
+  # return iparams['p1'] + iparams['p2'];
 
   # error handling: return a value denoting an invalid point
   # return gambit_light.invalid_point()
@@ -16,8 +16,8 @@ def user_loglike(iparams, oparams):
   # raise Exception("Invalid point: computations failed for these input parameters")
   
   # error handling: report a string warning using gambit_light.warning
-  # gambit_light.warning('Some warning')
-  # return iparams['p1'] + iparams['p2'];
+  gambit_light.warning('Some warning')
+  return iparams['p1'] + iparams['p2'];
 
   # error handling: report a string error using gambit_light.error
   # gambit_light.error('Invalid input parameters');
