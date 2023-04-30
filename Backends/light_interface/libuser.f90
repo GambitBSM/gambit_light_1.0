@@ -5,7 +5,7 @@ module user_mod
 
 contains
   
-  ! User-side log-likelihood function, registered in gambit by init_like
+  ! User-side log-likelihood function, registered in gambit by init_user_loglike
   real(c_double) function user_loglike(niparams, iparams, noparams, oparams) bind(c)
     integer(c_int), value, intent(in) :: niparams, noparams
     type(c_ptr), intent(in), value :: iparams
@@ -47,15 +47,15 @@ contains
   end function user_loglike
 
   ! user-side initialization function, called by gambit at init
-  subroutine init_like(fcn_name, rf) bind(c)
+  subroutine init_user_loglike(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
     procedure(gambit_light_register_fcn), pointer :: frf
 
-    print *, "libuser.f90: init_like: initializing user library."
+    print *, "libuser.f90: init_user_loglike: initializing user library."
 
     ! convert c function to fortran function, and call
     call c_f_procpointer(rf, frf)
     call frf(fcn_name, c_funloc(user_loglike))
-  end subroutine init_like
+  end subroutine init_user_loglike
 end module user_mod

@@ -28,7 +28,7 @@ def user_loglike(iparams, oparams):
   # raise Exception("Date provided can't be in the past")
 
 
-def init_like(fcn_name, rf_name):
+def init_user_loglike(fcn_name, rf_name):
   # gambit_light passes the registration function (rf) as string (rf_name)
   import importlib
   li = importlib.import_module('gambit_light')

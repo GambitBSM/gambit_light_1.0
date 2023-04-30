@@ -10,6 +10,7 @@
 ///
 ///  \author Anders Kvellestad
 ///          (anders.kvellestad@fys.uio.no)
+///  \date 2022, 2023 Apr
 ///  \author Marcin Krotkiewski
 ///          (marcin.krotkiewski@usit.uio.no)
 ///  \date 2022 Sep

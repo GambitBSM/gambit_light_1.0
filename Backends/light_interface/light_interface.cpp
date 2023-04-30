@@ -18,11 +18,11 @@
 #include <pybind11/stl_bind.h>
 
 extern "C"
-int gambit_light_register_python(const char *fcn_name, const char *python_fcn);
+int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light, m) {
-    m.def("register_loglike", &gambit_light_register_python, "register a python user likelihood function");
+    m.def("register_loglike", &gambit_light_register_python, "register a python user log-likelihood function");
     m.def("invalid_point", &gambit_light_invalid_point, "return a value signifying an invalid point");
     m.def("warning", &gambit_light_warning, "report user warning");
     m.def("error", &gambit_light_error, "report user error");
@@ -73,7 +73,7 @@ namespace Gambit {
             // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
             std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
-            double call_user_function(const std::string& fcn_name, const t_user_loglike_desc &desc, 
+            double call_user_function(const std::string& loglike_name, const t_user_loglike_desc &desc, 
                                       const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                       std::vector<std::string>& warnings)
             {
@@ -136,7 +136,7 @@ namespace Gambit {
                 if (str_warning){
                     printf("LIGHT INTERFACE WARNING: %s\n", str_warning);
                     std::string s(str_warning);
-                    warnings.push_back("Warning from " + fcn_name + ": " + s);
+                    warnings.push_back("Warning from " + loglike_name + ": " + s);
                     free(str_warning);
                     str_warning = nullptr;
                     // throw std::runtime_error(s);
@@ -202,13 +202,13 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
 #ifdef HAVE_PYBIND11
 // callback to register the user log-likelihood functions from Python: pass function name as string
 extern "C"
-int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
+int gambit_light_register_python(const char *loglike_name, const char *python_fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     t_user_loglike_desc desc;
     desc.name = std::string(python_fcn);
-    user_loglikes.insert({fcn_name, desc});
-    printf("light_interface: registering Python function '%s'\n", fcn_name);
+    user_loglikes.insert({loglike_name, desc});
+    printf("light_interface: Registering Python loglike '%s'\n", loglike_name);
     return 0;
 }
 #endif
@@ -216,20 +216,20 @@ int gambit_light_register_python(const char *fcn_name, const char *python_fcn)
 
 // callback to register the user log-likelihood functions: pass function address
 extern "C"
-int gambit_light_register(const char *fcn_name, void *fcn)
+int gambit_light_register(const char *loglike_name, void *fcn)
 {
     using namespace Gambit::Backends::light_interface_0_1;
     t_user_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
-    user_loglikes.insert({fcn_name, desc});
-    printf("light_interface: registering function '%s'\n", fcn_name);
+    user_loglikes.insert({loglike_name, desc});
+    printf("light_interface: Registering loglike '%s'\n", loglike_name);
     return 0;
 }
 
 
 extern "C"
 void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
-                                const std::string &lang, const std::string &function_name,
+                                const std::string &lang, const std::string &loglike_name,
                                 std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
@@ -237,7 +237,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     // load the init symbol from the user library (should be added to the config file)
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle){
-        printf("ligth_interface: could not load dynamic library: %s\n", dlerror());
+        printf("ligth_interface: Could not load dynamic library: %s\n", dlerror());
         return;
     }
 
@@ -248,18 +248,18 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     *(void**) (&user_init_function) = dlsym(handle, init_fun.c_str());
 
     if ((error = dlerror()) != NULL)  {
-        printf("light_interface: could not load init function: %s\n", error);
+        printf("light_interface: Could not load init function: %s\n", error);
         return;
     }
 
     // call user init function
-    (*user_init_function)(function_name.c_str(), gambit_light_register);
+    (*user_init_function)(loglike_name.c_str(), gambit_light_register);
 
-    // at this point function_name should be a key in user_loglikes, registered by the user
-    if(user_loglikes.find(function_name) != user_loglikes.end()) {
+    // at this point loglike_name should be a key in user_loglikes, registered by the user
+    if(user_loglikes.find(loglike_name) != user_loglikes.end()) {
 
-        // add parameter and output information to user function description
-        t_user_loglike_desc &desc = user_loglikes[function_name];
+        // add parameter and output information to user loglike description
+        t_user_loglike_desc &desc = user_loglikes[loglike_name];
 
         if (lang == "fortran")  desc.lang = LANG_FORTRAN;
         else if (lang == "c")   desc.lang = LANG_C;
@@ -268,7 +268,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
         desc.inputs = std::move(inputs);
         desc.outputs = std::move(outputs);
     } else {
-        printf("light_interface: expected function '%s' nas not been registered, skipping.\n", function_name.c_str());
+        printf("light_interface: Expected loglike '%s' nas not been registered, skipping.\n", loglike_name.c_str());
     }
 }
 
@@ -276,7 +276,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 #ifdef HAVE_PYBIND11
 extern "C"
 void lightLibrary_Python(const std::string &path, const std::string &init_fun,
-                         const std::string &lang, const std::string &function_name,
+                         const std::string &lang, const std::string &loglike_name,
                          std::vector<std::string> &inputs, std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
@@ -284,7 +284,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     // Bail now if the backend is not present.
     std::ifstream f(path.c_str());
     if(!f.good()) {
-        printf("Failed loading Python backend; source file not found at %s\n", path.c_str());
+        printf("light_interface: Failed loading Python backend; source file not found at %s\n", path.c_str());
         return;
     }
 
@@ -294,10 +294,10 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         // Create an instance of the interpreter.
         try{
             python_interpreter = new pybind11::scoped_interpreter;
-            printf("Python interpreter successfully started.\n");
+            printf("light_interface: Python interpreter successfully started.\n");
         }
         catch (std::runtime_error e){
-            printf("Did not start python interpreter: %s\n", e.what());
+            printf("light_interface: Did not start python interpreter: %s\n", e.what());
         }
     }
 
@@ -326,20 +326,20 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
 
     // call user init function
     pybind11::object user_init_function = user_module.attr(init_fun.c_str());
-    user_init_function(function_name.c_str(), "register_loglike");
+    user_init_function(loglike_name.c_str(), "register_loglike");
 
-    // at this point function_name should be a key in user_loglikes, registered by the user
-    if(user_loglikes.find(function_name) != user_loglikes.end()) {
+    // at this point loglike_name should be a key in user_loglikes, registered by the user
+    if(user_loglikes.find(loglike_name) != user_loglikes.end()) {
 
         // add parameter and output information to user function description
-        t_user_loglike_desc &desc = user_loglikes[function_name];
+        t_user_loglike_desc &desc = user_loglikes[loglike_name];
 
         desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
         desc.lang = LANG_PYTHON;
         desc.inputs = std::move(inputs);
         desc.outputs = std::move(outputs);
     } else {
-        printf("light_interface: expected Python function '%s' nas not been registered, skipping.\n", function_name.c_str());
+        printf("light_interface: Expected Python loglike '%s' nas not been registered, skipping.\n", loglike_name.c_str());
     }
 
     // Remove the path to the backend from the Python system path

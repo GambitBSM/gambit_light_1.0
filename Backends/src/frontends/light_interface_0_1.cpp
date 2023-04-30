@@ -10,6 +10,7 @@
 ///
 ///  \author Anders Kvellestad
 ///          (anders.kvellestad@fys.uio.no)
+///  \date 2022, 2023 Apr
 ///  \author Marcin Krotkiewski
 ///          (marcin.krotkiewski@usit.uio.no)
 ///  \date 2022 Sep
@@ -27,7 +28,7 @@ BE_INI_FUNCTION
     if(_so_initialized) return;
 
     std::string user_lib;
-    std::string function_name;
+    std::string loglike_name;
     std::string init_fun;
     std::string lang;
     std::vector<std::string> inputs, outputs;
@@ -38,11 +39,11 @@ BE_INI_FUNCTION
     {
         const YAML::Node& lightNode = lightRootNode[fi];
 
-        if (not lightNode["function_name"].IsDefined())
+        if (not lightNode["loglike_name"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'function_name' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'loglike_name' not specified in config file.");
         }
-        function_name = lightNode["function_name"].as<std::string>();
+        loglike_name = lightNode["loglike_name"].as<std::string>();
 
         if (not lightNode["user_lib"].IsDefined())
         {
@@ -96,20 +97,20 @@ BE_INI_FUNCTION
             }
         }
 
-        logger() << "Configuration for function '" << function_name << "':" << endl;
+        logger() << "Configuration for function '" << loglike_name << "':" << endl;
         logger() << "  user_lib: " << user_lib << endl;
         logger() << "  init_fun: " << init_fun << endl;
         logger() << "  lang:     " << lang << EOM;
 
         if (lang == "c" or lang == "c++" or lang == "fortran")
         {
-            lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, function_name, inputs, outputs);
+            lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
         }
 
 #ifdef HAVE_PYBIND11
         if (lang == "python")
         {
-            lightLibrary_Python(user_lib, init_fun, lang, function_name, inputs, outputs);
+            lightLibrary_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
         }
 #endif
     }
