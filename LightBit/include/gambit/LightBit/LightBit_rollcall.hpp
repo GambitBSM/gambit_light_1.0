@@ -25,14 +25,6 @@
 #define MODULE LightBit
 START_MODULE
 
-  #define CAPABILITY dummy_loglike
-  START_CAPABILITY
-    #define FUNCTION get_dummy_loglike
-    START_FUNCTION(double)
-    ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
-    #undef FUNCTION
-  #undef CAPABILITY
-
   #define CAPABILITY light_output
   START_CAPABILITY
     #define FUNCTION get_light_output

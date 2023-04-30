@@ -29,22 +29,6 @@ namespace Gambit
     /// \name Module functions
     /// @{
 
-    void get_dummy_loglike(double &result)
-    {
-      using namespace Pipes::get_dummy_loglike;
-
-      // Just use the first few parameters as a dummy log-likelihood result
-      double p1 = *Param["p1"];
-      double p2 = *Param["p2"];
-      double loglike = p1 + p2;
-
-      cout << endl;
-      cout << "get_dummy_loglike: Will return result: " << loglike << endl;
-
-      result = loglike;
-    }
-
-
     // This function will run the light_interface library 
     // and collect all the results from all the connected user libraries
     // in one map<string,double>.
@@ -62,7 +46,7 @@ namespace Gambit
 
       // Call the cpp interface library, which will fill the result map
       cout << endl;
-      cout << "get_light_loglike: Will now call light_interface.";
+      cout << "get_light_output: Will now call light_interface." << endl;
       try
       {
         BEreq::run_light_interface(input, result);
@@ -82,7 +66,7 @@ namespace Gambit
       }
 
       // Print the output map:
-      cout << "get_light_loglike: Got output:";
+      cout << "get_light_output: Got output:";
       for (auto& kv : result) 
       {
         cout << "  " << kv.first << ":" << kv.second;
