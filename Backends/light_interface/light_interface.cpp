@@ -17,6 +17,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
 
+#define OUTPUT_PREFIX "light_interface: "
+
 extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
 
@@ -149,12 +151,10 @@ namespace Gambit
                 // check if there were any warnings
                 if (str_warning)
                 {
-                    printf("LIGHT INTERFACE WARNING: %s\n", str_warning);
                     std::string s(str_warning);
                     warnings.push_back("Warning from " + loglike_name + ": " + s);
                     free(str_warning);
                     str_warning = nullptr;
-                    // throw std::runtime_error(s);
                 }
                 
                 return retval;
@@ -193,7 +193,7 @@ void gambit_light_warning(const char *warning)
 extern "C"
 void run(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
-    std::cout << "light_interface: run" << std::endl;
+    std::cout << OUTPUT_PREFIX << "run" << std::endl;
 
     double loglike;
 
@@ -224,7 +224,7 @@ int gambit_light_register_python(const char *loglike_name, const char *python_fc
     t_user_loglike_desc desc;
     desc.name = std::string(python_fcn);
     user_loglikes.insert({loglike_name, desc});
-    printf("light_interface: Registering Python loglike '%s'\n", loglike_name);
+    std::cout << OUTPUT_PREFIX << "Registering Python loglike '" << loglike_name << "'." << std::endl;
     return 0;
 }
 #endif
@@ -238,7 +238,7 @@ int gambit_light_register(const char *loglike_name, void *fcn)
     t_user_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
     user_loglikes.insert({loglike_name, desc});
-    printf("light_interface: Registering loglike '%s'\n", loglike_name);
+    std::cout << OUTPUT_PREFIX << "Registering loglike '" << loglike_name << "'." << std::endl;
     return 0;
 }
 
@@ -254,7 +254,8 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle)
     {
-        printf("ligth_interface: Could not load dynamic library: %s\n", dlerror());
+        // _Anders
+        std::cout << OUTPUT_PREFIX << "Could not load dynamic library: " << dlerror() << std::endl;
         return;
     }
 
@@ -266,7 +267,8 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 
     if ((error = dlerror()) != NULL)
     {
-        printf("light_interface: Could not load init function: %s\n", error);
+        // _Anders
+        std::cout << OUTPUT_PREFIX << "Could not load init function: " << error << std::endl;
         return;
     }
 
@@ -289,7 +291,9 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     } 
     else 
     {
-        printf("light_interface: Expected loglike '%s' nas not been registered, skipping.\n", loglike_name.c_str());
+        // _Anders
+        std::cout << OUTPUT_PREFIX << "Expected loglike '" << loglike_name 
+                  << "' has not been registered. Will skip it." << std::endl;
     }
 }
 
@@ -306,7 +310,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     std::ifstream f(path.c_str());
     if(!f.good())
     {
-        printf("light_interface: Failed loading Python backend; source file not found at %s\n", path.c_str());
+        std::cout << OUTPUT_PREFIX << "Failed loading Python backend; source file not found at " << path << std::endl;
         return;
     }
 
@@ -318,11 +322,11 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         try
         {
             python_interpreter = new pybind11::scoped_interpreter;
-            printf("light_interface: Python interpreter successfully started.\n");
+            std::cout << OUTPUT_PREFIX << "Python interpreter successfully started." << std::endl;
         }
         catch (std::runtime_error e)
         {
-            printf("light_interface: Did not start python interpreter: %s\n", e.what());
+            std::cout << OUTPUT_PREFIX << "Did not start Python interpreter: " << e.what() << std::endl;
         }
     }
 
@@ -344,8 +348,8 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     }
     catch (std::exception& e)
     {
-        printf("Failed to import Python module from %s.\n", name.c_str());
-        printf("Python error was: %s\n", e.what());
+        std::cout << OUTPUT_PREFIX << "Failed to import Python module from " << name << std::endl;
+        std::cout << OUTPUT_PREFIX << "Python error was: " << e.what() << std::endl;
         // Remove the path to the backend from the Python system path
         sys_path_remove(module_path);
         return;
@@ -368,7 +372,9 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     }
     else 
     {
-        printf("light_interface: Expected Python loglike '%s' nas not been registered, skipping.\n", loglike_name.c_str());
+        // _Anders
+        std::cout << OUTPUT_PREFIX << "Expected Python loglike '" << loglike_name 
+                  << "' has not been registered. Will skip it." << std::endl;
     }
 
     // Remove the path to the backend from the Python system path
