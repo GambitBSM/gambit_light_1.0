@@ -2,7 +2,8 @@
 
 // report an error from C and Fortran interfaces
 #ifdef __cplusplus
-extern "C" {
+extern "C" 
+{
 #endif
     double gambit_light_invalid_point();
     void gambit_light_error(const char *);
