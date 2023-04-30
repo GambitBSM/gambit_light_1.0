@@ -73,8 +73,9 @@ namespace Gambit {
             // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
             std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
-            double call_user_function(const std::map<std::string,double>& input, std::map<std::string,double>& output,
-                                      const t_user_loglike_desc &desc)
+            double call_user_function(const std::string& fcn_name, const t_user_loglike_desc &desc, 
+                                      const std::map<std::string,double>& input, std::map<std::string,double>& output,
+                                      std::vector<std::string>& warnings)
             {
                 double retval = 0.0;
                 
@@ -133,9 +134,9 @@ namespace Gambit {
 
                 // check if there were any warnings
                 if (str_warning){
-                    // TODO: how do we report a warning to GAMBIT?
                     printf("LIGHT INTERFACE WARNING: %s\n", str_warning);
                     std::string s(str_warning);
+                    warnings.push_back("Warning from " + fcn_name + ": " + s);
                     free(str_warning);
                     str_warning = nullptr;
                     // throw std::runtime_error(s);
@@ -175,7 +176,7 @@ void gambit_light_warning(const char *warning)
 
 
 extern "C"
-void run(const std::map<std::string,double>& input, std::map<std::string,double>& output)
+void run(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
     std::cout << "light_interface: run" << std::endl;
 
@@ -187,7 +188,7 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
     //  - what if there are multiple backend languages? which is first? does it matter
     using namespace Gambit::Backends::light_interface_0_1;
     for (const auto& fn : user_loglikes){
-        double user_loglike = call_user_function(input, output, fn.second);
+        double user_loglike = call_user_function(fn.first, fn.second, input, output, warnings);
         // Add each separate loglike contribution to the output map
         output[fn.first] = user_loglike;
         loglike += user_loglike;

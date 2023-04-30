@@ -42,7 +42,7 @@ LOAD_LIBRARY
  * BE_FUNCTION([choose function name], [type], [arguement types], "[exact symbol name]", "[choose capability name]")
  */
 
-BE_FUNCTION(run, void, (const map_str_dbl &, map_str_dbl &), "run", "run_light_interface")
+BE_FUNCTION(run, void, (const map_str_dbl&, map_str_dbl&, vec_str&), "run", "run_light_interface")
 BE_FUNCTION(lightLibrary_C_CXX_Fortran, void, (const std::string &, const std::string &, const std::string &, const std::string &, std::vector<std::string> &, std::vector<std::string> &), "lightLibrary_C_CXX_Fortran", "lightLibrary_C_CXX_Fortran")
 BE_FUNCTION(lightLibrary_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, std::vector<std::string> &, std::vector<std::string> &), "lightLibrary_Python", "lightLibrary_Python")
 

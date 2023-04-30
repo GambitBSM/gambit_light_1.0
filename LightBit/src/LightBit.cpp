@@ -37,6 +37,7 @@ namespace Gambit
       using namespace Pipes::get_light_output;
 
       std::map<std::string,double> input;
+      std::vector<std::string> warnings;
 
       // Construct input map from GAMBIT parameter map:
       for (auto& kv : Param) 
@@ -49,7 +50,7 @@ namespace Gambit
       cout << "get_light_output: Will now call light_interface." << endl;
       try
       {
-        BEreq::run_light_interface(input, result);
+        BEreq::run_light_interface(input, result, warnings);
       }
       catch (const std::runtime_error& e)
       {
@@ -63,6 +64,12 @@ namespace Gambit
         {
           LightBit_error().raise(LOCAL_INFO, "Caught a runtime error via the light_interface library: " + std::string(e.what()));
         }
+      }
+
+      // Log any warnings that we have collected
+      for (const std::string& w : warnings) 
+      {
+        LightBit_warning().raise(LOCAL_INFO, w);
       }
 
       // Print the output map:
