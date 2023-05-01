@@ -33,6 +33,16 @@ BE_INI_FUNCTION
     std::string lang;
     std::vector<std::string> inputs, outputs;
 
+    // _Anders
+
+    // // Read YAML file, which also initialises the logger.
+    // IniParser::IniFile iniFile;
+    // iniFile.readFile(filename);
+
+    /// inifile to which this dependency resolver is bound
+    // const IniParser::IniFile *boundIniFile;
+    // YAML::Node parametersNode = boundIniFile->getParametersNode();
+
     YAML::Node lightRootNode = runOptions->getNode("LightInterface");
 
     for (std::size_t fi = 0; fi < lightRootNode.size(); fi++)

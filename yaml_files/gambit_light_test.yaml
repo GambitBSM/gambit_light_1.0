@@ -32,61 +32,59 @@ Parameters:
     p20: 0.0
 
 
-Rules:
-  - options:
-      LightInterface:
-        - loglike_name: c_user_loglike
-          user_lib: Backends/light_interface/libuser_c.so
-          init_fun: init_user_loglike
-          lang:     c
-          input:
-            - p1
-            - p2
-          output:
-            - oname1_c
-            - oname2_c
-            - oname3_c
-        - loglike_name: cpp_user_loglike
-          user_lib: Backends/light_interface/libuser_cpp.so
-          init_fun: _Z9init_user_loglikePKcPFiS0_PvE
-          lang:     c++
-          input:
-            - p3
-            - p4
-            - p5
-          output:
-            - oname1_cpp
-            - oname2_cpp
-        - loglike_name: fortran_user_loglike
-          user_lib: Backends/light_interface/libuser_fortran.so
-          init_fun: init_user_loglike
-          lang:     fortran
-          input:
-            - p2
-            - p4
-            - p6
-          output:
-            - oname1_fortran
-        - loglike_name: py_user_loglike
-          user_lib: Backends/light_interface/libuser.py
-          init_fun: init_user_loglike
-          lang:     python
-          input:
-            - p1
-            - p2
-          output:
-            - oname1_py
-            - oname2_py
-            - oname3_py
-        - loglike_name: py_user_loglike_rosenbrock
-          user_lib: Backends/light_interface/libuser_rosenbrock.py
-          init_fun: init_user_loglike
-          lang:     python
-          input:
-            - p1
-            - p2
-          output:
-            - rosenbrock_oname1_py
+LightInterface:
+  - loglike_name: c_user_loglike
+    user_lib: Backends/light_interface/libuser_c.so
+    init_fun: init_user_loglike
+    lang:     c
+    input:
+      - p1
+      - p2
+    output:
+      - oname1_c
+      - oname2_c
+      - oname3_c
+  - loglike_name: cpp_user_loglike
+    user_lib: Backends/light_interface/libuser_cpp.so
+    init_fun: _Z9init_user_loglikePKcPFiS0_PvE
+    lang:     c++
+    input:
+      - p3
+      - p4
+      - p5
+    output:
+      - oname1_cpp
+      - oname2_cpp
+  - loglike_name: fortran_user_loglike
+    user_lib: Backends/light_interface/libuser_fortran.so
+    init_fun: init_user_loglike
+    lang:     fortran
+    input:
+      - p2
+      - p4
+      - p6
+    output:
+      - oname1_fortran
+  - loglike_name: py_user_loglike
+    user_lib: Backends/light_interface/libuser.py
+    init_fun: init_user_loglike
+    lang:     python
+    input:
+      - p1
+      - p2
+    output:
+      - oname1_py
+      - oname2_py
+      - oname3_py
+  - loglike_name: py_user_loglike_rosenbrock
+    user_lib: Backends/light_interface/libuser_rosenbrock.py
+    init_fun: init_user_loglike
+    lang:     python
+    input:
+      - p1
+      - p2
+    output:
+      - rosenbrock_oname1_py
 
 
 Printer:

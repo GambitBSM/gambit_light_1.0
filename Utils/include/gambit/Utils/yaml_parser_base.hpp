@@ -37,6 +37,7 @@
 #include "gambit/Utils/standalone_error_handlers.hpp"
 #include "gambit/Utils/util_types.hpp"
 #include "gambit/Utils/yaml_options.hpp"
+#include "gambit/cmake/cmake_variables.hpp"
 
 #include "yaml-cpp/yaml.h"
 #include <limits>
@@ -68,7 +69,10 @@ namespace Gambit
         YAML::Node getScannerNode() const;
         YAML::Node getLoggerNode() const;
         YAML::Node getKeyValuePairNode() const;
-        
+        #ifdef GAMBIT_LIGHT
+          YAML::Node getLightInterfaceNode() const;
+        #endif
+
         template <typename... args>
         bool hasKey(args... keys) const
         {
@@ -129,6 +133,9 @@ namespace Gambit
         YAML::Node printerNode;
         YAML::Node scannerNode;
         YAML::Node logNode;
+        #ifdef GAMBIT_LIGHT
+          YAML::Node lightInterfaceNode;
+        #endif
     };
 
 

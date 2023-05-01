@@ -1064,6 +1064,10 @@ namespace Gambit
       YAML::Node nodes;
       YAML::Node zlevels;
 
+      #ifdef GAMBIT_LIGHT
+        nodes["LightInterface"] = boundIniFile->getLightInterfaceNode();
+      #endif
+
       #ifdef DEPRES_DEBUG
         cout << "Searching options for " << masterGraph[vertex]->capability() << endl;
       #endif

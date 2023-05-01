@@ -163,6 +163,9 @@ namespace Gambit
       scannerNode = root["Scanner"];
       logNode = root["Logger"];
       keyValuePairNode = root["KeyValues"];
+      #ifdef GAMBIT_LIGHT
+        lightInterfaceNode = root["LightInterface"];
+      #endif
 
       // Set default output path
       std::string defpath;
@@ -325,6 +328,9 @@ namespace Gambit
     YAML::Node Parser::getScannerNode()      const {return scannerNode;}
     YAML::Node Parser::getLoggerNode()       const {return logNode;}
     YAML::Node Parser::getKeyValuePairNode() const {return keyValuePairNode;}
+    #ifdef GAMBIT_LIGHT
+      YAML::Node Parser::getLightInterfaceNode() const {return lightInterfaceNode;}
+    #endif
     /// @}
 
     /// Getters for model/parameter section
