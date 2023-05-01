@@ -1,6 +1,6 @@
 #pragma once
 
-// report an error from C and Fortran interfaces
+// Report an error from C and Fortran interfaces
 #ifdef __cplusplus
 extern "C" 
 {
@@ -12,7 +12,7 @@ extern "C"
 }
 #endif
 
-// user-side log-likelihood function
+// User-side log-likelihood function.
 typedef double (*user_loglike_fcn_fortran)(const int, const double *, const int, double *);
 typedef double (*user_loglike_fcn_c)(const int, const double *, const int, double *);
 
@@ -27,9 +27,9 @@ typedef double (*user_loglike_fcn_cpp)(const std::map<std::string,double>&, std:
 typedef pybind11::object *user_loglike_fcn_python;
 #endif
 
-// gambit-side callback to register user log-likelihood functions
+// GAMBIT-side callback to register user log-likelihood functions.
 typedef int (*gambit_light_register_loglike_fcn)(const char *, void *);
 
-// user-side library initialisation function
+// User-side library initialisation function.
 typedef void (*user_init_fcn)(const char *, gambit_light_register_loglike_fcn);
 

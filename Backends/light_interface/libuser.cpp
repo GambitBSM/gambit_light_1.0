@@ -2,7 +2,7 @@
 #include <iostream>
 #include "gambit_light.h"
 
-// user-side log-likelihood function, registered in gambit by init_user_loglike
+// User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
 double user_loglike(const std::map<std::string,double>& input, std::map<std::string,double>& output)
 {
     std::cout << "libuser.cpp: user_loglike: computing loglike." << std::endl;
@@ -12,22 +12,22 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
 
     // return input.at("p1") + input.at("p2");
     
-    // error handling: return a value denoting an invalid point
+    // Error handling: Return a value denoting an invalid point.
     // return gambit_light_invalid_point();
 
-    // error handling: report a string warning using gambit_light_warning
+    // Error handling: Report a string warning using gambit_light_warning.
     gambit_light_warning("Some warning");
     return input.at("p1") + input.at("p2");
 
-    // error handling: report a string error using gambit_light_error
+    // Error handling: Report a string error using gambit_light_error.
     // gambit_light_error("Invalid input parameters");
     // return gambit_light_invalid_point();
 
-    // error handling: throw an exception
+    // Error handling: Throw an exception.
     // throw std::runtime_error("test error");
 }
 
-// user-side initialisation function, called by gambit at init
+// User-side initialisation function, called by GAMBIT at init.
 void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
 {
     std::cout << "libuser.cpp: init_user_loglike: initialising user library." << std::endl;

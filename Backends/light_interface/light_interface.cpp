@@ -33,7 +33,7 @@ PYBIND11_MODULE(gambit_light, m)
 }
 #endif
 
-// registered functions
+// Registered functions
 namespace Gambit
 {
     namespace Backends
@@ -41,15 +41,16 @@ namespace Gambit
         namespace light_interface_0_1
         {
 
-            // used for error reporting from C and Fortran interfaces
+            // Used for error reporting from C and Fortran interfaces.
             static char *str_error = NULL;
             static char *str_warning = NULL;
 
 #ifdef HAVE_PYBIND11
-            /// Pointer to the Python interpreter
+            /// Pointer to the Python interpreter.
             pybind11::scoped_interpreter* python_interpreter = nullptr;
 #endif
 
+            // Enum for the allowed user library languages.
             typedef enum
             {
 #ifdef HAVE_PYBIND11
@@ -60,6 +61,7 @@ namespace Gambit
                 LANG_C
             } t_user_loglike_fcn_language;
 
+            // A struct to hold info about a user loglike.
             typedef struct
             {
                 t_user_loglike_fcn_language lang;
@@ -78,10 +80,12 @@ namespace Gambit
                 std::vector<std::string> outputs;
             } t_user_loglike_desc;
 
+            // A map between loglike names and the corresponding t_user_loglike_desc instances.
             // NOTE: init_priority attribute is needed to make sure that the map is initialised
-            // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
+            // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang.
             std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
+            // Function for calling a user library loglike function.
             double call_user_function(const std::string& loglike_name, const t_user_loglike_desc &desc, 
                                       const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                       std::vector<std::string>& warnings)
@@ -93,7 +97,7 @@ namespace Gambit
                     double *iparams = (double*)alloca(sizeof(double)*desc.inputs.size());
                     double *oparams = (double*)alloca(sizeof(double)*desc.outputs.size());
 
-                    // translate the input to a C array
+                    // Translate the input to a C array.
                     int iparam = 0;
                     for (auto& pname : desc.inputs)
                     {
@@ -103,7 +107,7 @@ namespace Gambit
                     if(desc.lang == LANG_FORTRAN) retval = desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
                     if(desc.lang == LANG_C) retval = desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
 
-                    // translate the input to a C array
+                    // Translate the input to a C array.
                     iparam = 0;
                     for (auto& pname : desc.outputs)
                     {
@@ -111,7 +115,7 @@ namespace Gambit
                     }
                 }
 
-                // this part can throw anything - this will be handled in Gambit
+                // This part can throw anything - this will be handled in GAMBIT.
                 if(desc.lang == LANG_CPP)
                 {
                     retval = desc.fcn.cpp(input, output);
@@ -120,9 +124,9 @@ namespace Gambit
 #ifdef HAVE_PYBIND11
                 if(desc.lang == LANG_PYTHON)
                 {
-                    // if a python exception is caught (via pybind11), re-throw it
+                    // If a Python exception is caught (via pybind11), re-throw it
                     // as a std::runtime_error without the leading "Exception: "
-                    // part of the error message
+                    // part of the error message.
                     try
                     {
                         retval = pybind11::cast<double>((*desc.fcn.python)(input, &output));
@@ -139,7 +143,7 @@ namespace Gambit
                 }
 #endif
 
-                // check if there were any errors
+                // Check if there were any errors.
                 if (str_error)
                 {
                     std::string s(str_error);
@@ -148,7 +152,7 @@ namespace Gambit
                     throw std::runtime_error(s);
                 }
 
-                // check if there were any warnings
+                // Collect any warnings.
                 if (str_warning)
                 {
                     std::string s(str_warning);
@@ -198,18 +202,18 @@ void run(const std::map<std::string,double>& input, std::map<std::string,double>
     for (const auto& fn : user_loglikes)
     {
         double user_loglike = call_user_function(fn.first, fn.second, input, output, warnings);
-        // Add each separate loglike contribution to the output map
+        // Add each separate loglike contribution to the output map.
         output[fn.first] = user_loglike;
         loglike += user_loglike;
     }
 
-    // Add the expected "loglike" entry
+    // Add the expected "loglike" entry.
     output["loglike"] = loglike;
 }
 
 
 #ifdef HAVE_PYBIND11
-// callback to register the user log-likelihood functions from Python: pass function name as string
+// Callback to register the user log-likelihood functions from Python: pass function name as string.
 extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn)
 {
@@ -223,7 +227,7 @@ int gambit_light_register_python(const char *loglike_name, const char *python_fc
 #endif
 
 
-// callback to register the user log-likelihood functions: pass function address
+// Callback to register the user log-likelihood functions: pass function address.
 extern "C"
 int gambit_light_register(const char *loglike_name, void *fcn)
 {
@@ -243,7 +247,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 {
     using namespace Gambit::Backends::light_interface_0_1;
 
-    // load the init symbol from the user library (should be added to the config file)
+    // Load the init symbol from the user library.
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle)
     {
@@ -261,14 +265,14 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
         throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load init function: " + std::string(error));
     }
 
-    // call user init function
+    // Call user init function.
     (*user_init_function)(loglike_name.c_str(), gambit_light_register);
 
-    // at this point loglike_name should be a key in user_loglikes, registered by the user
+    // At this point loglike_name should be a key in user_loglikes, registered by the user.
     if(user_loglikes.find(loglike_name) != user_loglikes.end())
     {
 
-        // add parameter and output information to user loglike description
+        // Add parameter and output information to user loglike description.
         t_user_loglike_desc &desc = user_loglikes[loglike_name];
 
         if (lang == "fortran")  desc.lang = LANG_FORTRAN;
@@ -319,7 +323,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         }
     }
 
-    // Add the path to the backend to the Python system path
+    // Add the path to the backend to the Python system path.
     pybind11::object sys_path = pybind11::module::import("sys").attr("path");
     pybind11::object sys_path_insert = sys_path.attr("insert");
     pybind11::object sys_path_remove = sys_path.attr("remove");
@@ -327,12 +331,12 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     const std::string name = std::filesystem::path(path).stem();
     sys_path_insert(0,module_path);
 
-    // Attempt to import the user module
+    // Attempt to import the user module.
     pybind11::module user_module;
     try
     {
         user_module = pybind11::module::import(name.c_str());
-        // needed if opaque str_dbl_map type defined in another file?
+        // Needed if opaque str_dbl_map type defined in another file?
         // pybind11::module::import("gambit_light");
     }
     catch (std::exception& e)
@@ -344,7 +348,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         );
     }
 
-    // Look for the user init function and call it
+    // Look for the user init function and call it.
     pybind11::object user_init_function;
     try
     {
@@ -360,10 +364,10 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     }
     user_init_function(loglike_name.c_str(), "register_loglike");
 
-    // at this point loglike_name should be a key in user_loglikes, registered by the user
+    // At this point loglike_name should be a key in user_loglikes, registered by the user.
     if(user_loglikes.find(loglike_name) != user_loglikes.end())
     {
-        // add parameter and output information to user function description
+        // Add parameter and output information to user function description.
         t_user_loglike_desc &desc = user_loglikes[loglike_name];
 
         desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
@@ -380,7 +384,7 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
         );
     }
 
-    // Remove the path to the backend from the Python system path
+    // Remove the path to the backend from the Python system path.
     sys_path_remove(module_path);
 }
 #endif

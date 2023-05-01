@@ -5,13 +5,13 @@ module user_mod
 
 contains
   
-  ! User-side log-likelihood function, registered in gambit by init_user_loglike
+  ! User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
   real(c_double) function user_loglike(niparams, iparams, noparams, oparams) bind(c)
     integer(c_int), value, intent(in) :: niparams, noparams
     type(c_ptr), intent(in), value :: iparams
     type(c_ptr), intent(in), value :: oparams
 
-    ! fortran arrays
+    ! Fortran arrays
     real(c_double), dimension(:), pointer :: fiparams
     real(c_double), dimension(:), pointer :: foparams
     integer :: pi
@@ -33,20 +33,20 @@ contains
 
     ! user_loglike = fiparams(1) + fiparams(2)
 
-    ! error handling: return a value denoting an invalid point
+    ! Error handling: Return a value denoting an invalid point.
     ! user_loglike = gambit_light_invalid_point()
 
-    ! error handling: report a string warning using gambit_light_warning
+    ! Error handling: Report a string warning using gambit_light_warning.
     call gambit_light_warning('Some warning.'//c_null_char)
     user_loglike = fiparams(1) + fiparams(2)
     
-    ! error handling: report a string error using gambit_light_error
+    ! Error handling: Report a string error using gambit_light_error.
     ! call gambit_light_error('Invalid input arguments.'//c_null_char)
     ! user_loglike = gambit_light_invalid_point()
 
   end function user_loglike
 
-  ! user-side initialisation function, called by gambit at init
+  ! User-side initialisation function, called by GAMBIT at init.
   subroutine init_user_loglike(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
@@ -54,7 +54,7 @@ contains
 
     print *, "libuser.f90: init_user_loglike: initialising user library."
 
-    ! convert c function to fortran function, and call
+    ! Convert c function to fortran function, and call it.
     call c_f_procpointer(rf, frf)
     call frf(fcn_name, c_funloc(user_loglike))
   end subroutine init_user_loglike
