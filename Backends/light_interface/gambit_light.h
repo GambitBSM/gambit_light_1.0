@@ -30,6 +30,6 @@ typedef pybind11::object *user_loglike_fcn_python;
 // gambit-side callback to register user log-likelihood functions
 typedef int (*gambit_light_register_loglike_fcn)(const char *, void *);
 
-// user-side library initialization function
+// user-side library initialisation function
 typedef void (*user_init_fcn)(const char *, gambit_light_register_loglike_fcn);
 

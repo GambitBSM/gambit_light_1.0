@@ -24,8 +24,8 @@
 // Initialisation function. This is called for every point.
 BE_INI_FUNCTION
 {
-    static bool _so_initialized = false;
-    if(_so_initialized) return;
+    static bool _so_initialised = false;
+    if(_so_initialised) return;
 
     std::string user_lib;
     std::string loglike_name;
@@ -41,28 +41,25 @@ BE_INI_FUNCTION
 
         if (not lightNode["loglike_name"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'loglike_name' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'loglike_name' not specified in config file.");
         }
         loglike_name = lightNode["loglike_name"].as<std::string>();
 
         if (not lightNode["user_lib"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'user_lib' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'user_lib' not specified in config file.");
         }
         user_lib = lightNode["user_lib"].as<std::string>();
 
         if (not lightNode["init_fun"].IsDefined())
         {
-            init_fun = "init_like";
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'init_fun' not specified in config file.");
         }
-        else 
-        {
-            init_fun = lightNode["init_fun"].as<std::string>();
-        }
+        init_fun = lightNode["init_fun"].as<std::string>();
 
         if (not lightNode["lang"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'lang' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'lang' not specified in config file.");
         }
         lang = lightNode["lang"].as<std::string>();
 
@@ -73,13 +70,13 @@ BE_INI_FUNCTION
 #endif
             lang != "c++")
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: unsupported plugin language '" + lang + "'.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: unsupported plugin language '" + lang + "'.");
             continue;
         }
 
         if (not lightNode["input"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "light_interface: Could not load dynamic library: 'input' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'input' not specified in config file.");
             continue;
         }
         const YAML::Node& node_input = lightNode["input"];
@@ -97,28 +94,39 @@ BE_INI_FUNCTION
             }
         }
 
-        logger() << "Configuration for function '" << loglike_name << "':" << endl;
+        logger() << "Configuration for the loglike '" << loglike_name << "':" << endl;
         logger() << "  user_lib: " << user_lib << endl;
         logger() << "  init_fun: " << init_fun << endl;
         logger() << "  lang:     " << lang << EOM;
 
         if (lang == "c" or lang == "c++" or lang == "fortran")
         {
-            lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+            try
+            {
+                lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+            }
+            catch (const std::runtime_error& e)
+            {
+                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the light_interface backend: " + std::string(e.what()));
+            }
         }
 
 #ifdef HAVE_PYBIND11
         if (lang == "python")
         {
-            lightLibrary_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+            try
+            {
+                lightLibrary_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+            }
+            catch (const std::runtime_error& e)
+            {
+                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the light_interface backend: " + std::string(e.what()));
+            }
         }
 #endif
     }
 
-    // TODO: cleanup in the destructor
-    // dlclose(handle);
-
-    _so_initialized = true;
+    _so_initialised = true;
 }
 END_BE_INI_FUNCTION
 

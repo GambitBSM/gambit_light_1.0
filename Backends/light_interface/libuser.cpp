@@ -27,9 +27,9 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
     // throw std::runtime_error("test error");
 }
 
-// user-side initialization function, called by gambit at init
+// user-side initialisation function, called by gambit at init
 void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
 {
-    std::cout << "libuser.cpp: init_user_loglike: initializing user library." << std::endl;
+    std::cout << "libuser.cpp: init_user_loglike: initialising user library." << std::endl;
     rf(fcn_name, (void*)user_loglike);
 }

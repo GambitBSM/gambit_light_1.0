@@ -46,13 +46,13 @@ contains
 
   end function user_loglike
 
-  ! user-side initialization function, called by gambit at init
+  ! user-side initialisation function, called by gambit at init
   subroutine init_user_loglike(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
     procedure(gambit_light_register_fcn), pointer :: frf
 
-    print *, "libuser.f90: init_user_loglike: initializing user library."
+    print *, "libuser.f90: init_user_loglike: initialising user library."
 
     ! convert c function to fortran function, and call
     call c_f_procpointer(rf, frf)

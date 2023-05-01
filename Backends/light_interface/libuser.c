@@ -23,9 +23,9 @@ double user_loglike(const int niparams, const double *iparams, const int noparam
     // return gambit_light_invalid_point();
 }
 
-// user-side initialization function, called by gambit at init
+// user-side initialisation function, called by gambit at init
 void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
 {
-    printf("libuser.c: init_user_loglike: initializing user library.\n");
+    printf("libuser.c: init_user_loglike: initialising user library.\n");
     rf(fcn_name, user_loglike);
 }

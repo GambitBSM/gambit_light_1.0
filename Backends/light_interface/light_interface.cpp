@@ -78,7 +78,7 @@ namespace Gambit
                 std::vector<std::string> outputs;
             } t_user_loglike_desc;
 
-            // NOTE: init_priority attribute is needed to make sure that the map is initialized
+            // NOTE: init_priority attribute is needed to make sure that the map is initialised
             // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang
             std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
@@ -193,14 +193,7 @@ void gambit_light_warning(const char *warning)
 extern "C"
 void run(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
-    std::cout << OUTPUT_PREFIX << "run" << std::endl;
-
     double loglike;
-
-    // call user functions
-    // TODO:
-    //  - what to do when there are multiple functions?
-    //  - what if there are multiple backend languages? which is first? does it matter
     using namespace Gambit::Backends::light_interface_0_1;
     for (const auto& fn : user_loglikes)
     {
@@ -254,9 +247,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
     if(!handle)
     {
-        // _Anders
-        std::cout << OUTPUT_PREFIX << "Could not load dynamic library: " << dlerror() << std::endl;
-        return;
+        throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load dynamic library: " + std::string(dlerror()));
     }
 
     dlerror();
@@ -267,9 +258,7 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 
     if ((error = dlerror()) != NULL)
     {
-        // _Anders
-        std::cout << OUTPUT_PREFIX << "Could not load init function: " << error << std::endl;
-        return;
+        throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load init function: " + std::string(error));
     }
 
     // call user init function
@@ -291,9 +280,11 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
     } 
     else 
     {
-        // _Anders
-        std::cout << OUTPUT_PREFIX << "Expected loglike '" << loglike_name 
-                  << "' has not been registered. Will skip it." << std::endl;
+        throw std::runtime_error(
+            std::string(OUTPUT_PREFIX) + "The loglike '" + loglike_name
+            + "' listed in the config file has not been registered through an init function. "
+            + "Check your config file."
+        );
     }
 }
 
@@ -310,14 +301,12 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     std::ifstream f(path.c_str());
     if(!f.good())
     {
-        std::cout << OUTPUT_PREFIX << "Failed loading Python backend; source file not found at " << path << std::endl;
-        return;
+        throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load Python library; source file not found at " + path);
     }
 
     if (nullptr == python_interpreter)
     {
         // Fire up the Python interpreter if it hasn't been started yet.
-
         // Create an instance of the interpreter.
         try
         {
@@ -348,15 +337,27 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     }
     catch (std::exception& e)
     {
-        std::cout << OUTPUT_PREFIX << "Failed to import Python module from " << name << std::endl;
-        std::cout << OUTPUT_PREFIX << "Python error was: " << e.what() << std::endl;
-        // Remove the path to the backend from the Python system path
         sys_path_remove(module_path);
-        return;
+        throw std::runtime_error(
+            std::string(OUTPUT_PREFIX) + "Failed to import Python module '" + name + "'. "
+            + "Python error was: " + std::string(e.what())
+        );
     }
 
-    // call user init function
-    pybind11::object user_init_function = user_module.attr(init_fun.c_str());
+    // Look for the user init function and call it
+    pybind11::object user_init_function;
+    try
+    {
+        user_init_function = user_module.attr(init_fun.c_str());
+    }
+    catch (std::exception& e)
+    {
+        sys_path_remove(module_path);
+        throw std::runtime_error(
+            std::string(OUTPUT_PREFIX) + "Failed to load function '" + init_fun 
+            + "' from Python module '" + name + "'. Python error was: " + std::string(e.what())
+        );
+    }
     user_init_function(loglike_name.c_str(), "register_loglike");
 
     // at this point loglike_name should be a key in user_loglikes, registered by the user
@@ -372,9 +373,11 @@ void lightLibrary_Python(const std::string &path, const std::string &init_fun,
     }
     else 
     {
-        // _Anders
-        std::cout << OUTPUT_PREFIX << "Expected Python loglike '" << loglike_name 
-                  << "' has not been registered. Will skip it." << std::endl;
+        throw std::runtime_error(
+            std::string(OUTPUT_PREFIX) + "The Python loglike '" + loglike_name
+            + "' listed in the config file has not been registered through an init function. "
+            + "Check your config file."
+        );
     }
 
     // Remove the path to the backend from the Python system path
