@@ -19,7 +19,6 @@
 
 namespace Gambit
 {
-
   namespace LightBit
   {
     using namespace LogTags;
@@ -32,9 +31,9 @@ namespace Gambit
     // This function will run the light_interface library 
     // and collect all the results from all the connected user libraries
     // in one map<string,double>.
-    void get_light_output(std::map<std::string,double> &result)
+    void output(std::map<std::string,double> &result)
     {
-      using namespace Pipes::get_light_output;
+      using namespace Pipes::output;
 
       std::map<std::string,double> input;
       std::vector<std::string> warnings;
@@ -46,8 +45,6 @@ namespace Gambit
       }
 
       // Call the cpp interface library, which will fill the result map
-      cout << endl;
-      cout << "get_light_output: Will now call light_interface." << endl;
       try
       {
         BEreq::run_light_interface(input, result, warnings);
@@ -71,37 +68,26 @@ namespace Gambit
       {
         LightBit_warning().raise(LOCAL_INFO, w);
       }
-
-      // Print the output map:
-      cout << "get_light_output: Got output:";
-      for (auto& kv : result) 
-      {
-        cout << "  " << kv.first << ":" << kv.second;
-      }
-      cout << endl;
     }
 
 
-    // This function will extract the expected 'loglike' entry
+    // This function will extract the expected 'total_loglike' entry
     // from the light_interface output map.
-    void get_light_loglike(double &result)
+    void total_loglike(double &result)
     {
-      using namespace Pipes::get_light_loglike;
+      using namespace Pipes::total_loglike;
 
       // Get the output map from dependency "light_output"
-      const std::map<std::string,double> &output = *Dep::light_output;
+      const std::map<std::string,double> &output = *Dep::output;
 
       // Check that the output map has a "loglike" entry, 
       // and return this as the result.
-      if (output.count("loglike") == 0)
+      if (output.count("total_loglike") == 0)
       {
-        LightBit_error().raise(LOCAL_INFO, "Missing loglike entry in output map.");
+        LightBit_error().raise(LOCAL_INFO, "Missing 'total_loglike' entry in output map.");
       }
 
-      double loglike = output.at("loglike");
-      cout << "get_light_loglike: Will return result: " << loglike << endl;
-
-      result = loglike;
+      result = output.at("total_loglike");
     }
 
 

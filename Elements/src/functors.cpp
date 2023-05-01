@@ -68,7 +68,11 @@ namespace Gambit
      myType          (Utils::fix_type(result_type)),
      myOrigin        (origin_name),
      myClaw          (&claw),
-     myLabel         ("#"+func_capability+" @"+origin_name+"::"+func_name),
+     #ifdef GAMBIT_LIGHT
+       myLabel         (func_capability),
+     #else
+       myLabel         ("#"+func_capability+" @"+origin_name+"::"+func_name),
+     #endif
      myTimingLabel   ("Runtime(ns) for "+myLabel),
      myStatus        (0),
      myVertexID      (-1),       // (Note: myVertexID = -1 is intended to mean that no vertexID has been assigned)

@@ -25,20 +25,20 @@
 #define MODULE LightBit
 START_MODULE
 
-  #define CAPABILITY light_output
+  #define CAPABILITY output
   START_CAPABILITY
-    #define FUNCTION get_light_output
+    #define FUNCTION output
     START_FUNCTION(map_str_dbl)
     ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
     BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl&, map_str_dbl&, vec_str&))
     #undef FUNCTION
   #undef CAPABILITY
 
-  #define CAPABILITY light_loglike
+  #define CAPABILITY total_loglike
   START_CAPABILITY
-    #define FUNCTION get_light_loglike
+    #define FUNCTION total_loglike
     START_FUNCTION(double)
-    DEPENDENCY(light_output, map_str_dbl)
+    DEPENDENCY(output, map_str_dbl)
     #undef FUNCTION
   #undef CAPABILITY
 

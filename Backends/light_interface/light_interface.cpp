@@ -197,18 +197,18 @@ void gambit_light_warning(const char *warning)
 extern "C"
 void run(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
-    double loglike;
+    double total_loglike;
     using namespace Gambit::Backends::light_interface_0_1;
     for (const auto& fn : user_loglikes)
     {
         double user_loglike = call_user_function(fn.first, fn.second, input, output, warnings);
         // Add each separate loglike contribution to the output map.
         output[fn.first] = user_loglike;
-        loglike += user_loglike;
+        total_loglike += user_loglike;
     }
 
-    // Add the expected "loglike" entry.
-    output["loglike"] = loglike;
+    // Add the expected "total_loglike" entry.
+    output["total_loglike"] = total_loglike;
 }
 
 

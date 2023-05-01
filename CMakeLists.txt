@@ -76,6 +76,9 @@ endforeach()
 # Set the project name, enabling C, C++ and Fortran support
 project(gambit C CXX Fortran)
 
+# Set GAMBIT_LIGHT macro to true
+set(GAMBIT_LIGHT TRUE)
+
 # Make sure the user hasn't accidentally set the C++ compiler to the C compiler.
 get_filename_component(CXX_COMPILER_NAME ${CMAKE_CXX_COMPILER} NAME)
 if (CXX_COMPILER_NAME MATCHES "gcc.*$")
