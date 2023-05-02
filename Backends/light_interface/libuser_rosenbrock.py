@@ -23,14 +23,14 @@ def loglike(x):
 
 
 def user_loglike(iparams, oparams):
-  print("libuser.py: user_loglike: computing loglike.");
+  print("libuser_rosenbrock.py: user_loglike: computing loglike.");
 
   x = np.array([iparams['p1'], iparams['p2']])
   oparams['rosenbrock_oname1_py'] = 10;
   result = loglike(x)
   return result
 
-def init_like(fcn_name, rf_name):
+def init_user_loglike(fcn_name, rf_name):
   # gambit_light passes the registration function (rf) as string (rf_name)
   import importlib
   li = importlib.import_module('gambit_light')
