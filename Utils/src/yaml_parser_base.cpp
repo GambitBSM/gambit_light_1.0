@@ -165,12 +165,12 @@ namespace Gambit
       keyValuePairNode = root["KeyValues"];
 
       // If GAMBIT-light: 
-      // - Add the LightInterface section. 
+      // - Add the UserLogLikes section. 
       // - Force the "like: LogLike" option for all listed scanner plugins,
       //   to match the "purpose: LogLike" in the pre-defined ObsLikes section 
       //   for GAMBIT-light.
       #ifdef GAMBIT_LIGHT
-        lightInterfaceNode = root["LightInterface"];
+        userLogLikesNode = root["UserLogLikes"];
 
         YAML::Node listed_scanner_plugins = scannerNode["scanners"];
         for(auto it = listed_scanner_plugins.begin(); it != listed_scanner_plugins.end(); ++it)
@@ -342,7 +342,7 @@ namespace Gambit
     YAML::Node Parser::getLoggerNode()       const {return logNode;}
     YAML::Node Parser::getKeyValuePairNode() const {return keyValuePairNode;}
     #ifdef GAMBIT_LIGHT
-      YAML::Node Parser::getLightInterfaceNode() const {return lightInterfaceNode;}
+      YAML::Node Parser::getUserLogLikesNode() const {return userLogLikesNode;}
     #endif
     /// @}
 

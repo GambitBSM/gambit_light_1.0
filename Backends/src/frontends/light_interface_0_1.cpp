@@ -33,7 +33,7 @@ BE_INI_FUNCTION
     std::string lang;
     std::vector<std::string> inputs, outputs;
 
-    YAML::Node lightRootNode = runOptions->getNode("LightInterface");
+    YAML::Node lightRootNode = runOptions->getNode("UserLogLikes");
 
     for (std::size_t fi = 0; fi < lightRootNode.size(); fi++)
     {
@@ -41,25 +41,25 @@ BE_INI_FUNCTION
 
         if (not lightNode["loglike_name"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'loglike_name' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'loglike_name' not specified in config file.");
         }
         loglike_name = lightNode["loglike_name"].as<std::string>();
 
         if (not lightNode["user_lib"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'user_lib' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'user_lib' not specified in config file.");
         }
         user_lib = lightNode["user_lib"].as<std::string>();
 
         if (not lightNode["init_fun"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'init_fun' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'init_fun' not specified in config file.");
         }
         init_fun = lightNode["init_fun"].as<std::string>();
 
         if (not lightNode["lang"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'lang' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'lang' not specified in config file.");
         }
         lang = lightNode["lang"].as<std::string>();
 
@@ -70,13 +70,13 @@ BE_INI_FUNCTION
 #endif
             lang != "c++")
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: unsupported plugin language '" + lang + "'.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: unsupported plugin language '" + lang + "'.");
             continue;
         }
 
         if (not lightNode["input"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the LightInterface settings: 'input' not specified in config file.");
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'input' not specified in config file.");
             continue;
         }
         const YAML::Node& node_input = lightNode["input"];

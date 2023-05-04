@@ -1065,7 +1065,7 @@ namespace Gambit
       YAML::Node zlevels;
 
       #ifdef GAMBIT_LIGHT
-        nodes["LightInterface"] = boundIniFile->getLightInterfaceNode();
+        nodes["UserLogLikes"] = boundIniFile->getUserLogLikesNode();
       #endif
 
       #ifdef DEPRES_DEBUG

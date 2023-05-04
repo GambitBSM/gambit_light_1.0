@@ -32,7 +32,7 @@ Parameters:
     p20: 0.0
 
 
-LightInterface:
+UserLogLikes:
 
   - loglike_name: c_user_loglike
     lang: c

@@ -1,4 +1,4 @@
-LightInterface:
+UserLogLikes:
  - function_name: cuser_loglike
    user_lib: libuser_c.so
    init_fun: init_like
