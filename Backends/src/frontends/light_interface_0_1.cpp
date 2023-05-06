@@ -21,9 +21,9 @@
 #include "gambit/Backends/frontend_macros.hpp"
 #include "gambit/Backends/frontends/light_interface_0_1.hpp"
 
-// Initialisation function. This is called for every point.
 BE_INI_FUNCTION
 {
+    // Only perform the initialization the first time this function is run.
     static bool _so_initialised = false;
     if(_so_initialised) return;
 
@@ -31,12 +31,13 @@ BE_INI_FUNCTION
     std::string loglike_name;
     std::string init_fun;
     std::string lang;
-    std::vector<std::string> inputs, outputs;
-
+    std::vector<std::string> all_outputs;
     YAML::Node lightRootNode = runOptions->getNode("UserLogLikes");
 
     for (std::size_t fi = 0; fi < lightRootNode.size(); fi++)
     {
+        std::vector<std::string> inputs, outputs;
+
         const YAML::Node& lightNode = lightRootNode[fi];
 
         if (not lightNode["loglike_name"].IsDefined())
@@ -90,7 +91,14 @@ BE_INI_FUNCTION
             const YAML::Node& node_output = lightNode["output"];
             for (std::size_t i = 0; i < node_output.size(); i++)
             {
-                outputs.push_back(node_output[i].as<std::string>());
+                std::string output_name = node_output[i].as<std::string>();
+                // Throw error if there already exists an output with the same output_name
+                if (std::find(all_outputs.begin(), all_outputs.end(), output_name) != all_outputs.end())
+                {
+                    backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: multiple outputs with the same name '" + output_name + "'. Each output must be assigned a unique name.");
+                }
+                outputs.push_back(output_name);
+                all_outputs.push_back(output_name);
             }
         }
 
