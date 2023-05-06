@@ -32,37 +32,37 @@ BE_INI_FUNCTION
     std::string init_fun;
     std::string lang;
     std::vector<std::string> all_outputs;
-    YAML::Node lightRootNode = runOptions->getNode("UserLogLikes");
+    YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
-    for (std::size_t fi = 0; fi < lightRootNode.size(); fi++)
+    for (std::size_t fi = 0; fi < userLogLikesNode.size(); fi++)
     {
         std::vector<std::string> inputs, outputs;
 
-        const YAML::Node& lightNode = lightRootNode[fi];
+        const YAML::Node& userLogLikesEntry = userLogLikesNode[fi];
 
-        if (not lightNode["loglike_name"].IsDefined())
+        if (not userLogLikesEntry["loglike_name"].IsDefined())
         {
             backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'loglike_name' not specified in config file.");
         }
-        loglike_name = lightNode["loglike_name"].as<std::string>();
+        loglike_name = userLogLikesEntry["loglike_name"].as<std::string>();
 
-        if (not lightNode["user_lib"].IsDefined())
+        if (not userLogLikesEntry["user_lib"].IsDefined())
         {
             backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'user_lib' not specified in config file.");
         }
-        user_lib = lightNode["user_lib"].as<std::string>();
+        user_lib = userLogLikesEntry["user_lib"].as<std::string>();
 
-        if (not lightNode["init_fun"].IsDefined())
+        if (not userLogLikesEntry["init_fun"].IsDefined())
         {
             backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'init_fun' not specified in config file.");
         }
-        init_fun = lightNode["init_fun"].as<std::string>();
+        init_fun = userLogLikesEntry["init_fun"].as<std::string>();
 
-        if (not lightNode["lang"].IsDefined())
+        if (not userLogLikesEntry["lang"].IsDefined())
         {
             backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'lang' not specified in config file.");
         }
-        lang = lightNode["lang"].as<std::string>();
+        lang = userLogLikesEntry["lang"].as<std::string>();
 
         if (lang != "fortran" and 
             lang != "c" and
@@ -75,20 +75,20 @@ BE_INI_FUNCTION
             continue;
         }
 
-        if (not lightNode["input"].IsDefined())
+        if (not userLogLikesEntry["input"].IsDefined())
         {
             backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'input' not specified in config file.");
             continue;
         }
-        const YAML::Node& node_input = lightNode["input"];
+        const YAML::Node& node_input = userLogLikesEntry["input"];
         for (std::size_t i = 0; i < node_input.size(); i++)
         {
             inputs.push_back(node_input[i].as<std::string>());
         }
 
-        if (lightNode["output"].IsDefined())
+        if (userLogLikesEntry["output"].IsDefined())
         {
-            const YAML::Node& node_output = lightNode["output"];
+            const YAML::Node& node_output = userLogLikesEntry["output"];
             for (std::size_t i = 0; i < node_output.size(); i++)
             {
                 std::string output_name = node_output[i].as<std::string>();
