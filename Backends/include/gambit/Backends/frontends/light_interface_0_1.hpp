@@ -43,10 +43,11 @@ LOAD_LIBRARY
  * BE_FUNCTION([choose function name], [type], [arguement types], "[exact symbol name]", "[choose capability name]")
  */
 
-BE_FUNCTION(run, void, (const map_str_dbl&, map_str_dbl&, vec_str&), "run", "run_light_interface")
-BE_FUNCTION(lightLibrary_C_CXX_Fortran, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "lightLibrary_C_CXX_Fortran", "lightLibrary_C_CXX_Fortran")
-BE_FUNCTION(lightLibrary_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "lightLibrary_Python", "lightLibrary_Python")
+BE_FUNCTION(run_user_loglikes, void, (const map_str_dbl&, map_str_dbl&, vec_str&), "run_user_loglikes", "run_user_loglikes")
+BE_FUNCTION(init_user_lib_C_CXX_Fortran, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_C_CXX_Fortran", "init_user_lib_C_CXX_Fortran")
+BE_FUNCTION(init_user_lib_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_Python", "init_user_lib_Python")
 
+BE_CONV_FUNCTION(run_light_interface, void, (const map_str_dbl&, map_str_dbl&, vec_str&), "run_light_interface")
 
 /* Syntax for BE_VARIABLE:
  * BE_VARIABLE([name], [type], "[exact symbol name]", "[choose capability name]")

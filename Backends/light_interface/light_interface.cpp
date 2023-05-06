@@ -237,7 +237,7 @@ void gambit_light_warning(const char *warning)
 
 
 extern "C"
-void run(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
+void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
     double total_loglike;
     using namespace Gambit::Backends::light_interface_0_1;
@@ -283,9 +283,9 @@ int gambit_light_register(const char *loglike_name, void *fcn)
 
 
 extern "C"
-void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
-                                const std::string &lang, const std::string &loglike_name,
-                                const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
+void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
+                                 const std::string &lang, const std::string &loglike_name,
+                                 const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
 
@@ -337,9 +337,9 @@ void lightLibrary_C_CXX_Fortran(const std::string &path, const std::string &init
 
 #ifdef HAVE_PYBIND11
 extern "C"
-void lightLibrary_Python(const std::string &path, const std::string &init_fun,
-                         const std::string &lang, const std::string &loglike_name,
-                         const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
+void init_user_lib_Python(const std::string &path, const std::string &init_fun,
+                          const std::string &lang, const std::string &loglike_name,
+                          const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::light_interface_0_1;
 

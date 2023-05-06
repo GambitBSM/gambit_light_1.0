@@ -111,7 +111,7 @@ BE_INI_FUNCTION
         {
             try
             {
-                lightLibrary_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+                init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
             }
             catch (const std::runtime_error& e)
             {
@@ -124,7 +124,7 @@ BE_INI_FUNCTION
         {
             try
             {
-                lightLibrary_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+                init_user_lib_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
             }
             catch (const std::runtime_error& e)
             {
@@ -138,3 +138,14 @@ BE_INI_FUNCTION
 }
 END_BE_INI_FUNCTION
 
+
+
+// Convenience functions
+BE_NAMESPACE
+{
+    void run_light_interface(const map_str_dbl& input, map_str_dbl& result, vec_str& warnings)
+    {
+        run_user_loglikes(input, result, warnings);
+    }
+}
+END_BE_NAMESPACE
