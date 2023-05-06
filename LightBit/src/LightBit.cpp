@@ -80,13 +80,6 @@ namespace Gambit
       // Get the output map from dependency "light_output"
       const std::map<std::string,double> &output = *Dep::output;
 
-      // Check that the output map has a "loglike" entry, 
-      // and return this as the result.
-      if (output.count("total_loglike") == 0)
-      {
-        LightBit_error().raise(LOCAL_INFO, "Missing 'total_loglike' entry in output map.");
-      }
-
       result = output.at("total_loglike");
     }
 
