@@ -98,38 +98,61 @@ namespace Gambit
                     double *oparams = (double*)alloca(sizeof(double)*desc.outputs.size());
 
                     // Translate the input to a C array.
-                    int iparam = 0;
+                    int index = 0;
                     for (auto& pname : desc.inputs)
                     {
-                        iparams[iparam++] = input.at(pname);
+                        iparams[index++] = input.at(pname);
                     }
 
                     if(desc.lang == LANG_FORTRAN) retval = desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
                     if(desc.lang == LANG_C) retval = desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
 
-                    // Translate the input to a C array.
-                    iparam = 0;
-                    for (auto& pname : desc.outputs)
+                    // Add outputs to the output map
+                    index = 0;
+                    for (auto& oname : desc.outputs)
                     {
-                        output[pname] = oparams[iparam++];
+                        output[oname] = oparams[index++];
                     }
                 }
 
-                // This part can throw anything - this will be handled in GAMBIT.
                 if(desc.lang == LANG_CPP)
                 {
-                    retval = desc.fcn.cpp(input, output);
+                    std::map<std::string,double> new_output;
+
+                    // This part can throw anything - this will be handled in GAMBIT.
+                    retval = desc.fcn.cpp(input, new_output);
+
+                    // A C++ library can in principle return an output map with
+                    // any number of elements. We therefore manually extract only
+                    // the outputs expected by GAMBIT.
+                    // TODO: Add option to switch this check off, for efficiency.
+                    for (auto& oname : desc.outputs)
+                    {
+                        try
+                        {
+                            output[oname] = new_output.at(oname);
+                        }
+                        catch (const std::out_of_range& e)
+                        {
+                            throw std::runtime_error(
+                                std::string(OUTPUT_PREFIX) + "Cannot find the expected entry '" + oname 
+                                + "' in the output map for the loglike '" + loglike_name + "'."
+                            );
+                        }
+                    }
                 }
 
 #ifdef HAVE_PYBIND11
                 if(desc.lang == LANG_PYTHON)
                 {
+                    std::map<std::string,double> new_output;
+
                     // If a Python exception is caught (via pybind11), re-throw it
                     // as a std::runtime_error without the leading "Exception: "
                     // part of the error message.
                     try
                     {
-                        retval = pybind11::cast<double>((*desc.fcn.python)(input, &output));
+                        retval = pybind11::cast<double>((*desc.fcn.python)(input, &new_output));
                     }
                     catch (pybind11::error_already_set& e)
                     {
@@ -140,10 +163,29 @@ namespace Gambit
                         }
                         throw std::runtime_error(errmsg);
                     }
+
+                    // A Python library can in principle return an output map with
+                    // any number of elements. We therefore manually extract only
+                    // the outputs expected by GAMBIT.
+                    // TODO: Maybe add option to switch this check off, for efficiency?
+                    for (auto& oname : desc.outputs)
+                    {
+                        try
+                        {
+                            output[oname] = new_output.at(oname);
+                        }
+                        catch (const std::out_of_range& e)
+                        {
+                            throw std::runtime_error(
+                                std::string(OUTPUT_PREFIX) + "Cannot find the expected entry '" + oname 
+                                + "' in the output map for the loglike '" + loglike_name + "'."
+                            );
+                        }
+                    }
                 }
 #endif
 
-                // Check if there were any errors.
+                // Throw any errors raised via gambit_light_error.
                 if (str_error)
                 {
                     std::string s(str_error);
@@ -152,7 +194,7 @@ namespace Gambit
                     throw std::runtime_error(s);
                 }
 
-                // Collect any warnings.
+                // Collect any warnings raised via gambit_light_warning.
                 if (str_warning)
                 {
                     std::string s(str_warning);
