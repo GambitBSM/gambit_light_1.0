@@ -143,9 +143,37 @@ END_BE_INI_FUNCTION
 // Convenience functions
 BE_NAMESPACE
 {
-    void run_light_interface(const map_str_dbl& input, map_str_dbl& result, vec_str& warnings)
+    void run_light_interface(const map_str_dbl& input, map_str_dbl& result)
     {
-        run_user_loglikes(input, result, warnings);
+
+        std::vector<std::string> warnings;
+
+        // Call run_user_loglikes from the light_interface library. 
+        // This will fill the result map (and the warnings vector).
+        try
+        {
+            run_user_loglikes(input, result, warnings);
+        }
+        catch (const std::runtime_error& e)
+        {
+            std::string errmsg(e.what());
+            std::string errmsg_lowercase = Utils::strtolower(errmsg);
+            if (errmsg_lowercase.substr(0,13) == "invalid point")
+            {
+                invalid_point().raise("Caught an 'invalid point' message via the light_interface library: " + errmsg);          
+            }
+            else
+            {
+                backend_error().raise(LOCAL_INFO, "Caught a runtime error via the light_interface library: " + std::string(e.what()));
+            }
+        }
+
+        // Log any warnings that we have collected
+        for (const std::string& w : warnings) 
+        {
+            backend_warning().raise(LOCAL_INFO, w);
+        }
     }
+
 }
 END_BE_NAMESPACE

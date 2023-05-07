@@ -36,7 +36,6 @@ namespace Gambit
       using namespace Pipes::output;
 
       std::map<std::string,double> input;
-      std::vector<std::string> warnings;
 
       // Construct input map from GAMBIT parameter map:
       for (auto& kv : Param) 
@@ -44,30 +43,7 @@ namespace Gambit
         input[kv.first] = *kv.second;
       }
 
-      // Call the cpp interface library, which will fill the result map
-      try
-      {
-        BEreq::run_light_interface(input, result, warnings);
-      }
-      catch (const std::runtime_error& e)
-      {
-        std::string errmsg(e.what());
-        std::string errmsg_lowercase = Utils::strtolower(errmsg);
-        if (errmsg_lowercase.substr(0,13) == "invalid point")
-        {
-          invalid_point().raise("Caught an 'invalid point' message via the light_interface library: " + errmsg);          
-        }
-        else
-        {
-          LightBit_error().raise(LOCAL_INFO, "Caught a runtime error via the light_interface library: " + std::string(e.what()));
-        }
-      }
-
-      // Log any warnings that we have collected
-      for (const std::string& w : warnings) 
-      {
-        LightBit_warning().raise(LOCAL_INFO, w);
-      }
+      BEreq::run_light_interface(input, result);
     }
 
 

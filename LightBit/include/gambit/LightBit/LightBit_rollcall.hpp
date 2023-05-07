@@ -30,7 +30,7 @@ START_MODULE
     #define FUNCTION output
     START_FUNCTION(map_str_dbl)
     ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
-    BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl&, map_str_dbl&, vec_str&))
+    BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl&, map_str_dbl&))
     #undef FUNCTION
   #undef CAPABILITY
 
