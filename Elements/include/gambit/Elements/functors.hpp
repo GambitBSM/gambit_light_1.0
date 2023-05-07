@@ -55,6 +55,7 @@
 #include "gambit/Utils/model_parameters.hpp"
 #include "gambit/Logs/logger.hpp"
 #include "gambit/Logs/logmaster.hpp" // Need full declaration of LogMaster class
+#include "gambit/cmake/cmake_variables.hpp"
 
 /// Decay rate of average runtime estimate [(number of functor evaluations)^-1]
 #define FUNCTORS_FADE_RATE 0.01
@@ -1006,6 +1007,9 @@ namespace Gambit
       /// Function for handing over parameter identities to another model_functor
       void donateParameters(model_functor &receiver);
 
+      #ifdef GAMBIT_LIGHT
+        void deleteParameter(str parname);
+      #endif
   };
 
 

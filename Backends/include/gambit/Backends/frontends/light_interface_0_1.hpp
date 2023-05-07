@@ -25,7 +25,6 @@
 #define REFERENCE GAMBIT:2017yxo
 
 #include "gambit/Utils/util_types.hpp"
-// #include "gambit/Core/yaml_parser.hpp"
 
 /* The following macro loads the library using dlopen
  * when this header file is included somewhere. */
@@ -48,6 +47,7 @@ BE_FUNCTION(init_user_lib_C_CXX_Fortran, void, (const std::string &, const std::
 BE_FUNCTION(init_user_lib_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_Python", "init_user_lib_Python")
 
 BE_CONV_FUNCTION(run_light_interface, void, (const map_str_dbl&, map_str_dbl&), "run_light_interface")
+BE_CONV_FUNCTION(get_input_par_set, set_str, (), "get_input_par_set")
 
 /* Syntax for BE_VARIABLE:
  * BE_VARIABLE([name], [type], "[exact symbol name]", "[choose capability name]")

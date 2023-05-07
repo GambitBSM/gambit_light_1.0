@@ -203,4 +203,9 @@ namespace Gambit
    void ModelParameters::setModelName (const std::string& in) { modelname = in; }
    void ModelParameters::setOutputName(const std::string& in) { outputname = in; }
 
+  // In GAMBIT-light we need the ability to delete parameters from models
+  #ifdef GAMBIT_LIGHT
+    void ModelParameters::deleteParameter(const std::string& parname) { _values.erase(parname); }
+  #endif
+
 } //end Gambit namespace

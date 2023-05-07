@@ -45,12 +45,12 @@ namespace Gambit
       // In GAMBIT-light: no Rules entries and a pre-defined set of ObsLikes entries.
       // In regular GAMBIT: get the ObsLikes and Rules entries from the YAML file.
       #ifdef GAMBIT_LIGHT
-        Types::Observable lightbit_loglike;
-        lightbit_loglike.purpose = "LogLike";
-        lightbit_loglike.capability = "total_loglike";
-        lightbit_loglike.module = "LightBit";
-        lightbit_loglike.printme = true;
-        observables.push_back(lightbit_loglike);
+        // Types::Observable lightbit_input;
+        // lightbit_input.purpose = "Observable";
+        // lightbit_input.capability = "input";
+        // lightbit_input.module = "LightBit";
+        // lightbit_input.printme = true;
+        // observables.push_back(lightbit_input);
 
         Types::Observable lightbit_output;
         lightbit_output.purpose = "Observable";
@@ -58,6 +58,13 @@ namespace Gambit
         lightbit_output.module = "LightBit";
         lightbit_output.printme = true;
         observables.push_back(lightbit_output);
+
+        Types::Observable lightbit_loglike;
+        lightbit_loglike.purpose = "LogLike";
+        lightbit_loglike.capability = "total_loglike";
+        lightbit_loglike.module = "LightBit";
+        lightbit_loglike.printme = true;
+        observables.push_back(lightbit_loglike);
       #else
         // Get the observables and rules sections
         YAML::Node outputNode = root["ObsLikes"];

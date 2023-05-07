@@ -17,9 +17,16 @@
 ///
 ///  *********************************************
 
-
 #include "gambit/Backends/frontend_macros.hpp"
 #include "gambit/Backends/frontends/light_interface_0_1.hpp"
+
+#include <set>
+
+BE_NAMESPACE
+{
+    set_str input_par_set;
+}
+END_BE_NAMESPACE
 
 BE_INI_FUNCTION
 {
@@ -83,7 +90,9 @@ BE_INI_FUNCTION
         const YAML::Node& node_input = userLogLikesEntry["input"];
         for (std::size_t i = 0; i < node_input.size(); i++)
         {
-            inputs.push_back(node_input[i].as<std::string>());
+            std::string input_name = node_input[i].as<std::string>();
+            inputs.push_back(input_name);
+            input_par_set.insert(input_name);
         }
 
         if (userLogLikesEntry["output"].IsDefined())
@@ -173,6 +182,12 @@ BE_NAMESPACE
         {
             backend_warning().raise(LOCAL_INFO, w);
         }
+    }
+
+    
+    set_str get_input_par_set()
+    {
+        return input_par_set;
     }
 
 }

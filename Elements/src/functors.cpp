@@ -1836,6 +1836,13 @@ namespace Gambit
       receiver.setModelName(myValue->getModelName());
     }
 
+    #ifdef GAMBIT_LIGHT
+      void model_functor::deleteParameter(str parname)
+      {
+        myValue->deleteParameter(parname);
+      }
+    #endif
+
     /// @}
 
     /// @{ Primary model functor class method definitions

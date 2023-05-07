@@ -21,15 +21,23 @@
 #include "gambit/Elements/shared_types.hpp"
 #include "gambit/Utils/util_types.hpp"
 
-
 #define MODULE LightBit
 START_MODULE
+  
+  #define CAPABILITY input
+  START_CAPABILITY
+    #define FUNCTION input
+    START_FUNCTION(map_str_dbl)
+    ALLOW_MODELS(UserModel)
+    BACKEND_REQ(get_input_par_set, (light_interface), set_str, ())
+    #undef FUNCTION
+  #undef CAPABILITY
 
   #define CAPABILITY output
   START_CAPABILITY
     #define FUNCTION output
     START_FUNCTION(map_str_dbl)
-    ALLOW_MODELS(GenericModel5, GenericModel10, GenericModel15, GenericModel20)
+    DEPENDENCY(input, map_str_dbl)
     BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl&, map_str_dbl&))
     #undef FUNCTION
   #undef CAPABILITY
