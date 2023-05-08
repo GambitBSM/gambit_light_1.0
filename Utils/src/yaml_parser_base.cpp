@@ -166,51 +166,23 @@ namespace Gambit
 
       // Special treatment for GAMBIT-light
       #ifdef GAMBIT_LIGHT
-        // Override the parametersNode variable with a node 
-        // we construct from the "UserModel" node.
-        // We construct a new parameters node (newParametersNode), 
-        // add an entry "UserModel" (which corresponds to a model name)
-        // and fill it with the content from root["UserModel"].
-        YAML::Node userModelNode = root["UserModel"];
+        userModelNode = root["UserModel"];
+        userLogLikesNode = root["UserLogLikes"];
+
+        // Override the parametersNode variable with a node we construct 
+        // from the "UserModel" node. We construct a new parameters node 
+        // (newParametersNode), add an entry "UserModel" (which corresponds 
+        // to a model name) and fill it with the content from root["UserModel"].
         YAML::Node newParametersNode;
         newParametersNode["UserModel"] = userModelNode;
         // Now override the existing parametersNode variable
         parametersNode = newParametersNode;
 
-        // Get the content of the "UserLogLikes" node and store in userLogLikesNode
-        userLogLikesNode = root["UserLogLikes"];
-
-        // Compare the input parameter names listed in "UserLogLikes"
-        // with those listed in "UserModel". Throw an error if "UserLogLikes" 
-        // requests some parameters that are not in "UserModel".
-        std::set<std::string> listed_pars;
-        for(auto it = userModelNode.begin(); it != userModelNode.end(); ++it)
-        {
-          listed_pars.insert(it->first.as<str>());
-        }
-
-        for (std::size_t fi = 0; fi < userLogLikesNode.size(); fi++)
-        {
-          const YAML::Node& userLogLikesEntry = userLogLikesNode[fi];
-          const YAML::Node& node_input = userLogLikesEntry["input"];
-          for (std::size_t i = 0; i < node_input.size(); i++)
-          {
-            std::string input_name = node_input[i].as<std::string>();
-            if (std::find(listed_pars.begin(), listed_pars.end(), input_name) == listed_pars.end())
-            {
-              str error_msg = "Error while parsing the UserLogLikes settings: "
-                              "The parameter " + input_name + " is requested as an input parameter, "
-                              "but it is not listed in the UserModel section.";
-              inifile_error().raise(LOCAL_INFO, error_msg);
-            }
-          }
-        }
-
         // Force the "like: LogLike" option for all listed scanner plugins,
         // to match the "purpose: LogLike" in the pre-defined ObsLikes section 
         // for GAMBIT-light.
         YAML::Node listed_scanner_plugins = scannerNode["scanners"];
-        for(auto it = listed_scanner_plugins.begin(); it != listed_scanner_plugins.end(); ++it)
+        for(YAML::const_iterator it = listed_scanner_plugins.begin(); it != listed_scanner_plugins.end(); ++it)
         {
           str plugin_name = it->first.as<str>();
           scannerNode["scanners"][plugin_name]["like"] = "LogLike";
@@ -379,6 +351,7 @@ namespace Gambit
     YAML::Node Parser::getLoggerNode()       const {return logNode;}
     YAML::Node Parser::getKeyValuePairNode() const {return keyValuePairNode;}
     #ifdef GAMBIT_LIGHT
+      YAML::Node Parser::getUserModelNode() const {return userModelNode;}
       YAML::Node Parser::getUserLogLikesNode() const {return userLogLikesNode;}
     #endif
     /// @}

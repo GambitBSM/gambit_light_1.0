@@ -70,6 +70,7 @@ namespace Gambit
         YAML::Node getLoggerNode() const;
         YAML::Node getKeyValuePairNode() const;
         #ifdef GAMBIT_LIGHT
+          YAML::Node getUserModelNode() const;
           YAML::Node getUserLogLikesNode() const;
         #endif
 
@@ -134,6 +135,7 @@ namespace Gambit
         YAML::Node scannerNode;
         YAML::Node logNode;
         #ifdef GAMBIT_LIGHT
+          YAML::Node userModelNode;
           YAML::Node userLogLikesNode;
         #endif
     };

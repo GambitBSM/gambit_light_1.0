@@ -4,6 +4,7 @@
 // User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
 double user_loglike(const int niparams, const double *iparams, const int noparams, double *oparams)
 {
+    printf("libuser.c: user_loglike: niparams = %i.\n", niparams);
     printf("libuser.c: user_loglike: computing loglike.\n");
     if(!niparams) return 0.0;
     for(int i=0; i<noparams; i++) oparams[i] = i;

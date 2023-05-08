@@ -39,11 +39,23 @@ BE_INI_FUNCTION
     std::string init_fun;
     std::string lang;
     std::vector<std::string> all_outputs;
+    std::set<std::string> listed_usermodel_pars;
+
+    YAML::Node userModelNode = runOptions->getNode("UserModel");
     YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
+    // First collect all parameter names listed in the "UserModel" section
+    for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
+    {
+        std::string usermodel_par_name = it->first.as<str>();
+        listed_usermodel_pars.insert(usermodel_par_name);
+    }
+
+    // Now loop over the entries in "UserLogLikes" and perform a set of checks
     for (std::size_t fi = 0; fi < userLogLikesNode.size(); fi++)
     {
-        std::vector<std::string> inputs, outputs;
+        std::vector<std::string> inputs;
+        std::vector<std::string> outputs;
 
         const YAML::Node& userLogLikesEntry = userLogLikesNode[fi];
 
@@ -82,17 +94,34 @@ BE_INI_FUNCTION
             continue;
         }
 
-        if (not userLogLikesEntry["input"].IsDefined())
+        if (userLogLikesEntry["input"].IsDefined())
         {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'input' not specified in config file.");
-            continue;
+            const YAML::Node& inputNode = userLogLikesEntry["input"];
+            for (std::size_t i = 0; i < inputNode.size(); i++)
+            {
+                std::string input_par_name = inputNode[i].as<std::string>();
+
+                // Check that all parameter names listed under "input" in the "UserLogLikes" 
+                // section are also specified in the "UserModel" section.
+                if (not userModelNode[input_par_name].IsDefined())
+                {
+                    str error_msg = "Error while parsing the UserLogLikes settings: "
+                                    "The parameter " + input_par_name + " is requested as an input parameter, "
+                                    "but it is not listed in the UserModel section.";
+                    backend_error().raise(LOCAL_INFO, error_msg);
+                }
+
+                // Register requested input parameter
+                inputs.push_back(input_par_name);
+                input_par_set.insert(input_par_name);
+            }
         }
-        const YAML::Node& node_input = userLogLikesEntry["input"];
-        for (std::size_t i = 0; i < node_input.size(); i++)
+        else  // The current "UserLogLike" entry has no "input" node
         {
-            std::string input_name = node_input[i].as<std::string>();
-            inputs.push_back(input_name);
-            input_par_set.insert(input_name);
+            // If there is no "input" node we assume that all parameters
+            // from "UserModel" should be used as input.
+            inputs.assign(listed_usermodel_pars.begin(), listed_usermodel_pars.end());
+            input_par_set.insert(listed_usermodel_pars.begin(), listed_usermodel_pars.end());
         }
 
         if (userLogLikesEntry["output"].IsDefined())
