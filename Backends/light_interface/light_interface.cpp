@@ -243,7 +243,17 @@ void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::
     using namespace Gambit::Backends::light_interface_0_1;
     for (const auto& fn : user_loglikes)
     {
-        double user_loglike = call_user_function(fn.first, fn.second, input, output, warnings);
+        // If this loglike function is only using a subset of the provided inputs, 
+        // we must construct the restricted input map before calling it.
+        std::map<std::string,double> use_input;
+        for (const std::string& iname : fn.second.inputs)
+        {
+            use_input[iname] = input.at(iname);
+        }
+
+        // Call the user loglike function
+        double user_loglike = call_user_function(fn.first, fn.second, use_input, output, warnings);
+
         // Add each separate loglike contribution to the output map.
         output[fn.first] = user_loglike;
         total_loglike += user_loglike;
