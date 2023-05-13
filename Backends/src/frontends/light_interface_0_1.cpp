@@ -44,26 +44,21 @@ BE_INI_FUNCTION
     YAML::Node userModelNode = runOptions->getNode("UserModel");
     YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
+
     // First collect all parameter names listed in the "UserModel" section
     for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
     {
-        std::string usermodel_par_name = it->first.as<str>();
+        std::string usermodel_par_name = it->first.as<std::string>();
         listed_usermodel_pars.insert(usermodel_par_name);
     }
 
-    // Now loop over the entries in "UserLogLikes" and perform a set of checks
-    for (std::size_t fi = 0; fi < userLogLikesNode.size(); fi++)
+    for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
     {
+        std::string loglike_name = it->first.as<std::string>();
+        const YAML::Node& userLogLikesEntry = it->second;
+
         std::vector<std::string> inputs;
         std::vector<std::string> outputs;
-
-        const YAML::Node& userLogLikesEntry = userLogLikesNode[fi];
-
-        if (not userLogLikesEntry["loglike_name"].IsDefined())
-        {
-            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'loglike_name' not specified in config file.");
-        }
-        loglike_name = userLogLikesEntry["loglike_name"].as<std::string>();
 
         if (not userLogLikesEntry["user_lib"].IsDefined())
         {

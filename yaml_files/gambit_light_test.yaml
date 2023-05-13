@@ -18,7 +18,7 @@ UserModel:
 
 UserLogLikes:
 
-  - loglike_name: c_user_loglike
+  c_user_loglike:
     lang: c
     user_lib: Backends/light_interface/libuser_c.so
     init_fun: init_user_loglike
@@ -30,7 +30,7 @@ UserLogLikes:
       - oname2_c
       - oname3_c
 
-  - loglike_name: cpp_user_loglike
+  cpp_user_loglike:
     lang: c++
     user_lib: Backends/light_interface/libuser_cpp.so
     init_fun: _Z17init_user_loglikePKcPFiS0_PvE
@@ -42,7 +42,7 @@ UserLogLikes:
       - oname1_cpp
       - oname2_cpp
 
-  - loglike_name: fortran_user_loglike
+  fortran_user_loglike:
     lang: fortran
     user_lib: Backends/light_interface/libuser_fortran.so
     init_fun: init_user_loglike
@@ -53,7 +53,7 @@ UserLogLikes:
     output:
       - oname1_fortran
 
-  - loglike_name: py_user_loglike
+  py_user_loglike:
     lang: python
     user_lib: Backends/light_interface/libuser.py
     init_fun: init_user_loglike
@@ -65,7 +65,7 @@ UserLogLikes:
       - oname2_py
       - oname3_py
 
-  - loglike_name: py_user_loglike_rosenbrock
+  py_user_loglike_rosenbrock:
     lang: python
     user_lib: Backends/light_interface/libuser_rosenbrock.py
     init_fun: init_user_loglike
