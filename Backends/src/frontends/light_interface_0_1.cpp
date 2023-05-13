@@ -44,14 +44,30 @@ BE_INI_FUNCTION
     YAML::Node userModelNode = runOptions->getNode("UserModel");
     YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
+    // Check for unknown options or typos in the "UserLogLikes" section.
+    const static std::vector<std::string> known_userloglike_options = {"lang", "user_lib", "init_fun", "input", "output"};
+    for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
+    {
+        std::string loglike_name = it->first.as<std::string>();
+        const YAML::Node& userLogLikesEntry = it->second;
+        for(YAML::const_iterator it2 = userLogLikesEntry.begin(); it2 != userLogLikesEntry.end(); ++it2)
+        {
+            std::string option_name = it2->first.as<std::string>();
+            if (std::find(known_userloglike_options.begin(), known_userloglike_options.end(), option_name) == known_userloglike_options.end())
+            {
+                backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: Unknown option '" + option_name + "' for the loglike '" + loglike_name + "'. (Maybe a typo?)");
+            }
+        }
+    }
 
-    // First collect all parameter names listed in the "UserModel" section
+    // Collect all parameter names listed in the "UserModel" section.
     for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
     {
         std::string usermodel_par_name = it->first.as<std::string>();
         listed_usermodel_pars.insert(usermodel_par_name);
     }
 
+    // Check consistency and collect settings from the "UserLogLikes" section.
     for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
     {
         std::string loglike_name = it->first.as<std::string>();
@@ -100,9 +116,9 @@ BE_INI_FUNCTION
                 // section are also specified in the "UserModel" section.
                 if (not userModelNode[input_par_name].IsDefined())
                 {
-                    str error_msg = "Error while parsing the UserLogLikes settings: "
-                                    "The parameter " + input_par_name + " is requested as an input parameter, "
-                                    "but it is not listed in the UserModel section.";
+                    std::string error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
+                                            + input_par_name + " is requested as an input parameter, "
+                                            "but it is not listed in the UserModel section.";
                     backend_error().raise(LOCAL_INFO, error_msg);
                 }
 
