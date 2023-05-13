@@ -20,11 +20,9 @@
 #include "gambit/Backends/frontend_macros.hpp"
 #include "gambit/Backends/frontends/light_interface_0_1.hpp"
 
-#include <set>
-
 BE_NAMESPACE
 {
-    set_str input_par_set;
+    std::vector<std::string> listed_usermodel_pars;
 }
 END_BE_NAMESPACE
 
@@ -39,7 +37,6 @@ BE_INI_FUNCTION
     std::string init_fun;
     std::string lang;
     std::vector<std::string> all_outputs;
-    std::set<std::string> listed_usermodel_pars;
 
     YAML::Node userModelNode = runOptions->getNode("UserModel");
     YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
@@ -64,7 +61,10 @@ BE_INI_FUNCTION
     for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
     {
         std::string usermodel_par_name = it->first.as<std::string>();
-        listed_usermodel_pars.insert(usermodel_par_name);
+        if (std::find(listed_usermodel_pars.begin(), listed_usermodel_pars.end(), usermodel_par_name) == listed_usermodel_pars.end())
+        {
+            listed_usermodel_pars.push_back(usermodel_par_name);
+        }
     }
 
     // Check consistency and collect settings from the "UserLogLikes" section.
@@ -124,7 +124,6 @@ BE_INI_FUNCTION
 
                 // Register requested input parameter
                 inputs.push_back(input_par_name);
-                input_par_set.insert(input_par_name);
             }
         }
         else  // The current "UserLogLike" entry has no "input" node
@@ -132,7 +131,6 @@ BE_INI_FUNCTION
             // If there is no "input" node we assume that all parameters
             // from "UserModel" should be used as input.
             inputs.assign(listed_usermodel_pars.begin(), listed_usermodel_pars.end());
-            input_par_set.insert(listed_usermodel_pars.begin(), listed_usermodel_pars.end());
         }
 
         if (userLogLikesEntry["output"].IsDefined())
@@ -225,9 +223,9 @@ BE_NAMESPACE
     }
 
     
-    set_str get_input_par_set()
+    vec_str get_input_par_names()
     {
-        return input_par_set;
+        return listed_usermodel_pars;
     }
 
 }

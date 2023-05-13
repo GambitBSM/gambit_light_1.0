@@ -39,12 +39,12 @@ namespace Gambit
       if (first)
       {
         // Get the names of input parameters in use
-        std::set<std::string> input_par_set = BEreq::get_input_par_set();
+        std::vector<std::string> input_par_set = BEreq::get_input_par_names();
 
         // For each parameter, get the pointer from Param in param_pointer_map
-        for (const std::string& par_name: input_par_set) 
+        for (const std::string& input_par_name: input_par_set) 
         {
-          param_pointer_map[par_name] = Param.at(par_name).operator->();
+          param_pointer_map[input_par_name] = Param.at(input_par_name).operator->();
         }
 
         first = false;

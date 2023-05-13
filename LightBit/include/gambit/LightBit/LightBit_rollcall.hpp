@@ -29,7 +29,7 @@ START_MODULE
     #define FUNCTION input
     START_FUNCTION(map_str_dbl)
     ALLOW_MODELS(UserModel)
-    BACKEND_REQ(get_input_par_set, (light_interface), set_str, ())
+    BACKEND_REQ(get_input_par_names, (light_interface), vec_str, ())
     #undef FUNCTION
   #undef CAPABILITY
 
