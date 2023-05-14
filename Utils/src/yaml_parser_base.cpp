@@ -169,18 +169,9 @@ namespace Gambit
         userModelNode = root["UserModel"];
         userLogLikesNode = root["UserLogLikes"];
 
-        // Override the parametersNode variable with a node we construct 
-        // from the "UserModel" node. We construct a new parameters node 
-        // (newParametersNode), add an entry "UserModel" (which corresponds 
-        // to a model name) and fill it with the content from root["UserModel"].
-        YAML::Node newParametersNode;
-        newParametersNode["UserModel"] = userModelNode;
-        // Now override the existing parametersNode variable
-        parametersNode = newParametersNode;
-
-        // For each parameter we need a "name" entry. Just use the UserModel parameter
-        // names ("p1", "p2", ...) if a name is not already specified.
-        for(YAML::iterator it = parametersNode["UserModel"].begin(); it != parametersNode["UserModel"].end(); ++it)
+        // For each parameter in "UserModel" we need a "name" entry. Just use the UserModel 
+        // parameter names ("p1", "p2", ...) if a name is not already specified.
+        for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
         {
           std::string p_par_name = it->first.as<std::string>();
           YAML::Node& p_par_node = it->second;
@@ -199,6 +190,15 @@ namespace Gambit
             p_par_node["name"] = p_par_name;
           }
         }
+
+        // Override the parametersNode variable with a node we construct 
+        // from the "UserModel" node. We construct a new parameters node 
+        // (newParametersNode), add an entry "UserModel" (which corresponds 
+        // to a model name) and fill it with the content from root["UserModel"].
+        YAML::Node newParametersNode;
+        newParametersNode["UserModel"] = userModelNode;
+        // Now override the existing parametersNode variable
+        parametersNode = newParametersNode;
 
         // Force the "like: LogLike" option for all listed scanner plugins,
         // to match the "purpose: LogLike" in the pre-defined ObsLikes section 
