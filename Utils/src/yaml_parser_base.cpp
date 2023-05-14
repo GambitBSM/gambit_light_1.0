@@ -178,6 +178,28 @@ namespace Gambit
         // Now override the existing parametersNode variable
         parametersNode = newParametersNode;
 
+        // For each parameter we need a "name" entry. Just use the UserModel parameter
+        // names ("p1", "p2", ...) if a name is not already specified.
+        for(YAML::iterator it = parametersNode["UserModel"].begin(); it != parametersNode["UserModel"].end(); ++it)
+        {
+          std::string p_par_name = it->first.as<std::string>();
+          YAML::Node& p_par_node = it->second;
+
+          // If p_par_node is Scalar/Sequence, convert to a Map by adding the "fixed_value" key.
+          if (p_par_node.IsScalar() or p_par_node.IsSequence()) 
+          {
+            YAML::Node new_node;
+            new_node["fixed_value"] = p_par_node;
+            p_par_node = new_node;
+          }
+
+          // Add "name" entry if missing
+          if (not p_par_node["name"].IsDefined())
+          {
+            p_par_node["name"] = p_par_name;
+          }
+        }
+
         // Force the "like: LogLike" option for all listed scanner plugins,
         // to match the "purpose: LogLike" in the pre-defined ObsLikes section 
         // for GAMBIT-light.
