@@ -17,7 +17,7 @@ double user_loglike(const int niparams, const double *iparams, const int noparam
 
     // Error handling: Report a string warning using gambit_light_warning.
     gambit_light_warning("Some warning");
-    return iparams[0] + iparams[1];
+    return iparams[0] + iparams[1] + iparams[2];
 
     // Error handling: Report a string error using gambit_light_error.
     // gambit_light_error("Invalid input parameters");

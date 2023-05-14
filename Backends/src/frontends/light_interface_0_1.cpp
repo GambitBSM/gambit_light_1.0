@@ -65,8 +65,6 @@ BE_INI_FUNCTION
         std::string model_par_name = it->first.as<std::string>();
         std::string user_par_name = (it->second)["name"].as<std::string>();
 
-        std::cerr << "DEBUG: got parameter names: " << model_par_name << " <--> " << user_par_name << std::endl;
-
         if (std::find(listed_user_pars.begin(), listed_user_pars.end(), model_par_name) == listed_user_pars.end())
         {
             listed_user_pars.push_back(user_par_name);

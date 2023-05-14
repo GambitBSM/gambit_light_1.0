@@ -2,11 +2,11 @@ import gambit_light
 
 def user_loglike(iparams, oparams):
   print("libuser.py: user_loglike: computing loglike.");
-  oparams['oname1_py'] = 1;
-  oparams['oname2_py'] = 2;
-  oparams['oname3_py'] = 3;
+  oparams['py_user_loglike_output_1'] = 1;
+  oparams['py_user_loglike_output_2'] = 2;
+  oparams['py_user_loglike_output_3'] = 3;
 
-  print("libuser.py: got iparams: ", iparams)
+  print("libuser.py: got iparams:", iparams)
 
   # return iparams['p1'] + iparams['p2'];
 
@@ -19,7 +19,7 @@ def user_loglike(iparams, oparams):
   
   # Error handling: Report a string warning using gambit_light.warning.
   gambit_light.warning('Some warning')
-  return iparams['alpha'] + iparams['beta'];
+  return iparams['param_name_1'] + iparams['param_name_2'] + iparams['param_name_4'];
 
   # Error handling: Report a string error using gambit_light.error.
   # gambit_light.error('Invalid input parameters');

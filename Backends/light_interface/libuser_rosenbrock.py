@@ -25,8 +25,8 @@ def loglike(x):
 def user_loglike(iparams, oparams):
   print("libuser_rosenbrock.py: user_loglike: computing loglike.");
 
-  x = np.array([iparams['p1'], iparams['p2']])
-  oparams['rosenbrock_oname1_py'] = 10;
+  x = np.array([iparams['param_name_1'], iparams['param_name_2']])
+  oparams['py_user_loglike_rosenbrock_output_1'] = 10;
   result = loglike(x)
   return result
 

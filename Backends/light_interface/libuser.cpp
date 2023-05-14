@@ -6,9 +6,9 @@
 double user_loglike(const std::map<std::string,double>& input, std::map<std::string,double>& output)
 {
     std::cout << "libuser.cpp: user_loglike: computing loglike." << std::endl;
-    output["oname1_cpp"] = 1;
-    output["oname2_cpp"] = 2;
-    output["oname3_cpp"] = 3;
+    output["cpp_user_loglike_output_1"] = 1;
+    output["cpp_user_loglike_output_2"] = 2;
+    output["cpp_user_loglike_output_3"] = 3;
 
     // return input.at("p1") + input.at("p2");
     
@@ -17,7 +17,7 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
 
     // Error handling: Report a string warning using gambit_light_warning.
     gambit_light_warning("Some warning");
-    return input.at("p1") + input.at("p2");
+    return input.at("param_name_2") + input.at("param_name_3");
 
     // Error handling: Report a string error using gambit_light_error.
     // gambit_light_error("Invalid input parameters");
