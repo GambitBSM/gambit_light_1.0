@@ -3,7 +3,8 @@
 # \file
 #
 #  Cmake configuration script to look for optional
-#  things for GAMBIT.
+#  things for GAMBIT-light, based on the 
+#  corresponding file for GAMBIT.
 #
 #************************************************
 #
@@ -24,6 +25,10 @@
 #  \author Will Handley
 #          (wh260@cam.ac.uk)
 #  \date 2018 May, Dec
+#
+#  \author Anders Kvellestad
+#          (anders.kvellestad@fys.uio.no)
+#  \date 2023 May
 #
 #************************************************
 
@@ -211,115 +216,6 @@ if(NOT LAPACK_LINKLIBS AND NOT LAPACK_FOUND)
   message("${BoldRed}   LAPACK shared library not found. Excluding FlexibleSUSY and MultiNest from GAMBIT configuration. ${ColourReset}")
 endif()
 
-# Helper function to check if ROOT has been compiled with the same standard as we are using here.  If not, downgrade to the standard that ROOT was compiled with.
-function(check_root_std_flag)
-  # Loop over C++ standards
-  set(std_list "17;1z;14;1y;11;0x")
-  foreach(std ${std_list})
-    set(CXX_FLAG "-std=c++${std}")
-    set(CXX_FLAG_RE "-std=c\\+\\+${std}")
-    # Check in ROOT_CXX_FLAGS
-    if (NOT ROOT_USES_STD)
-      string(REGEX MATCH ${CXX_FLAG_RE} ROOT_USES_STD ${ROOT_CXX_FLAGS})
-      if (ROOT_USES_STD)
-        message("${BoldYellow}   This ROOT was compiled with ${CXX_FLAG}.${ColourReset}")
-        set(ROOT_STD "${std}")
-        set(ROOT_CXX_FLAG "${CXX_FLAG}")
-        set(ROOT_CXX_FLAG_RE "${CXX_FLAG_RE}")
-      endif()
-    endif()
-    # Check in CMAKE_CXX_FLAGS
-    if(NOT CMAKE_USES_STD)
-      string(REGEX MATCH ${CXX_FLAG_RE} CMAKE_USES_STD ${CMAKE_CXX_FLAGS})
-      if (CMAKE_USES_STD)
-        set(CMAKE_STD "${std}")
-        set(CMAKE_CXX_FLAG "${CXX_FLAG}")
-        set(CMAKE_CXX_FLAG_RE "${CXX_FLAG_RE}")
-      endif()
-    endif()
-    # Check in BACKEND_CXX_FLAGS
-    if(NOT BACKEND_USES_STD)
-      string(REGEX MATCH ${CXX_FLAG_RE} BACKEND_USES_STD ${BACKEND_CXX_FLAGS})
-      if (BACKEND_USES_STD)
-        set(BACKEND_STD "${std}")
-        set(BACKEND_CXX_FLAG "${CXX_FLAG}")
-        set(BACKEND_CXX_FLAG_RE "${CXX_FLAG_RE}")
-      endif()
-    endif()
-    # Should we downgrade the -std flag used in CMAKE_CXX_FLAGS?
-    if ((CMAKE_USES_STD) AND (NOT ROOT_USES_STD))
-      set(DOWNGRADE_CMAKE_STD "True")
-    endif()
-    # Should we downgrade the -std flag used in BACKEND_CXX_FLAGS?
-    if ((BACKEND_USES_STD) AND (NOT ROOT_USES_STD))
-      set(DOWNGRADE_BACKEND_STD "True")
-    endif()
-  endforeach()
-  # Did we figure out the std used by ROOT?
-  if(NOT ROOT_USES_STD)
-    message(FATAL_ERROR "${BoldRed}Unable to detect what flavour of C++ your installation of ROOT has "
-                        "been compiled with; please set -DWITH_ROOT=OFF.${ColourReset}")
-  endif()
-  # Check that the std used by ROOT is OK
-  CHECK_CXX_COMPILER_FLAG(${ROOT_CXX_FLAG} COMPILER_SUPPORTS_CXX${ROOT_STD})
-  if(NOT COMPILER_SUPPORTS_CXX${ROOT_STD})
-    message(FATAL_ERROR "${BoldRed}This installation of ROOT has been compiled with C++${std} support, "
-                        "but your chosen compiler does not support C++${std}.  Please change compiler "
-                        "or set -DWITH_ROOT=OFF.${ColourReset}")
-  endif()
-  # Downgrade -std flag in CMAKE_CXX_FLAGS
-  if(DOWNGRADE_CMAKE_STD)
-    string(REGEX REPLACE ${CMAKE_CXX_FLAG_RE} ${ROOT_CXX_FLAG} CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} PARENT_SCOPE)
-  endif()
-  # Downgrade -std flag in BACKEND_CXX_FLAGS
-  if(DOWNGRADE_BACKEND_STD)
-    string(REGEX REPLACE ${BACKEND_CXX_FLAG_RE} ${ROOT_CXX_FLAG} BACKEND_CXX_FLAGS "${BACKEND_CXX_FLAGS}")
-    set(BACKEND_CXX_FLAGS ${BACKEND_CXX_FLAGS} PARENT_SCOPE)
-  endif()
-endfunction()
-
-# Check for ROOT.
-option(WITH_ROOT "Compile with ROOT enabled" OFF)
-if(WITH_ROOT)
-  if (DEFINED ENV{ROOTSYS})
-    list(APPEND CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake/)
-    find_package(ROOT 6)
-    if (ROOT_VERSION VERSION_LESS 6)
-      set (ROOT_FOUND FALSE)
-    endif()
-  else()
-    set (ROOT_FOUND FALSE)
-  endif()
-  if(NOT ROOT_FOUND)
-    message("${BoldRed}   ROOT 6 not found.  ROOT support will be disabled.${ColourReset}")
-  endif()
-else()
-  message("${BoldCyan} X ROOT support is deactivated. Set -DWITH_ROOT=ON to activate ROOT support in GAMBIT.${ColourReset}")
-endif()
-if (WITH_ROOT AND ROOT_FOUND)
-  message("${BoldYellow}   Found ROOT version ${ROOT_VERSION}.${ColourReset}")
-  if ("${ROOT_INCLUDE_DIRS}" STREQUAL "")
-    if ("${ROOT_INCLUDE_DIR}" STREQUAL "")
-      message(FATAL_ERROR "${BoldRed}FindROOT.cmake has not provided any include dir."
-                          "This is a ROOT bug; please report it to the ROOT developers."
-                          "You can set -DWITH_ROOT=OFF to compile GAMBIT without ROOT.${ColourReset}")
-    endif()
-    set(ROOT_INCLUDE_DIRS "${ROOT_INCLUDE_DIR}")
-  endif()
-  include_directories(${ROOT_INCLUDE_DIRS})
-  add_definitions(${ROOT_DEFINITIONS})
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};$ENV{ROOTSYS}/lib")
-
-  check_root_std_flag()
-  set (EXCLUDE_ROOT FALSE)
-else()
-  message("   Disabling GreAT, HepLike and RestFrames support in GAMBIT configuration.")
-  option (WITH_RESTFRAMES OFF)
-  set (itch "${itch}" "great" "heplike")
-  set (EXCLUDE_ROOT TRUE)
-endif()
-
 # Check for HDF5 libraries
 find_package(HDF5 QUIET COMPONENTS C)
 if(HDF5_FOUND)
@@ -351,11 +247,4 @@ if(SQLite3_FOUND)
 else()
   message("${BoldRed}   No SQLite C libraries found. Excluding sqliteprinter and sqlitereader from GAMBIT configuration.${ColourReset}")
   set(itch "${itch}" "sqliteprinter" "sqlitereader")
-endif()
-
-# Check for Cython
-find_package(Cython)
-if(CYTHON_FOUND)
-  include_directories(${CYTHON_INCLUDE_DIRS})
-  message("-- Found Cython libraries: ${CYTHON_EXECUTABLE}")
 endif()

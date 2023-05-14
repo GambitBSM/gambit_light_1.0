@@ -84,7 +84,19 @@ set(GAMBIT_LIGHT 1)
 
 # Set some other variables needed for GAMBIT-light
 set(HAVE_MATHEMATICA 0)
-
+set(EXCLUDE_ROOT 1)
+set(itch "${itch};DarkBit")
+set(itch "${itch};ColliderBit")
+set(itch "${itch};CosmoBit")
+set(itch "${itch};FlavBit")
+set(itch "${itch};PrecisionBit")
+set(itch "${itch};NeutrinoBit")
+set(itch "${itch};ObjectivesBit")
+set(itch "${itch};DecayBit")
+set(itch "${itch};SpecBit")
+set(itch "${itch};ExampleBit_A")
+set(itch "${itch};ExampleBit_B")
+set(itch "${itch};great")  # Leave out the GreAT scanner, to avoid all the ROOT stuff
 
 # Make sure the user hasn't accidentally set the C++ compiler to the C compiler.
 get_filename_component(CXX_COMPILER_NAME ${CMAKE_CXX_COMPILER} NAME)
@@ -433,6 +445,7 @@ else()
   set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 endif()
 
+# _Anders
 # Check for optional packages and disable sections of GAMBIT accordingly
 include(cmake/optional.cmake)
 

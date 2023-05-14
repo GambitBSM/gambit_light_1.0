@@ -63,9 +63,6 @@
 /// Leave out HepMC
 #cmakedefine EXCLUDE_HEPMC 1
 
-/// Leave out ROOT
-#cmakedefine EXCLUDE_ROOT 1
-
 /// Leave out RestFrames
 #cmakedefine EXCLUDE_RESTFRAMES 1
 
