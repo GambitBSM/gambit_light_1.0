@@ -59,18 +59,28 @@ BE_INI_FUNCTION
         }
     }
 
-    // Collect all parameter names listed in the "UserModel" section.
+    // Collect all parameter names listed in the "UserModel" section (and check for duplicates).
     for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
     {
         std::string model_par_name = it->first.as<std::string>();
         std::string user_par_name = (it->second)["name"].as<std::string>();
 
-        if (std::find(listed_user_pars.begin(), listed_user_pars.end(), model_par_name) == listed_user_pars.end())
+        // Check for duplicate entries of model_par_name ("p1", "p2", etc.)
+        if (std::find(listed_model_pars.begin(), listed_model_pars.end(), model_par_name) != listed_model_pars.end())
         {
-            listed_user_pars.push_back(user_par_name);
-            listed_model_pars.push_back(model_par_name);
-            model_to_user_par_names[model_par_name] = user_par_name;
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: Multiple entries for the parameter '" + model_par_name + "'.");
         }
+
+        // Check for duplicate entries of the user-specified parameter name.
+        if (std::find(listed_user_pars.begin(), listed_user_pars.end(), user_par_name) != listed_user_pars.end())
+        {
+            backend_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: The parameter name '" + user_par_name + "' is assigned to multiple parameters.");
+        }
+
+        // This is a new parameter. Register it.
+        listed_user_pars.push_back(user_par_name);
+        listed_model_pars.push_back(model_par_name);
+        model_to_user_par_names[model_par_name] = user_par_name;
     }
 
     // Check consistency and collect settings from the "UserLogLikes" section.
