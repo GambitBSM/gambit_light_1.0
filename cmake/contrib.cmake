@@ -3,7 +3,8 @@
 # \file
 #
 #  CMake configuration script for contributed
-#  packages in GAMBIT.
+#  packages in GAMBIT-light, based on corresponding
+#  file for GAMBIT.
 #
 #************************************************
 #
@@ -20,6 +21,10 @@
 # \author Tomas Gonzalo
 #         (tomas.gonzalo@monash.edu)
 # \dae 2019 June
+#
+#  \author Anders Kvellestad
+#          (anders.kvellestad@fys.uio.no)
+#  \date 2023 May
 #
 #************************************************
 
@@ -241,15 +246,6 @@ add_gambit_library(fjcore OPTION OBJECT
                           SOURCES ${PROJECT_SOURCE_DIR}/contrib/fjcore-3.2.0/fjcore.cc
                           HEADERS ${PROJECT_SOURCE_DIR}/contrib/fjcore-3.2.0/fjcore.hh)
 set(GAMBIT_BASIC_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECTS:fjcore>)
-
-#contrib/multimin
-set(multimin_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/contrib/multimin/include")
-include_directories("${multimin_INCLUDE_DIR}")
-add_gambit_library(multimin OPTION OBJECT
-                          SOURCES ${PROJECT_SOURCE_DIR}/contrib/multimin/src/multimin.cpp
-                          HEADERS ${PROJECT_SOURCE_DIR}/contrib/multimin/include/multimin/multimin.hpp)
-set(GAMBIT_BASIC_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECTS:multimin>)
-
 
 #contrib/MassSpectra; include only if SpecBit is in use and if
 #BUILD_FS_MODELS is set to something other than "" or "None" or "none"
