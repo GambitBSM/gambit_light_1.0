@@ -2,7 +2,8 @@
 #************************************************
 # \file
 #
-#  Master CMake configuration script for GAMBIT.
+#  Master CMake configuration script for GAMBIT-light,
+#  based on the corresponding file for GAMBIT.
 #
 #  CMakeLists files in this project can refer to
 #  the root source directory of the project as
@@ -33,6 +34,7 @@
 #  \author Anders Kvellestad
 #          (anders.kvellestad@fys.uio.no)
 #  \date 2021 Jul, Aug
+#  \date 2023 May
 #
 #************************************************
 
@@ -61,6 +63,7 @@ foreach(p
   CMP0022 # CMake 2.8.12
   CMP0025 # CMake 3.0
   CMP0042 # CMake 3.0
+  CMP0048 # Cmake 3.0
   CMP0051 # CMake 3.1
   CMP0054 # CMake 3.1
   CMP0060 # CMake 3.16.2
@@ -77,7 +80,7 @@ endforeach()
 project(gambit C CXX Fortran)
 
 # Set GAMBIT_LIGHT macro to true
-set(GAMBIT_LIGHT TRUE)
+set(GAMBIT_LIGHT 1)
 
 # Make sure the user hasn't accidentally set the C++ compiler to the C compiler.
 get_filename_component(CXX_COMPILER_NAME ${CMAKE_CXX_COMPILER} NAME)
@@ -125,82 +128,34 @@ string(REGEX MATCH ";pybind;|;pybind11;|;Pybind;|;Pybind11;" DITCH_PYBIND ";${it
 # greater than 3.3 manually, for compatibility with CMake 2.8.12.
 # If pybind11 is ditched, do not worry about PythonLibs
 set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8 3.9)
-# If both FORCE_PYTHON2 and FORCE_PYTHON3 are set, throw error
-if (FORCE_PYTHON2 AND FORCE_PYTHON3)
-  message(FATAL_ERROR "Two different versions of python requested. Switch either FORCE_PYTHON2 or FORCE_PYTHON3 off.")
-endif()
-if (FORCE_PYTHON2)
-  message("${BoldYellow}   Python 2 requested; searching for Python 2.7${ColourReset}")
-  find_package(PythonInterp 2.7 REQUIRED)
-  if(NOT DITCH_PYBIND)
-    find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT)
-  endif()
-elseif (FORCE_PYTHON3)
-  message("${BoldYellow}   Python 3 requested; searching for Python 3.x${ColourReset}")
-  find_package(PythonInterp 3 REQUIRED)
-  if(NOT DITCH_PYBIND)
-    find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT)
-  endif()
+
+find_package(PythonInterp 3)
+if(PYTHONINTERP_FOUND AND NOT DITCH_PYBIND)
+  find_package(PythonLibs 3)
 else()
-  find_package(PythonInterp 3)
-  if(PYTHONINTERP_FOUND AND NOT DITCH_PYBIND)
-    find_package(PythonLibs 3)
-  else()
-    message("${BoldYellow}   Python 3 not found, searching for Python 2.7${ColourReset}")
-    find_package(PythonInterp 2 REQUIRED)
-    if (PYTHON_VERSION_MINOR LESS 7)
-      message(FATAL_ERROR "\nGAMBIT requires Python 2.7.  \nIf you need to set the path to the Python interpreter manually, "
-                          "please use -D PYTHON_EXECUTABLE=path/to/preferred/python.")
-    endif()
-    if(NOT DITCH_PYBIND)
-      find_package(PythonLibs 2)
-    endif()
-  endif()
+  message("${BoldYellow}   Python 3 not found.${ColourReset}")
+  message(FATAL_ERROR "\nGAMBIT requires Python 3.  \nIf you need to set the path to the Python interpreter manually, "
+                        "please use -D PYTHON_EXECUTABLE=path/to/preferred/python.")
 endif()
 message("${BoldYellow}   Using Python interpreter version ${PYTHON_VERSION_STRING} for build.${ColourReset}")
 
-if(PYTHONLIBS_FOUND)
-  string(FIND "${PYTHONLIBS_VERSION_STRING}" "2.7" PY2_POSITION)
-  if(PY2_POSITION EQUAL 0)
-    set(UNSUPPORTED_PYTHON_VERSION "3")
-  else()
-    set(UNSUPPORTED_PYTHON_VERSION "2.7")
-  endif()
-  message("${BoldYellow}   Using Python libraries version ${PYTHONLIBS_VERSION_STRING} for Python backend support.${ColourReset}\n"
-          "   Backends requiring Python ${UNSUPPORTED_PYTHON_VERSION} will be ditched.")
-  if (NOT "${PYTHON_VERSION_STRING}" STREQUAL "${PYTHONLIBS_VERSION_STRING}")
-    message("${BoldRed}   NOTE: You are using different Python versions for the interpreter and the libraries!${ColourReset}\n"
-            "   In principle this should be fine, as the interpreter is only used for building GAMBIT, and the\n"
-            "   libraries are only used for providing support for Python backends at runtime.  However, if you\n"
-            "   have matching versions installed, you can make this message go away by trying one of the following\n"
-            "   (making sure to clean out your build directory in between any such changes):\n"
-            "   1. invoke cmake as cmake -DFORCE_PYTHON2=True .. (or similar)\n"
-            "   2. invoke cmake as cmake -DFORCE_PYTHON3=True .. (or similar)\n"
-            "   3. set the following variables when invoking cmake:\n"
-            "     PYTHON_LIBRARY\n"
-            "     PYTHON_INCLUDE_DIR\n"
-            "     PYTHON_EXECUTABLE\n")
-  endif()
-endif()
-
 # Check for pybind11 if PythonLibs were found and not ditched
+set(HAVE_PYBIND11 0) # Start from assumption that pybind is not present
 if(NOT PYTHONLIBS_FOUND)
   if(DITCH_PYBIND)
-    message("${BoldCyan} X Excluding pybind11 from GAMBIT configuration. Ditching support for Python backends.${ColourReset}")
+    message("${BoldCyan} X Excluding pybind11 from GAMBIT configuration. This means GAMBIT won't work with Python libraries.${ColourReset}")
   else()
-    message("${BoldRed}   PythonLibs NOT found, so pybind11 cannot be used. Ditching support for Python backends.${ColourReset}\n"
-            "   If you *do* have the Python libraries installed, you should first try setting/unsetting\n"
-            "   FORCE_PYTHON2 or FORCE_PYTHON3 when invoking cmake (make sure to clean out your build\n"
-            "   directory in between any such changes).  If that does not work, you can manually set the\n"
-            "   following variables when invoking cmake (also making sure to clean out your build dir):\n"
+    message("${BoldRed}   PythonLibs NOT found, so pybind11 cannot be used. This means GAMBIT won't work with Python libraries.${ColourReset}\n"
+            "   If you *do* have the Python libraries installed, you can manually set the following\n"
+            "   variables when invoking cmake (also making sure to clean out your build dir):\n"
             "     PYTHON_LIBRARY\n"
             "     PYTHON_INCLUDE_DIR\n"
             "     PYTHON_EXECUTABLE")
-  set(itch "${itch};pybind11")
+    set(itch "${itch};pybind11")
   endif()
 else()
-  set(MIN_pybind11_VERSION "2.5.0")
-  set(PREFERRED_pybind11_VERSION "2.5.0")
+  set(MIN_pybind11_VERSION "2.10.1")
+  set(PREFERRED_pybind11_VERSION "2.10.1")
   set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
   include_directories("${PYTHON_INCLUDE_DIRS}")
   find_package(pybind11 QUIET)
@@ -251,20 +206,20 @@ option(WITH_AXEL "Compile with Axel enabled" OFF)
 if(WITH_AXEL)
   find_program(axel_FOUND axel)
   if(axel_FOUND)
-    message("${BoldYellow}   Found axel.${ColourReset} Backend and scanner downloads will be as fast as possible.")
+    message("${BoldYellow}   Found axel.${ColourReset} Downloads will be as fast as possible.")
     set(CMAKE_DOWNLOAD_FLAGS "WITH_AXEL")
   else()
-    message("${Red}   Axel utility not found.  Backend downloads would be faster if you installed axel.${ColourReset}")
+    message("${Red}   Axel utility not found.  Downloads would be faster if you installed axel.${ColourReset}")
   endif()
 else()
   message("${BoldCyan} X Axel is disabled. Please use -DWITH_AXEL=ON to enable fast downloads with Axel.${ColourReset}")
 endif()
 
-# Check for X11
-find_package(X11)
-if(NOT X11_FOUND)
-  message("${BoldRed}   X11 not found. Backends such as CalcHEP that require X11 will be disabled.${ColourReset}")
-endif()
+# # Check for X11
+# find_package(X11)
+# if(NOT X11_FOUND)
+#   message("${BoldRed}   X11 not found. Backends such as CalcHEP that require X11 will be disabled.${ColourReset}")
+# endif()
 
 # Do OSX checks
 include(cmake/MacOSX.cmake)
@@ -291,6 +246,7 @@ if(PERMIT_CXX17_CHECK)
 endif()
 if(COMPILER_SUPPORTS_CXX17)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+  set(GAMBIT_SUPPORTS_CXX17 TRUE)
 else()
   if(PERMIT_CXX17_CHECK)
     CHECK_CXX_COMPILER_FLAG("-std=c++1z" COMPILER_SUPPORTS_CXX1z)
@@ -298,15 +254,18 @@ else()
   CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
   if(COMPILER_SUPPORTS_CXX14)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    set(GAMBIT_SUPPORTS_CXX14 TRUE)
   else()
     CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1y)
     CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
     if(COMPILER_SUPPORTS_CXX11)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+      set(GAMBIT_SUPPORTS_CXX11 TRUE)
     else()
       CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
       if(COMPILER_SUPPORTS_CXX0X)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+        set(GAMBIT_SUPPORTS_CXX0X TRUE)
       else()
         message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
       endif()
@@ -319,10 +278,6 @@ include(CheckCCompilerFlag)
 CHECK_C_COMPILER_FLAG("-std=c18" COMPILER_SUPPORTS_C18)
 CHECK_C_COMPILER_FLAG("-std=c11" COMPILER_SUPPORTS_C11)
 CHECK_C_COMPILER_FLAG("-std=c99" COMPILER_SUPPORTS_C99)
-if(NOT COMPILER_SUPPORTS_C99)
-  message("${BoldRed}   The compiler ${CMAKE_C_COMPILER} has no C99 support.  AlterBBN will be ditched.${ColourReset}")
-  set(itch "${itch};alterbbn")
-endif()
 
 # Add -fPIC for 64 bit systems
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
@@ -371,17 +326,6 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STR
   endif()
 endif()
 
-# Check for Eigen
-find_package(Eigen3 3.1.0)
-if(EIGEN3_FOUND)
-  include_directories("${EIGEN3_INCLUDE_DIR}")
-  message("-- Eigen version: ${EIGEN3_VERSION}")
-else()
-  message("${BoldRed}   Eigen v3.1.0 or greater not found.  FlexibleSUSY and GM2Calc interfaces will be excluded.${ColourReset}")
-  set(itch "${itch};gm2calc;flexiblesusy")
-  message(FATAL_ERROR "\nFlexibleSUSY is currently included in the GAMBIT distribution, so in fact it cannot be ditched.  Please install Eigen3.\n(Note that this will change in future GAMBIT versions, where FlexibleSUSY will be a 'true' backend.)")
-endif()
-
 # Check for OpenMP
 find_package(OpenMP QUIET)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
@@ -396,8 +340,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     else()
       execute_process(COMMAND ${BREW} --prefix libomp OUTPUT_VARIABLE BREW_LIBOMP_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
       if(NOT OPENMP_FOUND)
-        set(OpenMP_CXX_FLAGS "-Xclang -fopenmp")
-        set(OpenMP_C_FLAGS "-Xclang -fopenmp")
+        set(OpenMP_CXX_FLAGS "-Xclang -fopenmp -I${BREW_LIBOMP_PREFIX}/include")
+        set(OpenMP_C_FLAGS "-Xclang -fopenmp -I${BREW_LIBOMP_PREFIX}/include")
       endif()
       set(OpenMP_CXX_LIB_NAMES "omp")
       set(OpenMP_C_LIB_NAMES "omp")
@@ -408,7 +352,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     endif()
   endif()
 endif()
-if (OPENMP_FOUND)
+if (OPENMP_FOUND OR FOUND_BREW_OPENMP)
   message("-- OpenMP found successfully")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -423,53 +367,6 @@ else()
     endif()
   else()
     message(FATAL_ERROR "\nOpenMP libraries not found.  Your compiler installation seems to be broken.")
-  endif()
-endif()
-
-# Check for Gnu Scientific Library (GSL)
-include(cmake/FindGSL.cmake)
-if(GSL_FOUND)
-  if (NOT GSL_INCLUDE_DIRS STREQUAL "")
-    include_directories("${GSL_INCLUDE_DIRS}")
-  endif()
-else()
-  message(FATAL_ERROR "GAMBIT requires the GSL libraries.")
-endif()
-
-# Check for Mathematica
-string(REGEX MATCH ";M;|;Ma;|;Mat;|;Math;|;Mathe;|;Mathem;|;Mathema;|;Mathemat;|;Mathemati;|;Mathematic;|;Mathematica;|;m;|;ma;|;mat;|;math;|;mathe;|;mathem;|;mathema;|;mathemat;|;mathemati;|;mathematic;|;mathematica" DITCH_MATHEMATICA ";${itch};")
-if(DITCH_MATHEMATICA)
-  set(HAVE_MATHEMATICA 0)
-  message("${BoldCyan} X Excluding Mathematica from GAMBIT configuration. All backends using Mathematica will be disabled${ColourReset}")
-else()
-  find_library(LIBUUID NAMES uuid)
-  if(LIBUUID)
-    message("   Found library libuuid")
-    find_package(Mathematica 10.0 QUIET)
-    if(Mathematica_FOUND AND (NOT DEFINED Mathematica_Invalid_License OR IGNORE_MATHEMATICA_LICENSE))
-      message("${BoldYellow}   Found Mathematica.${ColourReset}")
-      if(Mathematica_WSTP_FOUND)
-        message("${BoldYellow}   Found Wolfram Symbolic Transfer Protocol. Mathematica backends enabled.${ColourReset}")
-        set(HAVE_MATHEMATICA 1)
-        set(MATHEMATICA_WSTP_H "${Mathematica_WSTP_INCLUDE_DIR}/wstp.h")
-        set(MATHEMATICA_KERNEL "${Mathematica_KERNEL_EXECUTABLE}")
-        set(MATHEMATICA_WSTP_VERSION_MAJOR ${Mathematica_WSTP_VERSION_MAJOR})
-        set(MATHEMATICA_WSTP_VERSION_MINOR ${Mathematica_WSTP_VERSION_MINOR})
-      else()
-        message("${BoldRed}  WSTP not found. Please make sure it is installed before attempting to use Mathematica backends.${ColourReset}")
-        set(HAVE_MATHEMATICA 0)
-      endif()
-    elseif(DEFINED Mathematica_Invalid_License AND NOT IGNORE_MATHEMATICA_LICENSE)
-      message("${BoldRed}   Mathematica found but with an invalid license. Backends using Mathematica will be disabled.${ColourReset}")
-      message("${BoldRed}   To ignore this license check, add -DIGNORE_MATHEMATICA_LICENSE=True to your cmake command.${ColourReset}")
-      set(HAVE_MATHEMATICA 0)
-    else()
-      message("${BoldRed}   Mathematica not found. Backends using Mathematica will be disabled.${ColourReset}")
-      set(HAVE_MATHEMATICA 0)
-    endif()
-  else()
-    message("${BoldRed}   Missing library libuuid required for WSTP. Mathematica will be disabled.${ColourReset}")
-    set(HAVE_MATHEMATICA 0)
   endif()
 endif()
 
@@ -676,19 +573,30 @@ set(GAMBIT_ALL_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECTS:
 foreach(bit ${GAMBIT_BITS})
   add_subdirectory(${bit})
   set(GAMBIT_BIT_OBJECTS ${GAMBIT_BIT_OBJECTS} "$<TARGET_OBJECTS:${bit}>")
+  # Add dependencies that need to be built before any bit
+  foreach(dep ${MODULE_DEPENDENCIES})
+    add_dependencies(${bit} ${dep})
+  endforeach()
 endforeach()
 
-# If ColliderBit is in use, make the collider_harvest step a dependency of ColliderBit
+# If ColliderBit is in use, set various dependencies
 if(";${GAMBIT_BITS};" MATCHES ";ColliderBit;")
+  # Make the collider_harvest step a dependency of ColliderBit
   add_dependencies(ColliderBit collider_harvest)
   # If RestFrames is in use, make it a dependency of ColliderBit
   if(NOT EXCLUDE_RESTFRAMES)
     add_dependencies(ColliderBit restframes)
   endif()
-  # If HepMC is in use, make it a dependency of ColliderBit
-  if(NOT EXCLUDE_HEPMC)
-    add_dependencies(ColliderBit hepmc)
+  # ColliderBit depends on HepMC
+  if(EXCLUDE_HEPMC)
+    message(FATAL_ERROR "\nColliderBit needs HepMC3. Either use -DWITH_HEPMC=ON or ditch ColliderBit with -Ditch=\"ColliderBit\".")
   endif()
+  add_dependencies(ColliderBit hepmc)
+  # ColliderBit depends on YODA
+  if(EXCLUDE_YODA)
+    message(FATAL_ERROR "\nColliderBit needs YODA. Either use -DWITH_YODA=ON or ditch ColliderBit with -Ditch=\"ColliderBit\".")
+  endif()
+  add_dependencies(ColliderBit yoda)
 endif()
 
 # If SpecBit is in use, make flexiblesusy a dependency of SpecBit
