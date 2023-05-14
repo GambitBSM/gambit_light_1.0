@@ -97,6 +97,13 @@ Printer:
 
   printer: cout
 
+  # printer: hdf5
+  # options:
+  #   output_file: "results.hdf5"
+  #   group: "/data"
+  #   buffer_length: 1000
+  #   delete_file_on_restart: true
+
   # printer: hdf5_v1
   # options:
   #   output_file: "results.hdf5"
