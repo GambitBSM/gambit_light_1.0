@@ -6,6 +6,8 @@ def user_loglike(iparams, oparams):
   oparams['oname2_py'] = 2;
   oparams['oname3_py'] = 3;
 
+  print("libuser.py: got iparams: ", iparams)
+
   # return iparams['p1'] + iparams['p2'];
 
   # Error handling: Return a value denoting an invalid point.
@@ -17,7 +19,7 @@ def user_loglike(iparams, oparams):
   
   # Error handling: Report a string warning using gambit_light.warning.
   gambit_light.warning('Some warning')
-  return iparams['p1'] + iparams['p2'];
+  return iparams['alpha'] + iparams['beta'];
 
   # Error handling: Report a string error using gambit_light.error.
   # gambit_light.error('Invalid input parameters');

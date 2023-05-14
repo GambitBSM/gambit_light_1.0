@@ -36,15 +36,17 @@ namespace Gambit
       // Construct a map with pointers to the parameter values in Param
       static std::map<std::string,const double*> param_pointer_map;
       static bool first = true;
+
       if (first)
       {
         // Get the names of input parameters in use
-        std::vector<std::string> input_par_set = BEreq::get_input_par_names();
+        vec_pair_str_str input_par_name_pairs = BEreq::get_input_par_name_pairs();
 
-        // For each parameter, get the pointer from Param in param_pointer_map
-        for (const std::string& input_par_name: input_par_set) 
+        // For each parameter, add a pointer in param_pointer_map that points
+        // to the corresponding parameter value in Param
+        for (const std::pair<std::string,std::string>& name_pair: input_par_name_pairs)
         {
-          param_pointer_map[input_par_name] = Param.at(input_par_name).operator->();
+          param_pointer_map[name_pair.first] = Param.at(name_pair.second).operator->();
         }
 
         first = false;

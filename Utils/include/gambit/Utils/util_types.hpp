@@ -97,6 +97,8 @@ namespace Gambit
   typedef std::map< std::pair < int, int >, double> map_intpair_dbl;
   /// Shorthand for a set of strings
   typedef std::set<std::string> set_str;
+  /// Shorthand for a set of strings
+  typedef std::vector<std::pair<std::string,std::string> > vec_pair_str_str;
 
   /// Shorthand for a pointer to a void function with no arguments
   typedef void (*fptr_void)();

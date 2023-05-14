@@ -22,7 +22,9 @@
 
 BE_NAMESPACE
 {
-    std::vector<std::string> listed_usermodel_pars;
+    std::vector<std::string> listed_user_pars;
+    std::vector<std::string> listed_model_pars;
+    std::map<std::string,std::string> model_to_user_par_names;
 }
 END_BE_NAMESPACE
 
@@ -60,10 +62,16 @@ BE_INI_FUNCTION
     // Collect all parameter names listed in the "UserModel" section.
     for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
     {
-        std::string usermodel_par_name = it->first.as<std::string>();
-        if (std::find(listed_usermodel_pars.begin(), listed_usermodel_pars.end(), usermodel_par_name) == listed_usermodel_pars.end())
+        std::string model_par_name = it->first.as<std::string>();
+        std::string user_par_name = (it->second)["name"].as<std::string>();
+
+        std::cerr << "DEBUG: got parameter names: " << model_par_name << " <--> " << user_par_name << std::endl;
+
+        if (std::find(listed_user_pars.begin(), listed_user_pars.end(), model_par_name) == listed_user_pars.end())
         {
-            listed_usermodel_pars.push_back(usermodel_par_name);
+            listed_user_pars.push_back(user_par_name);
+            listed_model_pars.push_back(model_par_name);
+            model_to_user_par_names[model_par_name] = user_par_name;
         }
     }
 
@@ -114,11 +122,28 @@ BE_INI_FUNCTION
 
                 // Check that all parameter names listed under "input" in the "UserLogLikes" 
                 // section are also specified in the "UserModel" section.
-                if (not userModelNode[input_par_name].IsDefined())
+                // if (not userModelNode[input_par_name].IsDefined())
+                bool in_listed_user_pars = std::find(listed_user_pars.begin(), listed_user_pars.end(), input_par_name) != listed_user_pars.end();
+                bool in_listed_model_pars = std::find(listed_model_pars.begin(), listed_model_pars.end(), input_par_name) != listed_model_pars.end();
+                if(not in_listed_user_pars)
                 {
-                    std::string error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
-                                            + input_par_name + " is requested as an input parameter, "
-                                            "but it is not listed in the UserModel section.";
+                    std::string error_msg;
+                    if(in_listed_model_pars)
+                    {
+                        error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
+                                    + input_par_name + " is requested as an input parameter for the "
+                                    "loglike '" + loglike_name + "', but this parameter has been assigned "
+                                    "a new name in the UserModel section. Use this new name in the 'input' "
+                                    "section for '" + loglike_name + "', or remove the 'name' option in "
+                                    "the UserModel section.";
+                    }
+                    else
+                    {
+                        error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
+                                    + input_par_name + " is requested as an input parameter for the "
+                                    "loglike '" + loglike_name + "', but it is not found in the "
+                                    " UserModel section.";
+                    }
                     backend_error().raise(LOCAL_INFO, error_msg);
                 }
 
@@ -128,9 +153,9 @@ BE_INI_FUNCTION
         }
         else  // The current "UserLogLike" entry has no "input" node
         {
-            // If there is no "input" node we assume that all parameters
-            // from "UserModel" should be used as input.
-            inputs.assign(listed_usermodel_pars.begin(), listed_usermodel_pars.end());
+            // If there is no "input" node we assume that all listed 
+            // parameters should be used as input.
+            inputs.assign(listed_user_pars.begin(), listed_user_pars.end());
         }
 
         if (userLogLikesEntry["output"].IsDefined())
@@ -223,9 +248,15 @@ BE_NAMESPACE
     }
 
     
-    vec_str get_input_par_names()
+    vec_pair_str_str get_input_par_name_pairs()
     {
-        return listed_usermodel_pars;
+        vec_pair_str_str input_par_name_pairs;
+        for (size_t i = 0; i < listed_user_pars.size(); ++i)
+        {
+            std::pair<std::string, std::string> p = {listed_user_pars[i], listed_model_pars[i]};
+            input_par_name_pairs.push_back(p);
+        }
+        return input_par_name_pairs;
     }
 
 }
