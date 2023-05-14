@@ -13,11 +13,11 @@
 
 #include "gambit_light.h"
 
+#define OUTPUT_PREFIX "light_interface: "
+
 #ifdef HAVE_PYBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
-
-#define OUTPUT_PREFIX "light_interface: "
 
 extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
