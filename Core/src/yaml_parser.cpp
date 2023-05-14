@@ -63,7 +63,7 @@ namespace Gambit
         lightbit_loglike.purpose = "LogLike";
         lightbit_loglike.capability = "total_loglike";
         lightbit_loglike.module = "LightBit";
-        lightbit_loglike.printme = true;
+        lightbit_loglike.printme = false;
         observables.push_back(lightbit_loglike);
       #else
         // Get the observables and rules sections
