@@ -3,7 +3,8 @@
 # \file
 #
 #  CMake configuration script for final executables
-#  of GAMBIT.
+#  of GAMBIT-light, based on the corresponding file
+#  for GAMBIT.
 #
 #************************************************
 #
@@ -25,6 +26,10 @@
 #  \author Tomas Gonzalo
 #          (gonzalo@physik.rwth-aachen.de)
 #  \date 2021 Mar
+#
+#  \author Anders Kvellestad
+#          (anders.kvellestad@fys.uio.no)
+#  \date 2023 May
 #
 #************************************************
 
@@ -57,10 +62,6 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/Core/")
 
   # EXPERIMENTAL: Linking against Electric Fence for heap corruption debugging
   #target_link_libraries(gambit PUBLIC efence) # just segfaults. Be good if it could be made to work though.
-  # If Mathematica is present and the system is OS X, absolutize paths to avoid dylib errors
-  if (${HAVE_MATHEMATICA} AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    Mathematica_ABSOLUTIZE_LIBRARY_DEPENDENCIES(gambit)
-  endif()
 endif()
 
 # Add the ScannerBit standalone executable
