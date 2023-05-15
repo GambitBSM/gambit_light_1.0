@@ -85,6 +85,7 @@ set(GAMBIT_LIGHT 1)
 # Set some other variables needed for GAMBIT-light
 set(HAVE_MATHEMATICA 0)
 set(EXCLUDE_ROOT 1)
+set(EXCLUDE_RESTFRAMES 1)
 set(itch "${itch};DarkBit")
 set(itch "${itch};ColliderBit")
 set(itch "${itch};CosmoBit")
@@ -445,7 +446,6 @@ else()
   set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 endif()
 
-# _Anders
 # Check for optional packages and disable sections of GAMBIT accordingly
 include(cmake/optional.cmake)
 
@@ -468,9 +468,6 @@ add_custom_target(docs WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND doxygen d
 
 # Work out which modules to include in the compile
 retrieve_bits(GAMBIT_BITS ${PROJECT_SOURCE_DIR} "${itch}" "Loud")
-
-# Set up targets to make standalone tarballs of the different modules
-add_standalone_tarballs("${GAMBIT_BITS}" "${GAMBIT_VERSION_FULL}")
 
 # Include contributed packages
 include(cmake/contrib.cmake)
@@ -595,31 +592,6 @@ foreach(bit ${GAMBIT_BITS})
     add_dependencies(${bit} ${dep})
   endforeach()
 endforeach()
-
-# If ColliderBit is in use, set various dependencies
-if(";${GAMBIT_BITS};" MATCHES ";ColliderBit;")
-  # Make the collider_harvest step a dependency of ColliderBit
-  add_dependencies(ColliderBit collider_harvest)
-  # If RestFrames is in use, make it a dependency of ColliderBit
-  if(NOT EXCLUDE_RESTFRAMES)
-    add_dependencies(ColliderBit restframes)
-  endif()
-  # ColliderBit depends on HepMC
-  if(EXCLUDE_HEPMC)
-    message(FATAL_ERROR "\nColliderBit needs HepMC3. Either use -DWITH_HEPMC=ON or ditch ColliderBit with -Ditch=\"ColliderBit\".")
-  endif()
-  add_dependencies(ColliderBit hepmc)
-  # ColliderBit depends on YODA
-  if(EXCLUDE_YODA)
-    message(FATAL_ERROR "\nColliderBit needs YODA. Either use -DWITH_YODA=ON or ditch ColliderBit with -Ditch=\"ColliderBit\".")
-  endif()
-  add_dependencies(ColliderBit yoda)
-endif()
-
-# If SpecBit is in use, make flexiblesusy a dependency of SpecBit
-if(";${GAMBIT_BITS};" MATCHES ";SpecBit;")
-  add_dependencies(SpecBit flexiblesusy)
-endif()
 
 # Add the executables
 include(cmake/executables.cmake)

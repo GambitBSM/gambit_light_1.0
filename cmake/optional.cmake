@@ -213,7 +213,7 @@ endif()
 if(NOT LAPACK_LINKLIBS AND NOT LAPACK_FOUND)
   # In future MN and FS need to be ditched if lapack cannot be found, and the build allowed to continue.
   message(FATAL_ERROR "${BoldRed}LAPACK shared library not found.${ColourReset}")
-  message("${BoldRed}   LAPACK shared library not found. Excluding FlexibleSUSY and MultiNest from GAMBIT configuration. ${ColourReset}")
+  message("${BoldRed}   LAPACK shared library not found. Excluding MultiNest from GAMBIT configuration. ${ColourReset}")
 endif()
 
 # Check for HDF5 libraries

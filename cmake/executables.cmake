@@ -39,18 +39,6 @@ include(cmake/standalones.cmake)
 
 # Add the main GAMBIT executable
 if(EXISTS "${PROJECT_SOURCE_DIR}/Core/")
-  if (NOT EXCLUDE_FLEXIBLESUSY)
-    set(gambit_XTRA ${flexiblesusy_LDFLAGS})
-  endif()
-  if (NOT EXCLUDE_ROOT)
-    set(gambit_XTRA ${gambit_XTRA} ${ROOT_LIBRARIES})
-    if (NOT EXCLUDE_RESTFRAMES)
-      set(gambit_XTRA ${gambit_XTRA} ${RESTFRAMES_LDFLAGS})
-    endif()
-  endif()
-  if (NOT EXCLUDE_HEPMC)
-    set(gambit_XTRA ${gambit_XTRA} ${HEPMC_LDFLAGS})
-  endif()
   add_gambit_executable(${PROJECT_NAME} "${gambit_XTRA}"
                         SOURCES ${PROJECT_SOURCE_DIR}/Core/src/gambit.cpp
                                 ${GAMBIT_ALL_COMMON_OBJECTS}
@@ -62,30 +50,6 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/Core/")
 
   # EXPERIMENTAL: Linking against Electric Fence for heap corruption debugging
   #target_link_libraries(gambit PUBLIC efence) # just segfaults. Be good if it could be made to work though.
-endif()
-
-# Add the ScannerBit standalone executable
-if(EXISTS "${PROJECT_SOURCE_DIR}/ScannerBit/")
-  if(EXISTS "${PROJECT_SOURCE_DIR}/Elements/")
-    if (NOT EXCLUDE_FLEXIBLESUSY)
-      set(ScannerBit_XTRA ${flexiblesusy_LDFLAGS})
-    endif()
-  endif()
-  add_gambit_executable(ScannerBit_standalone "${ScannerBit_XTRA}"
-                        SOURCES ${PROJECT_SOURCE_DIR}/ScannerBit/examples/ScannerBit_standalone.cpp
-                                $<TARGET_OBJECTS:ScannerBit>
-                                $<TARGET_OBJECTS:Printers>
-                                ${GAMBIT_BASIC_COMMON_OBJECTS}
-  )
-  if(EXISTS "${PROJECT_SOURCE_DIR}/Elements/")
-    if (NOT EXCLUDE_FLEXIBLESUSY)
-      add_dependencies(ScannerBit_standalone flexiblesusy)
-    endif()
-  else()
-    # Make sure the printers compile OK if the rest of GAMBIT is missing
-    target_compile_definitions(Printers PRIVATE SCANNER_STANDALONE)
-  endif()
-  add_dependencies(standalones ScannerBit_standalone)
 endif()
 
 # Add C++ hdf5 combine tool, if we have HDF5 libraries
