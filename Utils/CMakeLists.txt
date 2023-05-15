@@ -42,7 +42,6 @@ set(source_files src/ascii_table_reader.cpp
                  src/signal_helpers.cpp
                  src/slhaea_helpers.cpp
                  src/standalone_error_handlers.cpp
-                 src/standalone_utils.cpp
                  src/statistics.cpp
                  src/stream_overloads.cpp
                  src/table_formatter.cpp
@@ -74,7 +73,6 @@ set(header_files include/gambit/Utils/ascii_table_reader.hpp
                  include/gambit/Utils/signal_helpers.hpp
                  include/gambit/Utils/slhaea_helpers.hpp
                  include/gambit/Utils/standalone_error_handlers.hpp
-                 include/gambit/Utils/standalone_utils.hpp
                  include/gambit/Utils/static_members.hpp
                  include/gambit/Utils/statistics.hpp
                  include/gambit/Utils/stream_overloads.hpp

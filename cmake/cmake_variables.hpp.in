@@ -60,9 +60,6 @@
 /// Found/installed pybind11
 #cmakedefine HAVE_PYBIND11 1
 
-/// Leave out HepMC
-#cmakedefine EXCLUDE_HEPMC 1
-
 /// Leave out RestFrames
 #cmakedefine EXCLUDE_RESTFRAMES 1
 
