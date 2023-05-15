@@ -63,8 +63,10 @@ namespace Gambit
     USE_COMMON_PRINT_OVERLOAD(coutPrinter, ModelParameters)
     USE_COMMON_PRINT_OVERLOAD(coutPrinter, triplet<double>)
     #ifndef SCANNER_STANDALONE
+    #ifndef GAMBIT_LIGHT
       USE_COMMON_PRINT_OVERLOAD(coutPrinter, DM_nucleon_couplings)
       USE_COMMON_PRINT_OVERLOAD(coutPrinter, BBN_container)
+    #endif
     #endif
 
     /// @}

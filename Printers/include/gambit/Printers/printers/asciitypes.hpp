@@ -26,9 +26,12 @@
   (triplet<double>)                         \
   (map_intpair_dbl)                         \
 
-
-#define ASCII_BACKEND_TYPES                 \
-  (DM_nucleon_couplings)                    \
-  (BBN_container)                           \
+#ifdef GAMBIT_LIGHT
+  #define ASCII_BACKEND_TYPES
+#else
+  #define ASCII_BACKEND_TYPES           \
+    (DM_nucleon_couplings)              \
+    (BBN_container)
+#endif
 
 #endif
