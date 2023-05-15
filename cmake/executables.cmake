@@ -33,10 +33,6 @@
 #
 #************************************************
 
-# Add the module standalones
-add_custom_target(standalones)
-include(cmake/standalones.cmake)
-
 # Add the main GAMBIT executable
 if(EXISTS "${PROJECT_SOURCE_DIR}/Core/")
   add_gambit_executable(${PROJECT_NAME} "${gambit_XTRA}"
