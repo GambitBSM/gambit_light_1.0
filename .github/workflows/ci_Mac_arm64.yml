@@ -36,20 +36,20 @@ jobs:
       run: |
         echo "Build scanners"
         cd BUILD
-        make -j(( $nprocs/2 )) scanners
+        make -j $(( $nprocs/2 )) scanners
         cmake ..
     - name: Build Backends for tests
       run: |
         echo "Building Backends required for tests"
         cd BUILD
-        make -j(( $nprocs/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso contur
+        make -j $(( $nprocs/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso contur
         echo "Running cmake again, since this is required for ColliderBit/pythia"
         cmake ..
     - name: Build Gambit
       run: |
         echo "Build GAMBIT."
         cd BUILD
-        make -j(( $nprocs/2 )) gambit
+        make -j $(( $nprocs/2 )) gambit
     - name: Test spartan yaml
       run: |
         echo "Testing spartan.yaml (with cout printer)"
@@ -72,7 +72,7 @@ jobs:
       run: |
         echo "Building all Backends"
         cd BUILD
-        make -j(( $nprocs/2 )) backends
+        make -j $(( $nprocs/2 )) backends
     #- name: Build standalones
     #  run: |
     #    echo "Test the building of the standalones"
