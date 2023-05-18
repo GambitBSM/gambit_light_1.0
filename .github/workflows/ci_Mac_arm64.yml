@@ -38,9 +38,9 @@ jobs:
         cd BUILD
         make -j(( $nprocs/2 )) scanners
         cmake ..
-    - name: Build Backends
+    - name: Build Backends for tests
       run: |
-        echo "Building Backends"
+        echo "Building Backends required for tests"
         cd BUILD
         make -j(( $nprocs/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso contur
         echo "Running cmake again, since this is required for ColliderBit/pythia"
@@ -68,6 +68,11 @@ jobs:
       run: |
         echo "Test the ColliderBit CMSSM yaml file"
         ./gambit -f yaml_files/ColliderBit_CMSSM.yaml
+    - name: Build Backends
+      run: |
+        echo "Building all Backends"
+        cd BUILD
+        make -j(( $nprocs/2 )) backends
     #- name: Build standalones
     #  run: |
     #    echo "Test the building of the standalones"
