@@ -26,6 +26,7 @@ jobs:
         echo "Set up the build environment"
         mkdir -p BUILD
         cd BUILD
+        export nprocs=$(sysctl -n hw.ncpu)
     - name: Configure with cmake
       run: |
         echo "Configure with cmake"
@@ -35,27 +36,20 @@ jobs:
       run: |
         echo "Build scanners"
         cd BUILD
-        make scanners
+        make -j(( $nprocs/2 )) scanners
         cmake ..
     - name: Build Backends
       run: |
         echo "Building Backends"
         cd BUILD
-        make pythia
-        make higgssignals
-        make nulike
-        make ATLAS_FullLikes
-        make susyhit
-        make heplike
-        make superiso
-        make contur
+        make -j(( $nprocs/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso contur
         echo "Running cmake again, since this is required for ColliderBit/pythia"
         cmake ..
     - name: Build Gambit
       run: |
         echo "Build GAMBIT."
         cd BUILD
-        make -j8 gambit
+        make -j(( $nprocs/2 )) gambit
     - name: Test spartan yaml
       run: |
         echo "Testing spartan.yaml (with cout printer)"
