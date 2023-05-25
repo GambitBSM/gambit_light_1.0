@@ -147,21 +147,20 @@ string(REGEX MATCH ";pybind;|;pybind11;|;Pybind;|;Pybind11;" DITCH_PYBIND ";${it
 set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8 3.9)
 
 find_package(PythonInterp 3)
-if(PYTHONINTERP_FOUND AND NOT DITCH_PYBIND)
-  find_package(PythonLibs 3)
-else()
+if(NOT PYTHONINTERP_FOUND)
   message("${BoldYellow}   Python 3 not found.${ColourReset}")
   message(FATAL_ERROR "\nGAMBIT requires Python 3.  \nIf you need to set the path to the Python interpreter manually, "
                         "please use -D PYTHON_EXECUTABLE=path/to/preferred/python.")
 endif()
 message("${BoldYellow}   Using Python interpreter version ${PYTHON_VERSION_STRING} for build.${ColourReset}")
 
-# Check for pybind11 if PythonLibs were found and not ditched
-set(HAVE_PYBIND11 0) # Start from assumption that pybind is not present
-if(NOT PYTHONLIBS_FOUND)
-  if(DITCH_PYBIND)
-    message("${BoldCyan} X Excluding pybind11 from GAMBIT configuration. This means GAMBIT won't work with Python libraries.${ColourReset}")
-  else()
+find_package(PythonLibs 3)
+
+set(HAVE_PYBIND11 0) # Start from assumption that pybind is not present.
+if(DITCH_PYBIND)
+  message("${BoldCyan} X Excluding pybind11 from GAMBIT configuration. This means GAMBIT won't work with Python libraries.${ColourReset}")
+else()  # pybind is not ditched
+  if(NOT PYTHONLIBS_FOUND)
     message("${BoldRed}   PythonLibs NOT found, so pybind11 cannot be used. This means GAMBIT won't work with Python libraries.${ColourReset}\n"
             "   If you *do* have the Python libraries installed, you can manually set the following\n"
             "   variables when invoking cmake (also making sure to clean out your build dir):\n"
@@ -169,47 +168,48 @@ if(NOT PYTHONLIBS_FOUND)
             "     PYTHON_INCLUDE_DIR\n"
             "     PYTHON_EXECUTABLE")
     set(itch "${itch};pybind11")
-  endif()
-else()
-  set(MIN_pybind11_VERSION "2.10.1")
-  set(PREFERRED_pybind11_VERSION "2.10.1")
-  set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
-  include_directories("${PYTHON_INCLUDE_DIRS}")
-  find_package(pybind11 QUIET)
-  if(pybind11_FOUND)
-    if(pybind11_VERSION VERSION_LESS MIN_pybind11_VERSION)
+    set(DITCH_PYBIND 1)
+  else() # pybind is not ditched and the PythonLibs were found. Can now actually look for pybind.
+    set(MIN_pybind11_VERSION "2.10.1")
+    set(PREFERRED_pybind11_VERSION "2.10.1")
+    set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
+    include_directories("${PYTHON_INCLUDE_DIRS}")
+    find_package(pybind11 QUIET)
+    if(pybind11_FOUND)
+      if(pybind11_VERSION VERSION_LESS MIN_pybind11_VERSION)
+        if(EXISTS "${pybind11_CONTRIB_DIR}")
+          use_contributed_pybind11()
+        else()
+          message("${BoldRed}   Found pybind11 ${pybind11_VERSION}. GAMBIT requires at least v${MIN_pybind11_VERSION}.${ColourReset}")
+          set(pybind11_FOUND FALSE)
+        endif()
+      else()
+        message("${BoldYellow}   Found pybind11 ${pybind11_VERSION} at ${pybind11_DIR}.${ColourReset}")
+        if(NOT pybind11_INCLUDE_DIR)
+            include_directories("${PYBIND11_INCLUDE_DIR}")
+        else()
+            include_directories("${pybind11_INCLUDE_DIR}")
+        endif()
+      endif()
+    endif()
+    if(NOT pybind11_FOUND)
       if(EXISTS "${pybind11_CONTRIB_DIR}")
         use_contributed_pybind11()
       else()
-        message("${BoldRed}   Found pybind11 ${pybind11_VERSION}. GAMBIT requires at least v${MIN_pybind11_VERSION}.${ColourReset}")
-        set(pybind11_FOUND FALSE)
-      endif()
-    else()
-      message("${BoldYellow}   Found pybind11 ${pybind11_VERSION} at ${pybind11_DIR}.${ColourReset}")
-      if(NOT pybind11_INCLUDE_DIR)
-          include_directories("${PYBIND11_INCLUDE_DIR}")
-      else()
-          include_directories("${pybind11_INCLUDE_DIR}")
-      endif()
-    endif()
-  endif()
-  if(NOT pybind11_FOUND)
-    if(EXISTS "${pybind11_CONTRIB_DIR}")
-      use_contributed_pybind11()
-    else()
-      message("${BoldRed}   CMake will now download and install pybind11 v${PREFERRED_pybind11_VERSION}.${ColourReset}")
-      execute_process(RESULT_VARIABLE result COMMAND git clone https://github.com/pybind/pybind11.git ${pybind11_CONTRIB_DIR})
-      if(${result} STREQUAL "0")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${pybind11_CONTRIB_DIR} git checkout -q v${PREFERRED_pybind11_VERSION})
-        use_contributed_pybind11()
-      else()
-        message("${BoldRed}   Attempt to clone git repository for pybind11 failed.  This may be because you are disconnected from the internet.\n   "
-                "Otherwise, your git installation may be faulty. Errors about missing .so files are usually due to\n   "
-                "your git installation being linked to a buggy version of libcurl.  In that case, try reinstalling libcurl.${ColourReset}")
+        message("${BoldRed}   CMake will now download and install pybind11 v${PREFERRED_pybind11_VERSION}.${ColourReset}")
+        execute_process(RESULT_VARIABLE result COMMAND git clone https://github.com/pybind/pybind11.git ${pybind11_CONTRIB_DIR})
+        if(${result} STREQUAL "0")
+          execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${pybind11_CONTRIB_DIR} git checkout -q v${PREFERRED_pybind11_VERSION})
+          use_contributed_pybind11()
+        else()
+          message("${BoldRed}   Attempt to clone git repository for pybind11 failed.  This may be because you are disconnected from the internet.\n   "
+                  "Otherwise, your git installation may be faulty. Errors about missing .so files are usually due to\n   "
+                  "your git installation being linked to a buggy version of libcurl.  In that case, try reinstalling libcurl.${ColourReset}")
+        endif()
       endif()
     endif()
+    set(HAVE_PYBIND11 "${pybind11_FOUND}")
   endif()
-  set(HAVE_PYBIND11 "${pybind11_FOUND}")
 endif()
 
 # Check for required Python libraries
@@ -594,3 +594,36 @@ endif()
 
 # Create a list of Gambit bits to be used in the diagnostic system of Gambit.
 execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts/find_all_gambit_bits.py --source-dir ${PROJECT_SOURCE_DIR} --output-file=${PROJECT_SOURCE_DIR}/config/gambit_bits.yaml)
+
+
+# Add the light_interface shared library 
+set(light_interface_name "gambit_light")
+set(light_interface_dir "${PROJECT_SOURCE_DIR}/Backends/light_interface")
+add_library(${light_interface_name} SHARED "${PROJECT_SOURCE_DIR}/Backends/light_interface/light_interface.cpp")
+set_target_properties(${light_interface_name} PROPERTIES
+  PREFIX ""
+  ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}"
+  LIBRARY_OUTPUT_DIRECTORY "${light_interface_dir}"
+  RUNTIME_OUTPUT_DIRECTORY "${light_interface_dir}"
+)
+target_include_directories(${light_interface_name} PRIVATE "${PROJECT_SOURCE_DIR}/cmake/include" "${yaml_INCLUDE_DIR}")
+target_link_libraries(${light_interface_name} PRIVATE yaml-cpp)
+if(HAVE_PYBIND11)
+  target_include_directories(${light_interface_name} PRIVATE "${PYBIND11_INCLUDE_DIR}" "${PYTHON_INCLUDE_DIRS}")
+  target_compile_options(${light_interface_name} PRIVATE "-DHAVE_PYBIND11")
+  target_link_libraries(${light_interface_name} PRIVATE "${PYTHON_LIBRARIES}")
+endif()
+# Need to switch symbol visibility back to default since we're using the 
+# same CMAKE_CXX_FLAGS as for the GAMBIT source files (see above).
+target_compile_options(${light_interface_name} PRIVATE "-fvisibility=default") 
+
+# If we decide to link the interface library directly to GAMBIT rather 
+# than connect it as a backend, uncomment this code:
+# # Link the main gambit executable to the light_interface library and update the RPATH
+# target_link_libraries(${PROJECT_NAME} PRIVATE ${light_interface_name})
+# set_target_properties(${PROJECT_NAME} PROPERTIES
+#   INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}"
+# )
+
+# Make sure the gambit_light shared library is built before the the main gambit executable
+add_dependencies(${PROJECT_NAME} ${light_interface_name})  
