@@ -596,10 +596,10 @@ endif()
 execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts/find_all_gambit_bits.py --source-dir ${PROJECT_SOURCE_DIR} --output-file=${PROJECT_SOURCE_DIR}/config/gambit_bits.yaml)
 
 
-# Add the light_interface shared library 
-set(light_interface_name "gambit_light")
-set(light_interface_dir "${PROJECT_SOURCE_DIR}/Backends/light_interface")
-add_library(${light_interface_name} SHARED "${PROJECT_SOURCE_DIR}/Backends/light_interface/light_interface.cpp")
+# Add the gambit_light_interface shared library 
+set(light_interface_name "gambit_light_interface")
+set(light_interface_dir "${PROJECT_SOURCE_DIR}/Backends/gambit_light_interface")
+add_library(${light_interface_name} SHARED "${light_interface_dir}/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
   ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}"

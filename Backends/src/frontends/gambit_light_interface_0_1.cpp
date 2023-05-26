@@ -2,7 +2,8 @@
 //   *********************************************
 ///  \file
 ///
-///  GAMBIT_light interface library (C/C++, Fortra, Python backends)
+///  Backend that connects GAMBIT to the
+///  gambit_light_interface library
 ///
 ///  *********************************************
 ///
@@ -18,7 +19,7 @@
 ///  *********************************************
 
 #include "gambit/Backends/frontend_macros.hpp"
-#include "gambit/Backends/frontends/light_interface_0_1.hpp"
+#include "gambit/Backends/frontends/gambit_light_interface_0_1.hpp"
 
 BE_NAMESPACE
 {
@@ -195,7 +196,7 @@ BE_INI_FUNCTION
             }
             catch (const std::runtime_error& e)
             {
-                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the light_interface backend: " + std::string(e.what()));
+                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the gambit_light_interface backend: " + std::string(e.what()));
             }
         }
 
@@ -208,7 +209,7 @@ BE_INI_FUNCTION
             }
             catch (const std::runtime_error& e)
             {
-                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the light_interface backend: " + std::string(e.what()));
+                backend_error().raise(LOCAL_INFO, "Caught runtime error while initialising the gambit_light_interface backend: " + std::string(e.what()));
             }
         }
 #endif
@@ -228,7 +229,7 @@ BE_NAMESPACE
 
         std::vector<std::string> warnings;
 
-        // Call run_user_loglikes from the light_interface library. 
+        // Call run_user_loglikes from the interface library. 
         // This will fill the result map (and the warnings vector).
         try
         {
@@ -240,11 +241,11 @@ BE_NAMESPACE
             std::string errmsg_lowercase = Utils::strtolower(errmsg);
             if (errmsg_lowercase.substr(0,13) == "invalid point")
             {
-                invalid_point().raise("Caught an 'invalid point' message via the light_interface library: " + errmsg);          
+                invalid_point().raise("Caught an 'invalid point' message via the gambit_light_interface library: " + errmsg);          
             }
             else
             {
-                backend_error().raise(LOCAL_INFO, "Caught a runtime error via the light_interface library: " + std::string(e.what()));
+                backend_error().raise(LOCAL_INFO, "Caught a runtime error via the gambit_light_interface library: " + std::string(e.what()));
             }
         }
 

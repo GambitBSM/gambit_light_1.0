@@ -1,4 +1,4 @@
-import gambit_light
+import gambit_light_interface as gambit_light
 
 def user_loglike(iparams, oparams):
   print("libuser.py: user_loglike: computing loglike.");
@@ -32,7 +32,5 @@ def user_loglike(iparams, oparams):
 
 def init_user_loglike(fcn_name, rf_name):
   # gambit_light passes the registration function (rf) as string (rf_name).
-  import importlib
-  li = importlib.import_module('gambit_light')
-  rf = getattr(li, rf_name)
+  rf = getattr(gambit_light, rf_name)
   rf(fcn_name, "user_loglike")

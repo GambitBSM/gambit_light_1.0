@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <iostream>
-#include "gambit_light.h"
+#include "gambit_light_interface.h"
 
 // User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
 double user_loglike(const std::map<std::string,double>& input, std::map<std::string,double>& output)

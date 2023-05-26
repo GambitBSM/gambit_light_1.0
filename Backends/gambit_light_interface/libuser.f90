@@ -1,6 +1,6 @@
 module user_mod
   use iso_c_binding
-  use gambit_light_mod
+  use gambit_light_interface_mod
   implicit none
 
 contains

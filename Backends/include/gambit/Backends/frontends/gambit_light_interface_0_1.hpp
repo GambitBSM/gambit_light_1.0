@@ -2,7 +2,8 @@
 //   *********************************************
 ///  \file
 ///
-///  GAMBIT_light interface library (C/C++, Fortra, Python backends)
+///  Backend that connects GAMBIT to the
+///  gambit_light_interface library.
 ///
 ///  *********************************************
 ///
@@ -18,7 +19,7 @@
 ///  *********************************************
 
 
-#define BACKENDNAME light_interface
+#define BACKENDNAME gambit_light_interface
 #define BACKENDLANG CXX
 #define VERSION 0.1
 #define SAFE_VERSION 0_1

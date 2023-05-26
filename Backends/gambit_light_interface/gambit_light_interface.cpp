@@ -11,9 +11,9 @@
 #include <string.h>
 #include <dlfcn.h>
 
-#include "gambit_light.h"
+#include "gambit_light_interface.h"
 
-#define OUTPUT_PREFIX "light_interface: "
+#define OUTPUT_PREFIX "gambit_light_interface: "
 
 #ifdef HAVE_PYBIND11
 #include <pybind11/pybind11.h>
@@ -23,7 +23,7 @@ extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
-PYBIND11_MODULE(gambit_light, m)
+PYBIND11_MODULE(gambit_light_interface, m)
 {
     m.def("register_loglike", &gambit_light_register_python, "register a python user log-likelihood function");
     m.def("invalid_point", &gambit_light_invalid_point, "return a value signifying an invalid point");
@@ -38,7 +38,7 @@ namespace Gambit
 {
     namespace Backends
     {
-        namespace light_interface_0_1
+        namespace gambit_light_interface_0_1
         {
 
             // Used for error reporting from C and Fortran interfaces.
@@ -219,7 +219,7 @@ double gambit_light_invalid_point()
 extern "C"
 void gambit_light_error(const char *error)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
     if(str_error)
         free(str_error);
     str_error = strdup(error);
@@ -229,7 +229,7 @@ void gambit_light_error(const char *error)
 extern "C"
 void gambit_light_warning(const char *warning)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
     if(str_warning)
         free(str_warning);
     str_warning = strdup(warning);
@@ -240,7 +240,7 @@ extern "C"
 void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
     double total_loglike;
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
     for (const auto& fn : user_loglikes)
     {
         // If this loglike function is only using a subset of the provided inputs, 
@@ -269,7 +269,7 @@ void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::
 extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
     t_user_loglike_desc desc;
     desc.name = std::string(python_fcn);
     user_loglikes.insert({loglike_name, desc});
@@ -283,7 +283,7 @@ int gambit_light_register_python(const char *loglike_name, const char *python_fc
 extern "C"
 int gambit_light_register(const char *loglike_name, void *fcn)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
     t_user_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
     user_loglikes.insert({loglike_name, desc});
@@ -297,7 +297,7 @@ void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &ini
                                  const std::string &lang, const std::string &loglike_name,
                                  const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
 
     // Load the init symbol from the user library.
     void *handle = dlopen(path.c_str(), RTLD_LAZY);
@@ -351,7 +351,7 @@ void init_user_lib_Python(const std::string &path, const std::string &init_fun,
                           const std::string &lang, const std::string &loglike_name,
                           const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
 {
-    using namespace Gambit::Backends::light_interface_0_1;
+    using namespace Gambit::Backends::gambit_light_interface_0_1;
 
     // Bail now if the backend is not present.
     std::ifstream f(path.c_str());
@@ -389,7 +389,7 @@ void init_user_lib_Python(const std::string &path, const std::string &init_fun,
     {
         user_module = pybind11::module::import(name.c_str());
         // Needed if opaque str_dbl_map type defined in another file?
-        // pybind11::module::import("gambit_light");
+        // pybind11::module::import("gambit_light_interface");
     }
     catch (std::exception& e)
     {

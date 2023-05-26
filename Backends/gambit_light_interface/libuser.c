@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "gambit_light.h"
+#include "gambit_light_interface.h"
 
 // User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
 double user_loglike(const int niparams, const double *iparams, const int noparams, double *oparams)

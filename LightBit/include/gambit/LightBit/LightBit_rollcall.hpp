@@ -29,7 +29,7 @@ START_MODULE
     #define FUNCTION input
     START_FUNCTION(map_str_dbl)
     ALLOW_MODELS(UserModel)
-    BACKEND_REQ(get_input_par_name_pairs, (light_interface), vec_pair_str_str, ())
+    BACKEND_REQ(get_input_par_name_pairs, (gambit_light_interface), vec_pair_str_str, ())
     #undef FUNCTION
   #undef CAPABILITY
 
@@ -38,7 +38,7 @@ START_MODULE
     #define FUNCTION output
     START_FUNCTION(map_str_dbl)
     DEPENDENCY(input, map_str_dbl)
-    BACKEND_REQ(run_light_interface, (light_interface), void, (const map_str_dbl&, map_str_dbl&))
+    BACKEND_REQ(run_light_interface, (gambit_light_interface), void, (const map_str_dbl&, map_str_dbl&))
     #undef FUNCTION
   #undef CAPABILITY
 

@@ -1,4 +1,4 @@
-module gambit_light_mod
+module gambit_light_interface_mod
   use iso_c_binding
   implicit none
 
@@ -30,4 +30,4 @@ module gambit_light_mod
        type(c_funptr), value :: fcn_user_loglike
      end subroutine gambit_light_register_fcn
   end interface
-end module gambit_light_mod
+end module gambit_light_interface_mod
