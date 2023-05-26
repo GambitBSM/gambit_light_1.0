@@ -617,13 +617,14 @@ endif()
 # same CMAKE_CXX_FLAGS as for the GAMBIT source files (see above).
 target_compile_options(${light_interface_name} PRIVATE "-fvisibility=default") 
 
-# If we decide to link the interface library directly to GAMBIT rather 
-# than connect it as a backend, uncomment this code:
-# # Link the main gambit executable to the light_interface library and update the RPATH
-# target_link_libraries(${PROJECT_NAME} PRIVATE ${light_interface_name})
-# set_target_properties(${PROJECT_NAME} PROPERTIES
-#   INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}"
-# )
+# Link the main GAMBIT executable to the gambit_light_interface.so library and update GAMBIT's RPATH.
+# We do this to ensure that GAMBIT symbols are available (via gambit_light_interface.so) to the user 
+# libraries that gambit_light_interface.so load at runtime (dlopen), so that e.g. functions like 
+# "gambit_light_warning" can be called from the user library.
+target_link_libraries(${PROJECT_NAME} PRIVATE ${light_interface_name})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}"
+)
 
 # Make sure the gambit_light shared library is built before the the main gambit executable
 add_dependencies(${PROJECT_NAME} ${light_interface_name})  
