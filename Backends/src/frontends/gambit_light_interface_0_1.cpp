@@ -205,7 +205,7 @@ BE_INI_FUNCTION
         {
             try
             {
-                init_user_lib_Python(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+                init_user_lib_Python(user_lib, init_fun, loglike_name, inputs, outputs);
             }
             catch (const std::runtime_error& e)
             {
@@ -230,7 +230,7 @@ BE_NAMESPACE
         std::vector<std::string> warnings;
 
         // Call run_user_loglikes from the interface library. 
-        // This will fill the result map (and the warnings vector).
+        // This will fill the result map (and the 'warnings' vector).
         try
         {
             run_user_loglikes(input, result, warnings);
@@ -238,18 +238,24 @@ BE_NAMESPACE
         catch (const std::runtime_error& e)
         {
             std::string errmsg(e.what());
-            std::string errmsg_lowercase = Utils::strtolower(errmsg);
-            if (errmsg_lowercase.substr(0,13) == "invalid point")
+
+            if (errmsg.substr(0,9) == "[invalid]")
             {
-                invalid_point().raise("Caught an 'invalid point' message via the gambit_light_interface library: " + errmsg);          
+                errmsg.erase(0,9);
+                invalid_point().raise("Caught an 'invalid point' message via gambit_light_invalid_point: " + errmsg);
+            }
+            else if (errmsg.substr(0,7) == "[fatal]")
+            {
+                errmsg.erase(0,7);
+                backend_error().raise(LOCAL_INFO, "Caught a runtime error via gambit_light_error: " + errmsg);
             }
             else
             {
-                backend_error().raise(LOCAL_INFO, "Caught a runtime error via the gambit_light_interface library: " + std::string(e.what()));
+                backend_error().raise(LOCAL_INFO, "Caught an unrecognized runtime error: " + errmsg);
             }
         }
 
-        // Log any warnings that we have collected
+        // Log any warnings that we have collected.
         for (const std::string& w : warnings) 
         {
             backend_warning().raise(LOCAL_INFO, w);

@@ -33,16 +33,16 @@ contains
 
     ! user_loglike = fiparams(1) + fiparams(2)
 
-    ! Error handling: Return a value denoting an invalid point.
-    ! user_loglike = gambit_light_invalid_point()
+    ! Error handling: Report an invalid point usiong gambit_light_invalid_point.
+    ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
 
-    ! Error handling: Report a string warning using gambit_light_warning.
+    ! Error handling: Report a warning using gambit_light_warning.
     call gambit_light_warning('Some warning.'//c_null_char)
-    user_loglike = fiparams(1) + fiparams(2)
     
-    ! Error handling: Report a string error using gambit_light_error.
-    ! call gambit_light_error('Invalid input arguments.'//c_null_char)
-    ! user_loglike = gambit_light_invalid_point()
+    ! Error handling: Report an error using gambit_light_error.
+    ! call gambit_light_error('Some error.'//c_null_char)
+
+    user_loglike = fiparams(1) + fiparams(2)
 
   end function user_loglike
 

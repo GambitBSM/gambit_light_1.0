@@ -5,7 +5,7 @@
 extern "C" 
 {
 #endif
-    double gambit_light_invalid_point();
+    void gambit_light_invalid_point(const char *);
     void gambit_light_error(const char *);
     void gambit_light_warning(const char *);
 #ifdef __cplusplus

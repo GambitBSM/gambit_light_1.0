@@ -3,9 +3,10 @@ module gambit_light_interface_mod
   implicit none
 
   interface
-     real(c_double) function gambit_light_invalid_point() bind(c)
+     subroutine gambit_light_invalid_point(str_invalid_point) bind(c)
        use iso_c_binding
-     end function gambit_light_invalid_point
+       character(kind=c_char), dimension(*) :: str_invalid_point
+     end subroutine gambit_light_invalid_point
      
      subroutine gambit_light_error(str_error) bind(c)
        use iso_c_binding

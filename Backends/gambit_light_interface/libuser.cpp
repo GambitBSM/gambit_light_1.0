@@ -12,19 +12,19 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
 
     // return input.at("p1") + input.at("p2");
     
-    // Error handling: Return a value denoting an invalid point.
-    // return gambit_light_invalid_point();
+    // Error handling: Report an invalid point using gambit_light_invalid_point.
+    // gambit_light_invalid_point("This input point is no good.");
 
     // Error handling: Report a string warning using gambit_light_warning.
-    gambit_light_warning("Some warning");
+    gambit_light_warning("Some warning.");
+
+    // Error handling: Report an error using gambit_light_error.
+    // gambit_light_error("Some error.");
+
+    // Error handling, alternative to using gambit_light_error: Throw a runtime_error.
+    // throw std::runtime_error("Some runtime_error.");
+
     return input.at("param_name_2") + input.at("param_name_3");
-
-    // Error handling: Report a string error using gambit_light_error.
-    // gambit_light_error("Invalid input parameters");
-    // return gambit_light_invalid_point();
-
-    // Error handling: Throw an exception.
-    // throw std::runtime_error("test error");
 }
 
 // User-side initialisation function, called by GAMBIT at init.

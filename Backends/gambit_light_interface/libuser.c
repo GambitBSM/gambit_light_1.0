@@ -11,17 +11,17 @@ double user_loglike(const int niparams, const double *iparams, const int noparam
 
     // return iparams[0] + iparams[1];
     
-    // Error handling: Return a value denoting an invalid point.
-    // printf("libuser.c: calling gambit_light_invalid_point().\n");
-    // return gambit_light_invalid_point();
+    // Error handling: Report an invalid point using gambit_light_invalid_point.
+    // printf("libuser.c: calling gambit_light_invalid_point.\n");
+    // gambit_light_invalid_point("This input point is no good.");
 
-    // Error handling: Report a string warning using gambit_light_warning.
-    gambit_light_warning("Some warning");
+    // Error handling: Report a warning using gambit_light_warning.
+    gambit_light_warning("Some warning.");
+
+    // Error handling: Report an error using gambit_light_error.
+    // gambit_light_error("Some error.");
+
     return iparams[0] + iparams[1] + iparams[2];
-
-    // Error handling: Report a string error using gambit_light_error.
-    // gambit_light_error("Invalid input parameters");
-    // return gambit_light_invalid_point();
 }
 
 // User-side initialisation function, called by GAMBIT at init

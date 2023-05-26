@@ -45,7 +45,7 @@ LOAD_LIBRARY
 
 BE_FUNCTION(run_user_loglikes, void, (const map_str_dbl&, map_str_dbl&, vec_str&), "run_user_loglikes", "run_user_loglikes")
 BE_FUNCTION(init_user_lib_C_CXX_Fortran, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_C_CXX_Fortran", "init_user_lib_C_CXX_Fortran")
-BE_FUNCTION(init_user_lib_Python, void, (const std::string &, const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_Python", "init_user_lib_Python")
+BE_FUNCTION(init_user_lib_Python, void, (const std::string &, const std::string &, const std::string &, const std::vector<std::string> &, const std::vector<std::string> &), "init_user_lib_Python", "init_user_lib_Python")
 
 BE_CONV_FUNCTION(run_light_interface, void, (const map_str_dbl&, map_str_dbl&), "run_light_interface")
 BE_CONV_FUNCTION(get_input_par_name_pairs, vec_pair_str_str, (), "get_input_par_name_pairs")

@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
@@ -26,7 +27,7 @@ PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light_interface, m)
 {
     m.def("register_loglike", &gambit_light_register_python, "register a python user log-likelihood function");
-    m.def("invalid_point", &gambit_light_invalid_point, "return a value signifying an invalid point");
+    m.def("invalid_point", &gambit_light_invalid_point, "report an invalid input point");
     m.def("warning", &gambit_light_warning, "report user warning");
     m.def("error", &gambit_light_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
@@ -41,8 +42,7 @@ namespace Gambit
         namespace gambit_light_interface_0_1
         {
 
-            // Used for error reporting from C and Fortran interfaces.
-            static char *str_error = NULL;
+            // Variable used to collect warning messages from user libraries
             static char *str_warning = NULL;
 
 #ifdef HAVE_PYBIND11
@@ -149,18 +149,24 @@ namespace Gambit
 
                     // If a Python exception is caught (via pybind11), re-throw it
                     // as a std::runtime_error without the leading "Exception: "
-                    // part of the error message.
+                    // or "RuntimeError: " part of the error message.
+                    // TODO: This is silly. Find a better solution.
                     try
                     {
                         retval = pybind11::cast<double>((*desc.fcn.python)(input, &new_output));
                     }
-                    catch (pybind11::error_already_set& e)
+                    catch (const pybind11::error_already_set& e)
                     {
                         std::string errmsg(e.what());
-                        if(errmsg.substr(0,11) == "Exception: ")
+                        if (errmsg.substr(0,11) == "Exception: ")
                         {
                             errmsg.erase(0,11);
                         }
+                        else if(errmsg.substr(0,14) == "RuntimeError: ")
+                        {
+                            errmsg.erase(0,14);
+                        }
+
                         throw std::runtime_error(errmsg);
                     }
 
@@ -185,20 +191,11 @@ namespace Gambit
                 }
 #endif
 
-                // Throw any errors raised via gambit_light_error.
-                if (str_error)
-                {
-                    std::string s(str_error);
-                    free(str_error);
-                    str_error = nullptr;
-                    throw std::runtime_error(s);
-                }
-
                 // Collect any warnings raised via gambit_light_warning.
                 if (str_warning)
                 {
-                    std::string s(str_warning);
-                    warnings.push_back("Warning from " + loglike_name + ": " + s);
+                    std::string msg(str_warning);
+                    warnings.push_back("Warning from " + loglike_name + ": " + msg);
                     free(str_warning);
                     str_warning = nullptr;
                 }
@@ -211,28 +208,27 @@ namespace Gambit
 
 
 extern "C"
-double gambit_light_invalid_point()
+void gambit_light_invalid_point(const char *invalid_point_msg)
 {
-    return std::numeric_limits<double>::quiet_NaN();
+    std::string msg = "[invalid]" + std::string(invalid_point_msg) + "\n";
+    throw std::runtime_error(msg);
 }
 
 extern "C"
-void gambit_light_error(const char *error)
+void gambit_light_error(const char *error_msg)
 {
-    using namespace Gambit::Backends::gambit_light_interface_0_1;
-    if(str_error)
-        free(str_error);
-    str_error = strdup(error);
+    std::string msg = "[fatal]" + std::string(error_msg) + "\n";
+    throw std::runtime_error(msg);
 }
 
 
 extern "C"
-void gambit_light_warning(const char *warning)
+void gambit_light_warning(const char *warning_msg)
 {
     using namespace Gambit::Backends::gambit_light_interface_0_1;
     if(str_warning)
         free(str_warning);
-    str_warning = strdup(warning);
+    str_warning = strdup(warning_msg);
 }
 
 
@@ -347,8 +343,7 @@ void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &ini
 
 #ifdef HAVE_PYBIND11
 extern "C"
-void init_user_lib_Python(const std::string &path, const std::string &init_fun,
-                          const std::string &lang, const std::string &loglike_name,
+void init_user_lib_Python(const std::string &path, const std::string &init_fun, const std::string &loglike_name, 
                           const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
 {
     using namespace Gambit::Backends::gambit_light_interface_0_1;
@@ -369,7 +364,7 @@ void init_user_lib_Python(const std::string &path, const std::string &init_fun,
             python_interpreter = new pybind11::scoped_interpreter;
             std::cout << OUTPUT_PREFIX << "Python interpreter successfully started." << std::endl;
         }
-        catch (std::runtime_error e)
+        catch (const std::runtime_error& e)
         {
             std::cout << OUTPUT_PREFIX << "Did not start Python interpreter: " << e.what() << std::endl;
         }
@@ -391,7 +386,7 @@ void init_user_lib_Python(const std::string &path, const std::string &init_fun,
         // Needed if opaque str_dbl_map type defined in another file?
         // pybind11::module::import("gambit_light_interface");
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         sys_path_remove(module_path);
         throw std::runtime_error(
@@ -406,7 +401,7 @@ void init_user_lib_Python(const std::string &path, const std::string &init_fun,
     {
         user_init_function = user_module.attr(init_fun.c_str());
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         sys_path_remove(module_path);
         throw std::runtime_error(
