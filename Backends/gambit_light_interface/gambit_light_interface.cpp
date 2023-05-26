@@ -235,7 +235,7 @@ void gambit_light_warning(const char *warning_msg)
 extern "C"
 void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
 {
-    double total_loglike;
+    double total_loglike = 0.0;
     using namespace Gambit::Backends::gambit_light_interface_0_1;
     for (const auto& fn : user_loglikes)
     {
