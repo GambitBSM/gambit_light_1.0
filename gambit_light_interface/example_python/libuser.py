@@ -1,4 +1,12 @@
+# To import gambit_light_interface, first append the directory containing 
+# gambit_light_interface.so to sys.path. (Alternatively, add this directory 
+# to the PYTHONPATH environment variable.)
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, "../lib"))
 import gambit_light_interface as gambit_light
+
 
 def user_loglike(iparams, oparams):
   print("libuser.py: user_loglike: computing loglike.");

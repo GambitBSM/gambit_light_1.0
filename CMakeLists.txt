@@ -599,14 +599,13 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts
 # Add the gambit_light_interface shared library 
 set(light_interface_name "gambit_light_interface")
 set(light_interface_dir "${PROJECT_SOURCE_DIR}/gambit_light_interface")
-add_library(${light_interface_name} SHARED "${light_interface_dir}/gambit_light_interface.cpp")
+add_library(${light_interface_name} SHARED "${light_interface_dir}/src/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
-  ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}"
-  LIBRARY_OUTPUT_DIRECTORY "${light_interface_dir}"
-  RUNTIME_OUTPUT_DIRECTORY "${light_interface_dir}"
+  LIBRARY_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
+  ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
 )
-target_include_directories(${light_interface_name} PRIVATE "${PROJECT_SOURCE_DIR}/cmake/include" "${yaml_INCLUDE_DIR}")
+target_include_directories(${light_interface_name} PRIVATE "${light_interface_dir}/include" "${PROJECT_SOURCE_DIR}/cmake/include" "${yaml_INCLUDE_DIR}")
 target_link_libraries(${light_interface_name} PRIVATE yaml-cpp)
 if(HAVE_PYBIND11)
   target_include_directories(${light_interface_name} PRIVATE "${PYBIND11_INCLUDE_DIR}" "${PYTHON_INCLUDE_DIRS}")
@@ -623,7 +622,7 @@ target_compile_options(${light_interface_name} PRIVATE "-fvisibility=default")
 # "gambit_light_warning" can be called from the user library.
 target_link_libraries(${PROJECT_NAME} PRIVATE ${light_interface_name})
 set_target_properties(${PROJECT_NAME} PROPERTIES
-  INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}"
+  INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}/lib"
 )
 
 # Make sure the gambit_light shared library is built before the the main gambit executable

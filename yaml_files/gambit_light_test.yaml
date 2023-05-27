@@ -32,7 +32,7 @@ UserLogLikes:
 
   c_user_loglike:
     lang: c
-    user_lib: gambit_light_interface/libuser_c.so
+    user_lib: gambit_light_interface/example_c/libuser_c.so
     init_fun: init_user_loglike
     input:
       - param_name_1
@@ -46,7 +46,7 @@ UserLogLikes:
 
   cpp_user_loglike:
     lang: c++
-    user_lib: gambit_light_interface/libuser_cpp.so
+    user_lib: gambit_light_interface/example_cpp/libuser_cpp.so
     init_fun: _Z17init_user_loglikePKcPFiS0_PvE
     input:
       - param_name_2
@@ -59,7 +59,7 @@ UserLogLikes:
 
   fortran_user_loglike:
     lang: fortran
-    user_lib: gambit_light_interface/libuser_fortran.so
+    user_lib: gambit_light_interface/example_fortran/libuser_fortran.so
     init_fun: init_user_loglike
     input:
       - param_name_1
@@ -70,7 +70,7 @@ UserLogLikes:
 
   py_user_loglike:
     lang: python
-    user_lib: gambit_light_interface/libuser.py
+    user_lib: gambit_light_interface/example_python/libuser.py
     init_fun: init_user_loglike
     input:
       - param_name_1
@@ -84,7 +84,7 @@ UserLogLikes:
 
   py_user_loglike_rosenbrock:
     lang: python
-    user_lib: gambit_light_interface/libuser_rosenbrock.py
+    user_lib: gambit_light_interface/example_python/libuser_rosenbrock.py
     init_fun: init_user_loglike
     input:
       - param_name_1
