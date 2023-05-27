@@ -242,12 +242,14 @@ BE_NAMESPACE
             if (errmsg.substr(0,9) == "[invalid]")
             {
                 errmsg.erase(0,9);
-                invalid_point().raise("Caught an 'invalid point' message via gambit_light_invalid_point: " + errmsg);
+                // invalid_point().raise("Caught an 'invalid point' message via gambit_light_invalid_point: " + errmsg);
+                invalid_point().raise(errmsg);
             }
             else if (errmsg.substr(0,7) == "[fatal]")
             {
                 errmsg.erase(0,7);
-                backend_error().raise(LOCAL_INFO, "Caught a runtime error via gambit_light_error: " + errmsg);
+                // backend_error().raise(LOCAL_INFO, "Caught a runtime error via gambit_light_error: " + errmsg);
+                backend_error().raise(LOCAL_INFO, errmsg);
             }
             else
             {

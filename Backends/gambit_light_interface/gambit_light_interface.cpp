@@ -34,7 +34,7 @@ PYBIND11_MODULE(gambit_light_interface, m)
 }
 #endif
 
-// Registered functions
+
 namespace Gambit
 {
     namespace Backends
@@ -44,6 +44,11 @@ namespace Gambit
 
             // Variable used to collect warning messages from user libraries
             static char *str_warning = NULL;
+
+            // Variable to hold the name of the user loglike function 
+            // currently being run, used for error messages
+            std::string current_loglike_name;
+
 
 #ifdef HAVE_PYBIND11
             /// Pointer to the Python interpreter.
@@ -90,6 +95,8 @@ namespace Gambit
                                       const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                       std::vector<std::string>& warnings)
             {
+                current_loglike_name = loglike_name;
+
                 double retval = 0.0;
                 
                 if(desc.lang == LANG_FORTRAN || desc.lang == LANG_C)
@@ -200,6 +207,8 @@ namespace Gambit
                     str_warning = nullptr;
                 }
                 
+                current_loglike_name = "";
+
                 return retval;
             }
         }
@@ -210,15 +219,19 @@ namespace Gambit
 extern "C"
 void gambit_light_invalid_point(const char *invalid_point_msg)
 {
-    std::string msg = "[invalid]" + std::string(invalid_point_msg) + "\n";
-    throw std::runtime_error(msg);
+    std::string msg = "Invalid point message from " 
+                      + Gambit::Backends::gambit_light_interface_0_1::current_loglike_name + ": " 
+                      + std::string(invalid_point_msg) + "\n";
+    throw std::runtime_error("[invalid]" + msg);
 }
 
 extern "C"
 void gambit_light_error(const char *error_msg)
 {
-    std::string msg = "[fatal]" + std::string(error_msg) + "\n";
-    throw std::runtime_error(msg);
+    std::string msg = "Error message from "
+                      + Gambit::Backends::gambit_light_interface_0_1::current_loglike_name + ": " 
+                      + std::string(error_msg) + "\n";
+    throw std::runtime_error("[fatal]" + msg);
 }
 
 

@@ -8,15 +8,14 @@ def user_loglike(iparams, oparams):
 
   print("libuser.py: got iparams:", iparams)
 
-  # Error handling: Report an invalid point using gambit_light.invalid_point.
-  gambit_light.invalid_point("This input point is no good.")
+  # # Error handling: Report an invalid point using gambit_light.invalid_point.
+  # gambit_light.invalid_point("This input point is no good.")
 
   # Error handling: Report a warning using gambit_light.warning.
   # gambit_light.warning("Some warning.")
 
   # Error handling: Report an error using gambit_light.error.
   # gambit_light.error("Some error.");
-  # print("DEBUG: This message should not appear!")
   
   # Error handling: Error handling, alternative to using gambit_light.error: Throw an exception.
   # raise Exception("Some exception.")

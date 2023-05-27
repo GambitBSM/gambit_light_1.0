@@ -37,7 +37,7 @@ contains
     ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
 
     ! Error handling: Report a warning using gambit_light_warning.
-    call gambit_light_warning('Some warning.'//c_null_char)
+    ! call gambit_light_warning('Some warning.'//c_null_char)
     
     ! Error handling: Report an error using gambit_light_error.
     ! call gambit_light_error('Some error.'//c_null_char)

@@ -16,7 +16,7 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
     // gambit_light_invalid_point("This input point is no good.");
 
     // Error handling: Report a string warning using gambit_light_warning.
-    gambit_light_warning("Some warning.");
+    // gambit_light_warning("Some warning.");
 
     // Error handling: Report an error using gambit_light_error.
     // gambit_light_error("Some error.");
