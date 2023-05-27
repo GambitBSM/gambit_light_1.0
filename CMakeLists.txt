@@ -598,7 +598,7 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts
 
 # Add the gambit_light_interface shared library 
 set(light_interface_name "gambit_light_interface")
-set(light_interface_dir "${PROJECT_SOURCE_DIR}/Backends/gambit_light_interface")
+set(light_interface_dir "${PROJECT_SOURCE_DIR}/gambit_light_interface")
 add_library(${light_interface_name} SHARED "${light_interface_dir}/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
