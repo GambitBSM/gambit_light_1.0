@@ -111,6 +111,9 @@ BE_INI_FUNCTION
         }
         lang = userLogLikesEntry["lang"].as<std::string>();
 
+        // Treat "lang: cpp" and "lang: cxx" as equivalent to "lang: c++"
+        if (lang == "cpp" or lang == "cxx") { lang = "c++"; }
+
         if (lang != "fortran" and 
             lang != "c" and
 #ifdef HAVE_PYBIND11
