@@ -47,7 +47,7 @@ UserLogLikes:
   cpp_user_loglike:
     lang: c++
     user_lib: gambit_light_interface/example_cpp/example.so
-    init_fun: _Z17init_user_loglikePKcPFiS0_PvE
+    init_fun: init_user_loglike
     input:
       - param_name_2
       - param_name_3

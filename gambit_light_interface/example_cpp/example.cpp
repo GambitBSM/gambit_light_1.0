@@ -28,6 +28,7 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
 }
 
 // User-side initialisation function, called by GAMBIT at init.
+extern "C"
 void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
 {
     std::cout << "libuser.cpp: init_user_loglike: initialising user library." << std::endl;
