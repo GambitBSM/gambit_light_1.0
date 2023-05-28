@@ -111,6 +111,9 @@ BE_INI_FUNCTION
         }
         lang = userLogLikesEntry["lang"].as<std::string>();
 
+        // Avoid confusion with "Fortran" vs "fortran", etc. 
+        std::transform(lang.begin(), lang.end(), lang.begin(), ::tolower);
+
         // Treat "lang: cpp" and "lang: cxx" as equivalent to "lang: c++"
         if (lang == "cpp" or lang == "cxx") { lang = "c++"; }
 
