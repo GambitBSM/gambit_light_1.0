@@ -6,32 +6,32 @@ module user_mod
 contains
   
   ! User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
-  real(c_double) function user_loglike(niparams, iparams, noparams, oparams) bind(c)
-    integer(c_int), value, intent(in) :: niparams, noparams
-    type(c_ptr), intent(in), value :: iparams
-    type(c_ptr), intent(in), value :: oparams
+  real(c_double) function user_loglike(n_inputs, input, n_outputs, output) bind(c)
+    integer(c_int), value, intent(in) :: n_inputs, n_outputs
+    type(c_ptr), intent(in), value :: input
+    type(c_ptr), intent(in), value :: output
 
     ! Fortran arrays
-    real(c_double), dimension(:), pointer :: fiparams
-    real(c_double), dimension(:), pointer :: foparams
+    real(c_double), dimension(:), pointer :: finput
+    real(c_double), dimension(:), pointer :: foutput
     integer :: pi
 
     print *, "libuser.f90: user_loglike: computing loglike."
-    if (niparams == 0) then
+    if (n_inputs == 0) then
       user_loglike = 0
       return
     end if
 
-    call c_f_pointer(iparams, fiparams, shape=[niparams])
-    call c_f_pointer(oparams, foparams, shape=[noparams])
+    call c_f_pointer(input, finput, shape=[n_inputs])
+    call c_f_pointer(output, foutput, shape=[n_outputs])
     
     pi = 1
-    do while(pi<=noparams)
-      foparams(pi) = pi
+    do while(pi<=n_outputs)
+      foutput(pi) = pi
       pi = pi + 1
     end do
 
-    ! user_loglike = fiparams(1) + fiparams(2)
+    ! user_loglike = finput(1) + finput(2)
 
     ! Error handling: Report an invalid point usiong gambit_light_invalid_point.
     ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
@@ -42,7 +42,7 @@ contains
     ! Error handling: Report an error using gambit_light_error.
     ! call gambit_light_error('Some error.'//c_null_char)
 
-    user_loglike = fiparams(1) + fiparams(2)
+    user_loglike = finput(1) + finput(2)
 
   end function user_loglike
 

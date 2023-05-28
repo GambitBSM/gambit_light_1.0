@@ -9,13 +9,13 @@ _See the example code in `example.c`._
 
 2. Add to your code a target/log-likelihood function with the following signature:
    ```c
-   double user_loglike(const int niparams, const double *iparams, const int noparams, double *oparams)
+   double user_loglike(const int n_inputs, const double *input, const int n_outputs, double *output)
    ```
    _Arguments_:
-   * `niparams`: The number of input parameters.
-   * `iparams`: A pointer to an array with the input parameters.
-   * `noparams`: The number of output quantities (besides the function return value).
-   * `oparams`: A pointer to the output array that the function will fill.
+   * `n_inputs`: The number of input parameters.
+   * `input`: A pointer to an array with the input parameters.
+   * `n_outputs`: The number of output quantities (besides the function return value).
+   * `output`: A pointer to the output array that the function will fill.
 
    _Return value_: The target/log-likelihood value.
 

@@ -2,14 +2,14 @@
 #include "gambit_light_interface.h"
 
 // User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
-double user_loglike(const int niparams, const double *iparams, const int noparams, double *oparams)
+double user_loglike(const int n_inputs, const double *input, const int n_outputs, double *outputs)
 {
-    printf("libuser.c: user_loglike: niparams = %i.\n", niparams);
+    printf("libuser.c: user_loglike: n_inputs = %i.\n", n_inputs);
     printf("libuser.c: user_loglike: computing loglike.\n");
-    if(!niparams) return 0.0;
-    for(int i=0; i<noparams; i++) oparams[i] = i;
+    if(!n_inputs) return 0.0;
+    for(int i=0; i<n_outputs; i++) outputs[i] = i;
 
-    // return iparams[0] + iparams[1];
+    // return input[0] + input[1];
     
     // Error handling: Report an invalid point using gambit_light_invalid_point.
     // printf("libuser.c: calling gambit_light_invalid_point.\n");
@@ -21,7 +21,7 @@ double user_loglike(const int niparams, const double *iparams, const int noparam
     // Error handling: Report an error using gambit_light_error.
     // gambit_light_error("Some error.");
 
-    return iparams[0] + iparams[1] + iparams[2];
+    return input[0] + input[1] + input[2];
 }
 
 // User-side initialisation function, called by GAMBIT at init
