@@ -4,7 +4,7 @@ _See the example code in `example.c`._
 
 1. Include the header for the GAMBIT-light interface:
    ```c
-   #include "gambit_light_interface.h
+   #include "gambit_light_interface.h"
    ```
 
 2. Add to your code a target/log-likelihood function with the following signature:
@@ -20,7 +20,7 @@ _See the example code in `example.c`._
    _Return value_: The target/log-likelihood value.
 
 
-3. Add a small initialisation function that registeres the target function (in this example `user_loglike`) with GAMBIT-light:
+3. Add a small initialisation function that registers the target function (in this example `user_loglike`) with GAMBIT-light:
    ```c
    void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
    {
@@ -50,11 +50,11 @@ _See the example code in `example.c`._
         - c_user_loglike_output_2
         - c_user_loglike_output_3
    ```
-   * Here `c_user_loglike` is simply the GAMBIT name we choose for our target function, for use in output files, log messages, etc. 
-   * The `init_fun` setting must match the name of the initialisation function in our library (here `init_user_loglike`).
+   * Here `c_user_loglike` is simply a label you choose for your target function. It will be used in GAMBIT output files, log messages, etc. 
+   * The `init_fun` setting must match the name of the initialisation function in your library (here `init_user_loglike`).
    * In the above example, the target function expects three input parameters and computes three output quantities in addition to the return value. 
    * The input parameter names (`param_name_1`, etc.) correspond to parameters defined in the GAMBIT configuration file.
-   * The output names (`c_user_loglike_output_1`, etc.) are the names that will be assigned to the three output quantities in the GAMBIT output.
+   * The output names (`c_user_loglike_output_1`, etc.) are the names that will be assigned to the output quantities in the GAMBIT output.
 
    See `yaml_files/gambit_light_example.yaml` for a complete GAMBIT configuration file.
    
