@@ -158,7 +158,7 @@ Logger:
 
 KeyValues:
 
-  default_output_path: "runs/gambit_light_test"
+  default_output_path: "runs/gambit_light_example"
 
   debug: false
 
