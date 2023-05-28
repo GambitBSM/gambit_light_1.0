@@ -18,7 +18,7 @@ _See the example code in `example.cpp`._
    _Return value_: The target/log-likelihood value.
 
 
-3. Add a small initialisation function that registeres the target function (in this example `user_loglike`) with GAMBIT-light:
+3. Add a small initialisation function that registers the target function (in this example `user_loglike`) with GAMBIT-light:
    ```cpp
    extern "C"
    void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
