@@ -71,13 +71,11 @@ namespace Gambit
             if (errmsg.substr(0,9) == "[invalid]")
             {
                 errmsg.erase(0,9);
-                // invalid_point().raise("Caught an 'invalid point' message via gambit_light_invalid_point: " + errmsg);
                 invalid_point().raise(errmsg);
             }
             else if (errmsg.substr(0,7) == "[fatal]")
             {
                 errmsg.erase(0,7);
-                // LightBit_error().raise(LOCAL_INFO, "Caught a runtime error via gambit_light_error: " + errmsg);
                 LightBit_error().raise(LOCAL_INFO, errmsg);
             }
             else
@@ -91,18 +89,6 @@ namespace Gambit
         {
             backend_warning().raise(LOCAL_INFO, w);
         }
-    }
-
-
-    vec_pair_str_str get_input_par_name_pairs()
-    {
-        vec_pair_str_str input_par_name_pairs;
-        for (size_t i = 0; i < listed_user_pars.size(); ++i)
-        {
-            std::pair<std::string, std::string> p = {listed_user_pars[i], listed_model_pars[i]};
-            input_par_name_pairs.push_back(p);
-        }
-        return input_par_name_pairs;
     }
 
     /// @}
@@ -326,8 +312,17 @@ namespace Gambit
 
       if (first)
       {
-        // Get the names of input parameters in use
-        vec_pair_str_str input_par_name_pairs = get_input_par_name_pairs();
+        // Construct a vector of string pairs, where each pair contains 
+        // two corresponding parameter names. The first element of a pair 
+        // is the parameter name assigned by the user in the YAML file, 
+        // and the second element is the corresponding parameter name in 
+        // the UserModel ('p1', 'p2', etc.).
+        vec_pair_str_str input_par_name_pairs;
+        for (size_t i = 0; i < listed_user_pars.size(); ++i)
+        {
+            std::pair<std::string, std::string> p = {listed_user_pars[i], listed_model_pars[i]};
+            input_par_name_pairs.push_back(p);
+        }
 
         // For each parameter, add a pointer in param_pointer_map that points
         // to the corresponding parameter value in Param
@@ -351,7 +346,7 @@ namespace Gambit
     // This function will run the gambit_light_interface library 
     // and collect all the results from all the connected user libraries
     // in one map<string,double>.
-    void output(std::map<std::string,double>& result)
+    void output(std::map<std::string, double>& result)
     {
       using namespace Pipes::output;
 
