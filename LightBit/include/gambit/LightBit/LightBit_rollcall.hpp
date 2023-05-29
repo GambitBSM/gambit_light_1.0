@@ -24,12 +24,20 @@
 #define MODULE LightBit
 START_MODULE
   
+  #define CAPABILITY initialisation
+  START_CAPABILITY
+    #define FUNCTION initialisation
+    START_FUNCTION(bool)
+    ALLOW_MODELS(UserModel)
+    #undef FUNCTION
+  #undef CAPABILITY
+
   #define CAPABILITY input
   START_CAPABILITY
     #define FUNCTION input
     START_FUNCTION(map_str_dbl)
+    DEPENDENCY(initialisation, bool)
     ALLOW_MODELS(UserModel)
-    BACKEND_REQ(get_input_par_name_pairs, (gambit_light_interface), vec_pair_str_str, ())
     #undef FUNCTION
   #undef CAPABILITY
 
@@ -38,7 +46,6 @@ START_MODULE
     #define FUNCTION output
     START_FUNCTION(map_str_dbl)
     DEPENDENCY(input, map_str_dbl)
-    BACKEND_REQ(run_light_interface, (gambit_light_interface), void, (const map_str_dbl&, map_str_dbl&))
     #undef FUNCTION
   #undef CAPABILITY
 

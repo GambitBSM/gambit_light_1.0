@@ -97,10 +97,6 @@
 #
 #************************************************
 
-
-# TODO: Add setup for building the light_interface library
-
-
 # Alternative download command for getting unreleased things from the gambit_internal repository.
 # If you don't know what that is, you don't need to tinker with these.
 #    DOWNLOAD_COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --yellow --bold ${private_code_warning1}

@@ -79,10 +79,13 @@ endforeach()
 # Set the project name, enabling C, C++ and Fortran support
 project(gambit C CXX Fortran)
 
-# Set GAMBIT_LIGHT macro to true
+# Some settings needed for GAMBIT-light
 set(GAMBIT_LIGHT 1)
 
-# Set some other variables needed for GAMBIT-light
+set(light_interface_name "gambit_light_interface")
+set(light_interface_dir "${PROJECT_SOURCE_DIR}/gambit_light_interface")
+include_directories("${light_interface_dir}/include")
+
 set(HAVE_MATHEMATICA 0)
 set(EXCLUDE_ROOT 1)
 set(EXCLUDE_RESTFRAMES 1)
@@ -597,8 +600,6 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts
 
 
 # Add the gambit_light_interface shared library 
-set(light_interface_name "gambit_light_interface")
-set(light_interface_dir "${PROJECT_SOURCE_DIR}/gambit_light_interface")
 add_library(${light_interface_name} SHARED "${light_interface_dir}/src/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
@@ -625,5 +626,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
   INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${light_interface_dir}/lib"
 )
 
+# Add include directory
+# include_directories("${light_interface_dir}/include")
+
 # Make sure the gambit_light shared library is built before the the main gambit executable
 add_dependencies(${PROJECT_NAME} ${light_interface_name})  
+
+
