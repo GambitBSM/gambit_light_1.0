@@ -25,13 +25,14 @@ _See the example code in `example.py`._
 
 2. Add to your code a target/log-likelihood function with the following signature:
    ```python
-   def user_loglike(input, output):
+   user_loglike(input, output)
    ```
    _Arguments_:
    * `input`: A string-to-float dictionary with the input parameters. 
    * `output`: A reference to a string-to-float dictionary that the target function can fill with any additional output quantities. 
    
-      **Note:** Technically, `input` and `output` are instances of the class `gambit_light_interface.str_dbl_map`, which corresponds to the pybind11 type `pybind11::bind_map<std::map<std::string,double>>`. This type mimics a regular Python `dict`.
+      **Note:** Technically, `input` and `output` will be instances of the class `gambit_light_interface.str_dbl_map`, 
+      which corresponds to the pybind11 type `pybind11::bind_map<std::map<std::string,double>>`. This type mimics a regular Python `dict`.
 
    _Return value_: The target/log-likelihood value.
 
