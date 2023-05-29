@@ -45,58 +45,15 @@ namespace Gambit
 
     std::vector<std::string> listed_user_pars;
     std::vector<std::string> listed_model_pars;
-    std::map<std::string,std::string> model_to_user_par_names;
+    std::map<std::string,std::string> user_to_model_par_names;
 
     /// @}
-
-
-    /// \name Helper functions
-    /// @{
-
-    void run_light_interface(const map_str_dbl& input, map_str_dbl& result)
-    {
-
-        std::vector<std::string> warnings;
-
-        // Call run_user_loglikes from the interface library. 
-        // This will fill the result map (and the 'warnings' vector).
-        try
-        {
-            Gambit::gambit_light_interface::run_user_loglikes(input, result, warnings);
-        }
-        catch (const std::runtime_error& e)
-        {
-            std::string errmsg(e.what());
-
-            if (errmsg.substr(0,9) == "[invalid]")
-            {
-                errmsg.erase(0,9);
-                invalid_point().raise(errmsg);
-            }
-            else if (errmsg.substr(0,7) == "[fatal]")
-            {
-                errmsg.erase(0,7);
-                LightBit_error().raise(LOCAL_INFO, errmsg);
-            }
-            else
-            {
-                LightBit_error().raise(LOCAL_INFO, "Caught an unrecognized runtime error: " + errmsg);
-            }
-        }
-
-        // Log any warnings that we have collected.
-        for (const std::string& w : warnings) 
-        {
-            backend_warning().raise(LOCAL_INFO, w);
-        }
-    }
-
-    /// @}
-
 
     /// \name Module functions
     /// @{
 
+    // The first time this function is run, it performs a series of consistency 
+    // checks for the YAML file settings and extracts the information needed.
     void initialisation(bool& result)
     {
       using namespace Pipes::initialisation;
@@ -152,7 +109,7 @@ namespace Gambit
             // This is a new parameter. Register it.
             listed_user_pars.push_back(user_par_name);
             listed_model_pars.push_back(model_par_name);
-            model_to_user_par_names[model_par_name] = user_par_name;
+            user_to_model_par_names[user_par_name] = model_par_name;
         }
 
         // Check consistency and collect settings from the "UserLogLikes" section.
@@ -312,23 +269,11 @@ namespace Gambit
 
       if (first)
       {
-        // Construct a vector of string pairs, where each pair contains 
-        // two corresponding parameter names. The first element of a pair 
-        // is the parameter name assigned by the user in the YAML file, 
-        // and the second element is the corresponding parameter name in 
-        // the UserModel ('p1', 'p2', etc.).
-        vec_pair_str_str input_par_name_pairs;
-        for (size_t i = 0; i < listed_user_pars.size(); ++i)
-        {
-            std::pair<std::string, std::string> p = {listed_user_pars[i], listed_model_pars[i]};
-            input_par_name_pairs.push_back(p);
-        }
-
         // For each parameter, add a pointer in param_pointer_map that points
         // to the corresponding parameter value in Param
-        for (const std::pair<std::string,std::string>& name_pair: input_par_name_pairs)
+        for (const std::string& user_par_name: listed_user_pars)
         {
-          param_pointer_map[name_pair.first] = Param.at(name_pair.second).operator->();
+          param_pointer_map[user_par_name] = Param.at(user_to_model_par_names[user_par_name]).operator->();
         }
 
         first = false;
@@ -346,11 +291,45 @@ namespace Gambit
     // This function will run the gambit_light_interface library 
     // and collect all the results from all the connected user libraries
     // in one map<string,double>.
-    void output(std::map<std::string, double>& result)
+    void output(map_str_dbl& result)
     {
       using namespace Pipes::output;
 
-      run_light_interface(*Dep::input, result);
+      const map_str_dbl& input = *Dep::input;
+      std::vector<std::string> warnings;
+
+      // Call run_user_loglikes from the interface library. 
+      // This will fill the result map (and the 'warnings' vector).
+      try
+      {
+        Gambit::gambit_light_interface::run_user_loglikes(input, result, warnings);
+      }
+      catch (const std::runtime_error& e)
+      {
+        std::string errmsg(e.what());
+
+        if (errmsg.substr(0,9) == "[invalid]")
+        {
+          errmsg.erase(0,9);
+          invalid_point().raise(errmsg);
+        }
+        else if (errmsg.substr(0,7) == "[fatal]")
+        {
+          errmsg.erase(0,7);
+          LightBit_error().raise(LOCAL_INFO, errmsg);
+        }
+        else
+        {
+          LightBit_error().raise(LOCAL_INFO, "Caught an unrecognized runtime error: " + errmsg);
+        }
+      }
+
+      // Log any warnings that we have collected.
+      for (const std::string& w : warnings) 
+      {
+        LightBit_warning().raise(LOCAL_INFO, w);
+      }
+
     }
 
 
