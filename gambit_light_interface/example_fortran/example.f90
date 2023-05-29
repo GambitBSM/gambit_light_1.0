@@ -5,33 +5,20 @@ module user_mod
 
 contains
   
-  ! User-side log-likelihood function, registered in GAMBIT by init_user_loglike.
+  ! User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
   real(c_double) function user_loglike(n_inputs, input, n_outputs, output) bind(c)
     integer(c_int), value, intent(in) :: n_inputs, n_outputs
-    type(c_ptr), intent(in), value :: input
-    type(c_ptr), intent(in), value :: output
+    type(c_ptr), intent(in), value :: input, output
 
-    ! Fortran arrays
+    ! Create pointers to Fortran arrays
     real(c_double), dimension(:), pointer :: finput
     real(c_double), dimension(:), pointer :: foutput
-    integer :: pi
 
-    print *, "libuser.f90: user_loglike: computing loglike."
-    if (n_inputs == 0) then
-      user_loglike = 0
-      return
-    end if
-
+    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
     call c_f_pointer(input, finput, shape=[n_inputs])
     call c_f_pointer(output, foutput, shape=[n_outputs])
-    
-    pi = 1
-    do while(pi<=n_outputs)
-      foutput(pi) = pi
-      pi = pi + 1
-    end do
-
-    ! user_loglike = finput(1) + finput(2)
+  
+    print *, "example.f90: user_loglike: Computing loglike."
 
     ! Error handling: Report an invalid point usiong gambit_light_invalid_point.
     ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
@@ -42,17 +29,21 @@ contains
     ! Error handling: Report an error using gambit_light_error.
     ! call gambit_light_error('Some error.'//c_null_char)
 
-    user_loglike = finput(1) + finput(2)
+    foutput(1) = 10 * finput(1)
+    foutput(2) = 10 * finput(2)
+    
+    user_loglike = finput(1) * finput(1) + finput(2) * finput(2)
 
   end function user_loglike
 
-  ! User-side initialisation function, called by GAMBIT at init.
+
+  ! User-side initialisation function, called by GAMBIT.
   subroutine init_user_loglike(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
     procedure(gambit_light_register_fcn), pointer :: frf
 
-    print *, "libuser.f90: init_user_loglike: initialising user library."
+    print *, "example.f90: init_user_loglike: Registering loglike function."
 
     ! Convert c function to fortran function, and call it.
     call c_f_procpointer(rf, frf)

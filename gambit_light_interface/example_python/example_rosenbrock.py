@@ -32,15 +32,18 @@ def loglike(x):
     return -rosenbrock_general(x)
 
 
-def user_loglike(iparams, oparams):
-  print("libuser_rosenbrock.py: user_loglike: computing loglike.");
+def user_loglike(input, output):
 
-  x = np.array([iparams['param_name_1'], iparams['param_name_2']])
-  oparams['py_user_loglike_rosenbrock_output_1'] = 10;
-  result = loglike(x)
-  return result
+    print("example_rosenbrock.py: user_loglike: Computing loglike.")
+
+    x = np.array([input['param_name_1'], input['param_name_2']])
+
+    output['py_user_loglike_rosenbrock_output_1'] = 10;
+
+    return loglike(x)
+
 
 def init_user_loglike(fcn_name, rf_name):
-  # gambit_light passes the registration function (rf) as string (rf_name)
-  rf = getattr(gambit_light, rf_name)
-  rf(fcn_name, "user_loglike")
+    print("example_rosenbrock.py: init_user_loglike: Registering loglike function.")
+    rf = getattr(gambit_light, rf_name)
+    rf(fcn_name, "user_loglike")
