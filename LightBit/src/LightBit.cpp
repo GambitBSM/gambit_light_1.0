@@ -83,7 +83,11 @@ namespace Gambit
                 std::string option_name = it2->first.as<std::string>();
                 if (std::find(known_userloglike_options.begin(), known_userloglike_options.end(), option_name) == known_userloglike_options.end())
                 {
-                    LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: Unknown option '" + option_name + "' for the loglike '" + loglike_name + "'. (Maybe a typo?)");
+                    LightBit_error().raise(LOCAL_INFO,
+                        "Error while parsing the UserLogLikes settings: Unknown option '" 
+                        + option_name + "' for the loglike '" + loglike_name + "'. "
+                        "(Maybe a typo?)"
+                    );
                 }
             }
         }
@@ -97,13 +101,20 @@ namespace Gambit
             // Check for duplicate entries of model_par_name ("p1", "p2", etc.)
             if (std::find(listed_model_pars.begin(), listed_model_pars.end(), model_par_name) != listed_model_pars.end())
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: Multiple entries for the parameter '" + model_par_name + "'.");
+                LightBit_error().raise(LOCAL_INFO, 
+                    "Error while parsing the UserLogLikes settings: Multiple entries " 
+                    "for the parameter '" + model_par_name + "'."
+                );
             }
 
             // Check for duplicate entries of the user-specified parameter name.
             if (std::find(listed_user_pars.begin(), listed_user_pars.end(), user_par_name) != listed_user_pars.end())
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: The parameter name '" + user_par_name + "' is assigned to multiple parameters.");
+                LightBit_error().raise(LOCAL_INFO, 
+                    "Error while parsing the UserLogLikes settings: "
+                    "The parameter name '" + user_par_name + "' is "
+                    "assigned to multiple parameters."
+                );
             }
 
             // This is a new parameter. Register it.
@@ -123,19 +134,28 @@ namespace Gambit
 
             if (not userLogLikesEntry["user_lib"].IsDefined())
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'user_lib' not specified in config file.");
+                LightBit_error().raise(LOCAL_INFO, 
+                    "Error while parsing the UserLogLikes settings: "
+                    "'user_lib' not specified in config file."
+                );
             }
             user_lib = userLogLikesEntry["user_lib"].as<std::string>();
 
             if (not userLogLikesEntry["init_fun"].IsDefined())
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'init_fun' not specified in config file.");
+                LightBit_error().raise(LOCAL_INFO,
+                    "Error while parsing the UserLogLikes settings: "
+                    "'init_fun' not specified in config file."
+                );
             }
             init_fun = userLogLikesEntry["init_fun"].as<std::string>();
 
             if (not userLogLikesEntry["lang"].IsDefined())
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: 'lang' not specified in config file.");
+                LightBit_error().raise(LOCAL_INFO, 
+                    "Error while parsing the UserLogLikes settings: "
+                    "'lang' not specified in config file."
+                );
             }
             lang = userLogLikesEntry["lang"].as<std::string>();
 
@@ -152,8 +172,10 @@ namespace Gambit
                 #endif
                 lang != "c++")
             {
-                LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: unsupported plugin language '" + lang + "'.");
-                continue;
+                LightBit_error().raise(LOCAL_INFO, 
+                    "Error while parsing the UserLogLikes settings: "
+                    "unsupported plugin language '" + lang + "'."
+                );
             }
 
             if (userLogLikesEntry["input"].IsDefined())
@@ -163,6 +185,17 @@ namespace Gambit
                 {
                     std::string input_par_name = inputNode[i].as<std::string>();
 
+                    // Check for duplicate parameter names in the "input" section.
+                    bool in_inputs = std::find(inputs.begin(), inputs.end(), input_par_name) != inputs.end();
+                    if(in_inputs)
+                    {
+                        LightBit_error().raise(LOCAL_INFO,
+                            "Error while parsing the UserLogLikes settings: The parameter name '" 
+                            + input_par_name + "' appears multiple times in the input section for "
+                            "the loglike '" + loglike_name + "'."
+                        );
+                    }
+
                     // Check that all parameter names listed under "input" in the "UserLogLikes" 
                     // section are also specified in the "UserModel" section.
                     // if (not userModelNode[input_par_name].IsDefined())
@@ -170,24 +203,26 @@ namespace Gambit
                     bool in_listed_model_pars = std::find(listed_model_pars.begin(), listed_model_pars.end(), input_par_name) != listed_model_pars.end();
                     if(not in_listed_user_pars)
                     {
-                        std::string error_msg;
                         if(in_listed_model_pars)
                         {
-                            error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
-                                        + input_par_name + " is requested as an input parameter for the "
-                                        "loglike '" + loglike_name + "', but this parameter has been assigned "
-                                        "a new name in the UserModel section. Use this new name in the 'input' "
-                                        "section for '" + loglike_name + "', or remove the 'name' option in "
-                                        "the UserModel section.";
+                            LightBit_error().raise(LOCAL_INFO,
+                                "Error while parsing the UserLogLikes settings: The parameter '" 
+                                + input_par_name + "' is requested as an input parameter for the "
+                                "loglike '" + loglike_name + "', but this parameter has been assigned "
+                                "a new name in the UserModel section. Use this new name in the 'input' "
+                                "section for '" + loglike_name + "', or remove the 'name' option in "
+                                "the UserModel section."
+                            );
                         }
                         else
                         {
-                            error_msg = "Error while parsing the UserLogLikes settings: The parameter " 
-                                        + input_par_name + " is requested as an input parameter for the "
-                                        "loglike '" + loglike_name + "', but it is not found in the "
-                                        "UserModel section.";
+                            LightBit_error().raise(LOCAL_INFO,
+                                "Error while parsing the UserLogLikes settings: The parameter '" 
+                                + input_par_name + "' is requested as an input parameter for the "
+                                "loglike '" + loglike_name + "', but it is not found in the "
+                                "UserModel section."
+                            );
                         }
-                        LightBit_error().raise(LOCAL_INFO, error_msg);
                     }
 
                     // Register requested input parameter
@@ -210,7 +245,11 @@ namespace Gambit
                     // Throw error if there already exists an output with the same output_name
                     if (std::find(all_outputs.begin(), all_outputs.end(), output_name) != all_outputs.end())
                     {
-                        LightBit_error().raise(LOCAL_INFO, "Error while parsing the UserLogLikes settings: multiple outputs with the same name '" + output_name + "'. Each output must be assigned a unique name.");
+                        LightBit_error().raise(LOCAL_INFO, 
+                            "Error while parsing the UserLogLikes settings: multiple outputs "
+                            "with the same name '" + output_name + "'. Each output must be " 
+                            "assigned a unique name."
+                        );
                     }
                     outputs.push_back(output_name);
                     all_outputs.push_back(output_name);
@@ -230,7 +269,10 @@ namespace Gambit
                 }
                 catch (const std::runtime_error& e)
                 {
-                    LightBit_error().raise(LOCAL_INFO, "Caught runtime error while initialising the gambit_light_interface: " + std::string(e.what()));
+                    LightBit_error().raise(LOCAL_INFO, 
+                        "Caught runtime error while initialising the "
+                        "gambit_light_interface: " + std::string(e.what())
+                    );
                 }
             }
 
@@ -243,7 +285,10 @@ namespace Gambit
                   }
                   catch (const std::runtime_error& e)
                   {
-                      LightBit_error().raise(LOCAL_INFO, "Caught runtime error while initialising the gambit_light_interface: " + std::string(e.what()));
+                      LightBit_error().raise(LOCAL_INFO,
+                        "Caught runtime error while initialising the "
+                        "gambit_light_interface: " + std::string(e.what())
+                    );
                   }
               }
             #endif
