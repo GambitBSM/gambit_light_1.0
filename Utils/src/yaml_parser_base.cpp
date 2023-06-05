@@ -30,6 +30,9 @@
 #include "gambit/Logs/logger.hpp"
 #include "gambit/Logs/logmaster.hpp"
 
+#ifdef GAMBIT_LIGHT
+#include <regex>
+#endif
 
 namespace Gambit
 {
@@ -169,17 +172,97 @@ namespace Gambit
         userModelNode = root["UserModel"];
         userLogLikesNode = root["UserLogLikes"];
 
-        // If a parameter node in "UserModel" is a Scalar/Sequence, 
-        // convert to a Map by adding the "fixed_value" key.
+        std::map<std::pair<int,int>,YAML::Node> par_range_nodes;
+        std::map<std::pair<int,int>,std::string> par_range_names;
+
         for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
         {
-          YAML::Node& p_par_node = it->second;
-          if (p_par_node.IsScalar() or p_par_node.IsSequence()) 
+          std::string par_name = it->first.as<std::string>();
+          YAML::Node& par_node = it->second;
+  
+          // If a parameter node in "UserModel" is a Scalar/Sequence, 
+          // convert to a Map by adding the "fixed_value" key.
+          if (par_node.IsScalar() or par_node.IsSequence()) 
           {
             YAML::Node new_node;
-            new_node["fixed_value"] = p_par_node;
-            p_par_node = new_node;
+            new_node["fixed_value"] = par_node;
+            par_node = new_node;
           }
+
+          // Check that all nodes in "UserModel" have names that match a parameter
+          // name (e.g. "p13") or a range of parameter names (e.g. "p5-p10").
+          const std::regex par_name_regex("^p[0-9]+$");
+          const std::regex par_name_range_regex("^p([0-9]+)-p([0-9]+)$");
+          std::smatch par_name_match;
+          std::smatch par_name_range_match;
+
+          bool par_name_matched = std::regex_match(par_name, par_name_match, par_name_regex);
+          bool par_name_range_matched = std::regex_match(par_name, par_name_range_match, par_name_range_regex);
+
+          if (!par_name_matched && !par_name_range_matched)
+          {
+            inifile_error().raise(LOCAL_INFO, 
+              "Error while parsing the UserModel settings: The name '" + par_name + "' "
+              "is not a valid UserModel parameter entry. Either use a valid parameter name "
+              "('p0', 'p1', 'p2', ...) or specify a range of parameters (e.g. 'p1-p8')."
+            );
+          }
+
+          // If a range of parameters was specified, save the parameter indices and 
+          // the YAML node so we can add individual parameter nodes later
+          if (par_name_range_matched)
+          {
+            int par_index_min = std::stoi(par_name_range_match[1].str());
+            int par_index_max = std::stoi(par_name_range_match[2].str());
+            if (par_index_min >= par_index_max)
+            {
+              inifile_error().raise(LOCAL_INFO, 
+                "Error while parsing the UserModel settings: The parameter range '"
+                 + par_name_range_match[0].str() + "' has non-increasing indices."
+              );
+            }
+            std::pair<int,int> par_index_pair(par_index_min, par_index_max);
+            par_range_nodes[par_index_pair] = YAML::Clone(par_node);
+            par_range_names[par_index_pair] = par_name;
+          }
+        }
+
+        // For each parameter range entry (e.g. 'p1-p8'), construct individual parameter 
+        // nodes for all parameters included in the range, and then delete the node
+        // with the parameter range entry.
+        for (const auto& pair_ii_node : par_range_nodes)
+        {
+          std::string par_range_name = par_range_names[pair_ii_node.first];
+          int min_index = pair_ii_node.first.first;
+          int max_index = pair_ii_node.first.second;
+
+          const YAML::Node& par_range_node = pair_ii_node.second;
+
+          bool has_name_option = par_range_node["name"].IsDefined();
+          std::string user_name;
+          if (has_name_option)
+          {
+            user_name = par_range_node["name"].as<std::string>();
+          }
+
+          for (int index = min_index; index <= max_index; ++index)
+          {
+            std::string par_name = "p" + std::to_string(index);
+            if (userModelNode[par_name].IsDefined())
+            {
+              inifile_error().raise(LOCAL_INFO, 
+                "Error while parsing the UserModel settings: Multiple entries "
+                "for the parameter '" + par_name + "', which is part of "
+                "the range entry '" + par_range_name + "'."
+              );
+            }
+            userModelNode[par_name] = YAML::Clone(par_range_node);
+            if (has_name_option)
+            {
+              userModelNode[par_name]["name"] = user_name + std::to_string(index);
+            }
+          }
+          userModelNode.remove(par_range_name);
         }
 
         // Override the parametersNode variable with a node we construct 

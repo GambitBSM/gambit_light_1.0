@@ -331,7 +331,7 @@ namespace Gambit
           {
             LightBit_error().raise(LOCAL_INFO, 
               "The parameter '" + model_par_name + "' is not a valid UserModel parameter. "
-              "Valid parameters are 'p0', 'p1', 'p2', ..., 'p999'."
+              "Valid parameters are 'p0', 'p1', 'p2', ..."
             );
           }
           param_pointer_map[user_par_name] = Param[model_par_name].operator->();

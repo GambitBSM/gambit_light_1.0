@@ -19,9 +19,14 @@ UserModel:
     name: param_name_3
     fixed_value: 3.0
 
-  p4: 
+  p4:
     name: param_name_4
-    fixed_value: 4.0
+    same_as: UserModel::p1
+
+  p5-p7: 
+    name: param_name_  # GAMBIT will generate the names "param_name_5", "param_name_6", etc.
+    prior_type: flat
+    range: [-1.0, 1.0]
 
 
 UserLogLikes:
