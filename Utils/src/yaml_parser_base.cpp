@@ -169,25 +169,16 @@ namespace Gambit
         userModelNode = root["UserModel"];
         userLogLikesNode = root["UserLogLikes"];
 
-        // For each parameter in "UserModel" we need a "name" entry. Just use the UserModel 
-        // parameter names ("p1", "p2", ...) if a name is not already specified.
+        // If a parameter node in "UserModel" is a Scalar/Sequence, 
+        // convert to a Map by adding the "fixed_value" key.
         for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
         {
-          std::string p_par_name = it->first.as<std::string>();
           YAML::Node& p_par_node = it->second;
-
-          // If p_par_node is Scalar/Sequence, convert to a Map by adding the "fixed_value" key.
           if (p_par_node.IsScalar() or p_par_node.IsSequence()) 
           {
             YAML::Node new_node;
             new_node["fixed_value"] = p_par_node;
             p_par_node = new_node;
-          }
-
-          // Add "name" entry if missing
-          if (not p_par_node["name"].IsDefined())
-          {
-            p_par_node["name"] = p_par_name;
           }
         }
 

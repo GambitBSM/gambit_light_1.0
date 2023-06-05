@@ -95,8 +95,17 @@ namespace Gambit
         // Collect all parameter names listed in the "UserModel" section (and check for duplicates).
         for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
         {
+            // Get the UserModel parameter name
             std::string model_par_name = it->first.as<std::string>();
-            std::string user_par_name = (it->second)["name"].as<std::string>();
+
+            // If there's a "name" entry for this parameter, use it.
+            // If not, just use the model_par_name.
+            std::string user_par_name = model_par_name;
+            const YAML::Node& par_node = it->second;
+            if (par_node["name"].IsDefined())
+            {
+                user_par_name = par_node["name"].as<std::string>();
+            }
 
             // Check for duplicate entries of model_par_name ("p1", "p2", etc.)
             if (std::find(listed_model_pars.begin(), listed_model_pars.end(), model_par_name) != listed_model_pars.end())
