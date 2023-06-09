@@ -175,6 +175,13 @@ namespace Gambit
         std::map<std::pair<int,int>,YAML::Node> par_range_nodes;
         std::map<std::pair<int,int>,std::string> par_range_names;
 
+        const std::regex full_par_name_regex("^UserModel::p[0-9]+$");
+        const std::regex par_name_regex("^p[0-9]+$");
+        const std::regex par_name_range_regex("^p([0-9]+)-p([0-9]+)$");
+        std::smatch full_par_name_match;
+        std::smatch par_name_match;
+        std::smatch par_name_range_match;
+
         for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
         {
           std::string par_name = it->first.as<std::string>();
@@ -191,11 +198,6 @@ namespace Gambit
 
           // Check that all nodes in "UserModel" have names that match a parameter
           // name (e.g. "p13") or a range of parameter names (e.g. "p5-p10").
-          const std::regex par_name_regex("^p[0-9]+$");
-          const std::regex par_name_range_regex("^p([0-9]+)-p([0-9]+)$");
-          std::smatch par_name_match;
-          std::smatch par_name_range_match;
-
           bool par_name_matched = std::regex_match(par_name, par_name_match, par_name_regex);
           bool par_name_range_matched = std::regex_match(par_name, par_name_range_match, par_name_range_regex);
 
@@ -263,6 +265,37 @@ namespace Gambit
             }
           }
           userModelNode.remove(par_range_name);
+        }
+
+        // For each parameter, check the 'same_as' option if present. 
+        // If an entry like "same_as: p3" is found, automatically 
+        // translate it to the complete form "same_as: UserModel::p3" 
+        // expected by GAMBIT.
+        for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
+        {
+          std::string par_name = it->first.as<std::string>();
+          YAML::Node& par_node = it->second;
+          if (par_node["same_as"].IsDefined())
+          {
+            std::string same_as_par_name = par_node["same_as"].as<std::string>();
+
+            bool full_par_name_matched = std::regex_match(same_as_par_name, full_par_name_match, full_par_name_regex);
+            bool par_name_matched = std::regex_match(same_as_par_name, par_name_match, par_name_regex);
+
+            if (par_name_matched)
+            {
+              par_node["same_as"] = "UserModel::" + same_as_par_name;
+            }
+
+            if (!full_par_name_matched && !par_name_matched)
+            {
+              inifile_error().raise(LOCAL_INFO, 
+                "Error while parsing the UserModel settings: Unrecognised parameter "
+                "'" + same_as_par_name + "' in the 'same_as' option for parameter "
+                "'" + par_name + "'. Expected a parmater name of the form 'p1', 'p2', etc."
+              );
+            }
+          }
         }
 
         // Override the parametersNode variable with a node we construct 
