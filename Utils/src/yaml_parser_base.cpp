@@ -172,6 +172,12 @@ namespace Gambit
         userModelNode = root["UserModel"];
         userLogLikesNode = root["UserLogLikes"];
 
+        bool has_UserPrior_node = root["UserPrior"].IsDefined();
+        if (has_UserPrior_node)
+        {
+          userPriorNode = root["UserPrior"];
+        }
+
         std::map<std::pair<int,int>,YAML::Node> par_range_nodes;
         std::map<std::pair<int,int>,std::string> par_range_names;
 
@@ -306,6 +312,32 @@ namespace Gambit
         newParametersNode["UserModel"] = userModelNode;
         // Now override the existing parametersNode variable
         parametersNode = newParametersNode;
+
+
+        // If there is a "UserPrior" node, use this to construct a new
+        // "Priors" node that overrides the old priorsNode variable
+        if (has_UserPrior_node)
+        {
+          if (!userPriorNode["lang"].IsDefined()
+              || !userPriorNode["user_lib"].IsDefined()
+              || !userPriorNode["init_fun"].IsDefined())
+          {
+            inifile_error().raise(LOCAL_INFO, 
+              "Error while parsing the UserPrior settings: One or more of the expected entries "
+              "'lang', 'user_lib' and 'init_fun' are missing."
+            );
+          }
+          YAML::Node newPriorsNode;
+          newPriorsNode["gambit_light_prior"] = userPriorNode;
+          userPriorNode["prior_type"] = "userprior";
+          for(YAML::iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
+          {
+            std::string par_name = it->first.as<std::string>();
+            userPriorNode["parameters"].push_back("UserModel::" + par_name);
+          }
+          priorsNode = newPriorsNode;
+        }
+
 
         // Force the "like: LogLike" option for all listed scanner plugins,
         // to match the "purpose: LogLike" in the pre-defined ObsLikes section 

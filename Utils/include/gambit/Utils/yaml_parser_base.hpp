@@ -136,6 +136,7 @@ namespace Gambit
         YAML::Node logNode;
         #ifdef GAMBIT_LIGHT
           YAML::Node userModelNode;
+          YAML::Node userPriorNode;
           YAML::Node userLogLikesNode;
         #endif
     };
