@@ -64,53 +64,53 @@ namespace Gambit
             LANG_FORTRAN,
             LANG_CPP,
             LANG_C
-        } t_user_fcn_language;
+        } t_fcn_language;
 
         // A struct to hold info about a user loglike.
         typedef struct
         {
-            t_user_fcn_language lang;
+            t_fcn_language lang;
             std::string name;
             union 
             {
                 void *typeless_ptr;
-                user_loglike_fcn_fortran fortran;
-                user_loglike_fcn_cpp cpp;
-                user_loglike_fcn_c c;
+                t_loglike_fcn_fortran fortran;
+                t_loglike_fcn_cpp cpp;
+                t_loglike_fcn_c c;
                 #ifdef HAVE_PYBIND11
-                    user_loglike_fcn_python python;
+                    t_loglike_fcn_python python;
                 #endif
             } fcn;
             std::vector<std::string> inputs;
             std::vector<std::string> outputs;
-        } t_user_loglike_desc;
+        } t_loglike_desc;
 
-        // A map between loglike names and the corresponding t_user_loglike_desc instances.
+        // A map between loglike names and the corresponding t_loglike_desc instances.
         // NOTE: init_priority attribute is needed to make sure that the map is initialised
         // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang.
-        std::map<std::string, t_user_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
+        std::map<std::string, t_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
 
         // A struct to hold info about a user prior transformation function
         typedef struct
         {
-            t_user_fcn_language lang;
+            t_fcn_language lang;
             std::string name;
             union 
             {
                 void *typeless_ptr;
-                user_prior_fcn_fortran fortran;
-                user_prior_fcn_cpp cpp;
-                user_prior_fcn_c c;
+                t_prior_fcn_fortran fortran;
+                t_prior_fcn_cpp cpp;
+                t_prior_fcn_c c;
                 #ifdef HAVE_PYBIND11
-                    user_prior_fcn_python python;
+                    t_prior_fcn_python python;
                 #endif
             } fcn;
             std::vector<std::string> inputs;
             std::vector<std::string> outputs;
-        } t_user_prior_desc;
+        } t_prior_desc;
 
-        // An instance of t_user_prior_desc to hold info about a single user-supplied prior.
-        t_user_prior_desc user_prior;
+        // An instance of t_prior_desc to hold info about a single user-supplied prior.
+        t_prior_desc user_prior;
 
     }
 }
@@ -151,7 +151,7 @@ extern "C"
 int gambit_light_register(const char *loglike_name, void *fcn)
 {
     using namespace Gambit::gambit_light_interface;
-    t_user_loglike_desc desc;
+    t_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
     user_loglikes.insert({loglike_name, desc});
     std::cout << OUTPUT_PREFIX << "Registering loglike '" << loglike_name << "'." << std::endl;
@@ -165,7 +165,7 @@ int gambit_light_register(const char *loglike_name, void *fcn)
     int gambit_light_register_python(const char *loglike_name, const char *python_fcn)
     {
         using namespace Gambit::gambit_light_interface;
-        t_user_loglike_desc desc;
+        t_loglike_desc desc;
         desc.name = std::string(python_fcn);
         user_loglikes.insert({loglike_name, desc});
         std::cout << OUTPUT_PREFIX << "Registering Python loglike '" << loglike_name << "'." << std::endl;
@@ -205,7 +205,7 @@ namespace Gambit
     {
 
         // Function for calling a user library loglike function.
-        double call_user_function(const std::string& loglike_name, const t_user_loglike_desc &desc, 
+        double call_user_function(const std::string& loglike_name, const t_loglike_desc &desc, 
                                   const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                   std::vector<std::string>& warnings)
         {
@@ -459,7 +459,7 @@ namespace Gambit
             // Are we registering a prior transform or a loglike function?
             if (func_name == "[prior]")
             {
-                user_init_fcn_prior user_init_function;
+                t_init_fcn_prior user_init_function;
                 *(void**) (&user_init_function) = vptr;
 
                 // Call user init function.
@@ -474,7 +474,7 @@ namespace Gambit
             }
             else
             {
-                user_init_fcn_loglike user_init_function;
+                t_init_fcn_loglike user_init_function;
                 *(void**) (&user_init_function) = vptr;
 
                 // Call user init function.
@@ -485,7 +485,7 @@ namespace Gambit
                 {
 
                     // Add parameter and output information to user loglike description.
-                    t_user_loglike_desc &desc = user_loglikes[func_name];
+                    t_loglike_desc &desc = user_loglikes[func_name];
 
                     if (lang == "fortran")  desc.lang = LANG_FORTRAN;
                     else if (lang == "c")   desc.lang = LANG_C;
@@ -595,7 +595,7 @@ namespace Gambit
                     if(user_loglikes.find(func_name) != user_loglikes.end())
                     {
                         // Add parameter and output information to user function description.
-                        t_user_loglike_desc &desc = user_loglikes[func_name];
+                        t_loglike_desc &desc = user_loglikes[func_name];
 
                         desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
                         desc.lang = LANG_PYTHON;
