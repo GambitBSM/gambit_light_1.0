@@ -18,7 +18,8 @@ def prior_transform(input, output):
     print(f"DEBUG: example_prior_transform.py: input = {input}")
     print(f"DEBUG: example_prior_transform.py: x = {x}")
 
-    return 0.0
+    for k,v in input.items():
+        output[k] = 10*v
 
 
 def init_user_prior(fcn_name, rf_name):
