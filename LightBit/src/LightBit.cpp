@@ -22,12 +22,10 @@ namespace Gambit
 {
   namespace gambit_light_interface
   {
-
     // Functions from the gambit_light_interface library
     extern void run_user_loglikes(const map_str_dbl&, map_str_dbl&, vec_str&);
     extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
     extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
-
   }
 }
 

@@ -29,12 +29,10 @@ namespace Gambit
 {
   namespace gambit_light_interface
   {
-
     // Functions from the gambit_light_interface library
     extern void run_user_prior(const map_str_dbl&, map_str_dbl&, vec_str&);
-    extern void init_user_lib_prior_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
-    extern void init_user_lib_prior_Python(const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
-
+    extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
+    extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
   }
 }
 
@@ -64,7 +62,7 @@ namespace Gambit
                 {
                     try
                     {
-                        Gambit::gambit_light_interface::init_user_lib_prior_C_CXX_Fortran(user_lib, init_fun, lang, inputs, outputs);
+                        Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, "[prior]", inputs, outputs);
                     }
                     catch (const std::runtime_error& e)
                     {
@@ -80,7 +78,7 @@ namespace Gambit
                     {
                         try
                         {
-                            Gambit::gambit_light_interface::init_user_lib_prior_Python(user_lib, init_fun, inputs, outputs);
+                            Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, "[prior]", inputs, outputs);
                         }
                         catch (const std::runtime_error& e)
                         {
@@ -98,8 +96,13 @@ namespace Gambit
             {
                 std::vector<std::string> warnings;
 
-                // Call run_user_prior from the interface library. 
-                // This will fill the result map (and the 'warnings' vector).
+                // Prepare input and result maps, and fill 
+                // the input map with the parameter point.
+                //
+                // TODO: 
+                //   This vector --> map translation can be 
+                //   avoided if we base communication on vectors
+                //   rather than on maps. 
 
                 std::map<std::string,double> input;
                 std::map<std::string,double> result;
@@ -110,7 +113,8 @@ namespace Gambit
                     input[*it] = *(it_vec++);
                 }
 
-
+                // Call run_user_prior from the interface library. 
+                // This will fill the result map (and the 'warnings' vector).
                 try
                 {
                     Gambit::gambit_light_interface::run_user_prior(input, result, warnings);
