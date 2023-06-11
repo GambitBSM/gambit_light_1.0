@@ -52,8 +52,8 @@ typedef void (*user_prior_fcn_cpp)(const std::map<std::string,double>&, std::map
 typedef pybind11::object *user_prior_fcn_python;
 #endif
 
-// GAMBIT-side callback to register user log-likelihood functions.
-typedef int (*gambit_light_register_prior_fcn)(const char *, void *);
+// GAMBIT-side callback to register user prior functions.
+typedef int (*gambit_light_register_prior_fcn)(void *);
 
 // User-side library initialisation function.
-typedef void (*user_init_fcn_prior)(const char *, gambit_light_register_prior_fcn);
+typedef void (*user_init_fcn_prior)(gambit_light_register_prior_fcn);

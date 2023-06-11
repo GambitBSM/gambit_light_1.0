@@ -46,21 +46,16 @@ namespace Gambit
         class UserPrior : public BasePrior
         {
         private:
-            std::string lang;
-            std::string user_lib;
-            std::string init_fun;
 
         public:
             // Constructor
             UserPrior(const std::vector<std::string>& param, const Options& options) : BasePrior(param, param.size())
             {
-                std::cout << "DEBUG: Start UserPrior constructor" << std::endl;
-
                 YAML::Node userPriorNode = options.getNode();
         
-                lang = userPriorNode["lang"].as<std::string>();
-                user_lib = userPriorNode["user_lib"].as<std::string>();
-                init_fun = userPriorNode["init_fun"].as<std::string>();
+                std::string lang = userPriorNode["lang"].as<std::string>();
+                std::string user_lib = userPriorNode["user_lib"].as<std::string>();
+                std::string init_fun = userPriorNode["init_fun"].as<std::string>();
   
                 std::vector<std::string> inputs;
                 std::vector<std::string> outputs;
@@ -97,14 +92,10 @@ namespace Gambit
                         }
                     }
                 #endif
-
-                std::cout << "DEBUG: End UserPrior constructor" << std::endl;
             }
 
             void transform(const std::vector<double> &unitpars, std::unordered_map<std::string, double> &outputMap) const override
             {
-                std::cout << "DEBUG: Start UserPrior transform" << std::endl;
-
                 std::vector<std::string> warnings;
 
                 // Call run_user_prior from the interface library. 
@@ -154,12 +145,21 @@ namespace Gambit
                 {
                     outputMap[kv.first] = kv.second;
                 }
-
-                std::cout << "DEBUG: End UserPrior transform" << std::endl;
             }
 
             std::vector<double> inverse_transform(const std::unordered_map<std::string, double> &physical) const override
             {
+
+                Scanner::scan_error().raise(LOCAL_INFO, 
+                    "The 'inverse_transform' functionality for user-supplied priors "
+                    "is not yet implemented in GAMBIT-light. Please use a scanner "
+                    "that does not rely on this functionality."
+                );
+
+                // TODO: Allow user to register an inverse transform function
+                //       and call that here.
+
+                // Dummy code that just returns the point without transforming it
                 std::vector<double> u;
                 for (const auto& n : param_names)
                 {

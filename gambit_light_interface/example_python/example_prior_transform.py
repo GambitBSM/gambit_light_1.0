@@ -10,9 +10,9 @@ import gambit_light_interface as gambit_light
 
 import numpy as np
 
-def prior_transform(input, output):
+def user_prior(input, output):
 
-    print("example_prior_transform.py: prior_transform: Transforming sample from unit hypercube.")
+    print("example_prior_transform.py: user_prior: Transforming sample from unit hypercube.")
 
     x = np.array(list(input.values()))
     print(f"DEBUG: example_prior_transform.py: input = {input}")
@@ -22,7 +22,8 @@ def prior_transform(input, output):
         output[k] = 10*v
 
 
-def init_user_prior(fcn_name, rf_name):
+def init_user_prior(rf_name):
     print("example_prior_transform.py: init_user_prior: Registering prior transform function.")
     rf = getattr(gambit_light, rf_name)
-    rf(fcn_name, "prior_transform")
+    rf("user_prior")
+

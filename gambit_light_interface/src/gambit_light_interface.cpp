@@ -22,7 +22,7 @@
 extern "C"
 int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
 extern "C"
-int gambit_light_register_prior_python(const char *prior_name, const char *python_fcn);
+int gambit_light_register_prior_python(const char *python_fcn);
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light_interface, m)
@@ -45,9 +45,9 @@ namespace Gambit
         // Variable used to collect warning messages from user libraries
         static char *str_warning = NULL;
 
-        // Variable to hold the name of the user loglike function 
+        // Variable to hold the name of the user function 
         // currently being run, used for error messages
-        std::string current_loglike_name;
+        std::string current_user_function_name;
 
 
         #ifdef HAVE_PYBIND11
@@ -95,7 +95,7 @@ namespace Gambit
                                   const std::map<std::string,double>& input, std::map<std::string,double>& output,
                                   std::vector<std::string>& warnings)
         {
-            current_loglike_name = loglike_name;
+            current_user_function_name = loglike_name;
 
             double retval = 0.0;
             
@@ -207,7 +207,7 @@ namespace Gambit
                 str_warning = nullptr;
             }
             
-            current_loglike_name = "";
+            current_user_function_name = "";
 
             return retval;
         }
@@ -220,7 +220,7 @@ extern "C"
 void gambit_light_invalid_point(const char *invalid_point_msg)
 {
     std::string msg = "Invalid point message from " 
-                      + Gambit::gambit_light_interface::current_loglike_name + ": " 
+                      + Gambit::gambit_light_interface::current_user_function_name + ": " 
                       + std::string(invalid_point_msg) + "\n";
     throw std::runtime_error("[invalid]" + msg);
 }
@@ -229,7 +229,7 @@ extern "C"
 void gambit_light_error(const char *error_msg)
 {
     std::string msg = "Error message from "
-                      + Gambit::gambit_light_interface::current_loglike_name + ": " 
+                      + Gambit::gambit_light_interface::current_user_function_name + ": " 
                       + std::string(error_msg) + "\n";
     throw std::runtime_error("[fatal]" + msg);
 }
@@ -451,13 +451,18 @@ namespace Gambit
                 sys_path_remove(module_path);
             }
         #endif
+    }
+}
 
 
 
-        // =======================================================================0
 
+// ============ Code dealing with priors ============
 
-
+namespace Gambit
+{
+    namespace gambit_light_interface
+    {
         // A struct to hold info about a user prior transformation function
         typedef struct
         {
@@ -477,46 +482,76 @@ namespace Gambit
             std::vector<std::string> outputs;
         } t_user_prior_desc;
 
+        t_user_prior_desc user_prior;
+    }
+}
 
-        // A t_user_prior_desc instance for the user-defined prior transform
-        t_user_prior_desc user_prior __attribute__ ((init_priority (128)));
 
 
-        // Function for calling a user library prior transform function.
-        void call_user_prior(const t_user_prior_desc &desc, const std::map<std::string,double>& input, 
-                               std::map<std::string,double>& output, std::vector<std::string>& warnings)
+#ifdef HAVE_PYBIND11
+    // Callback to register a user prior function from Python: pass function name as string.
+    extern "C"
+    int gambit_light_register_prior_python(const char *python_fcn)
+    {
+        using namespace Gambit::gambit_light_interface;
+        user_prior.name = std::string(python_fcn);
+        std::cout << OUTPUT_PREFIX << "Registering Python prior transform function." << std::endl;
+        return 0;
+    }
+#endif
+
+
+// Callback to register the user log-likelihood functions: pass function address.
+extern "C"
+int gambit_light_register_prior(void *fcn)
+{
+    using namespace Gambit::gambit_light_interface;
+    user_prior.fcn.typeless_ptr = fcn;
+    std::cout << OUTPUT_PREFIX << "Registering prior transform function." << std::endl;
+    return 0;
+}
+
+
+namespace Gambit
+{
+    namespace gambit_light_interface
+    {
+        void run_user_prior(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
         {
-            if(desc.lang == LANG_FORTRAN || desc.lang == LANG_C)
+
+            current_user_function_name = "user-supplied prior transform";
+
+            if(user_prior.lang == LANG_FORTRAN || user_prior.lang == LANG_C)
             {
-                double *iparams = (double*)alloca(sizeof(double)*desc.inputs.size());
-                double *oparams = (double*)alloca(sizeof(double)*desc.outputs.size());
+                double *iparams = (double*)alloca(sizeof(double)*user_prior.inputs.size());
+                double *oparams = (double*)alloca(sizeof(double)*user_prior.outputs.size());
 
                 // Translate the input to a C array.
                 int index = 0;
-                for (auto& pname : desc.inputs)
+                for (auto& pname : user_prior.inputs)
                 {
                     iparams[index++] = input.at(pname);
                 }
 
-                if(desc.lang == LANG_FORTRAN) desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
-                if(desc.lang == LANG_C) desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
+                if(user_prior.lang == LANG_FORTRAN) user_prior.fcn.fortran(user_prior.inputs.size(), iparams, user_prior.outputs.size(), oparams);
+                if(user_prior.lang == LANG_C) user_prior.fcn.c(user_prior.inputs.size(), iparams, user_prior.outputs.size(), oparams);
 
                 // Add outputs to the output map
                 index = 0;
-                for (auto& oname : desc.outputs)
+                for (auto& oname : user_prior.outputs)
                 {
                     output[oname] = oparams[index++];
                 }
             }
 
-            if(desc.lang == LANG_CPP)
+            if(user_prior.lang == LANG_CPP)
             {
                 // This part can throw anything - this will be handled in GAMBIT.
-                desc.fcn.cpp(input, output);
+                user_prior.fcn.cpp(input, output);
             }
 
             #ifdef HAVE_PYBIND11
-                if(desc.lang == LANG_PYTHON)
+                if(user_prior.lang == LANG_PYTHON)
                 {
                     // If a Python exception is caught (via pybind11), re-throw it
                     // as a std::runtime_error without the leading "Exception: "
@@ -524,7 +559,7 @@ namespace Gambit
                     // TODO: This is silly. Find a better solution.
                     try
                     {
-                        (*desc.fcn.python)(input, &output);
+                        (*user_prior.fcn.python)(input, &output);
                     }
                     catch (const pybind11::error_already_set& e)
                     {
@@ -547,50 +582,12 @@ namespace Gambit
             if (str_warning)
             {
                 std::string msg(str_warning);
-                warnings.push_back("Warning from user-supplied prior transform: " + msg);
+                warnings.push_back("Warning from " + current_user_function_name + ": " + msg);
                 free(str_warning);
                 str_warning = nullptr;
             }
-        }
-    }
-}
 
-
-#ifdef HAVE_PYBIND11
-    // Callback to register the user log-likelihood functions from Python: pass function name as string.
-    extern "C"
-    int gambit_light_register_prior_python(const char *prior_name, const char *python_fcn)
-    {
-        using namespace Gambit::gambit_light_interface;
-        t_user_prior_desc desc;
-        desc.name = std::string(python_fcn);
-        user_prior = desc;
-        std::cout << OUTPUT_PREFIX << "Registering Python prior '" << prior_name << "'." << std::endl;
-        return 0;
-    }
-#endif
-
-
-// Callback to register the user log-likelihood functions: pass function address.
-extern "C"
-int gambit_light_register_prior(const char *prior_name, void *fcn)
-{
-    using namespace Gambit::gambit_light_interface;
-    t_user_prior_desc desc;
-    desc.fcn.typeless_ptr = fcn;
-    user_prior = desc;
-    std::cout << OUTPUT_PREFIX << "Registering prior '" << prior_name << "'." << std::endl;
-    return 0;
-}
-
-
-namespace Gambit
-{
-    namespace gambit_light_interface
-    {
-        void run_user_prior(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
-        {
-            call_user_prior(user_prior, input, output, warnings);
+            current_user_function_name = "";
         }
 
 
@@ -618,15 +615,14 @@ namespace Gambit
             }
 
             // Call user init function.
-            (*user_init_function)("prior", gambit_light_register_prior);
+            (*user_init_function)(gambit_light_register_prior);
 
             // Fill in the rest of the function info in the struct 'user_prior'
-            t_user_prior_desc &desc = user_prior;
-            if (lang == "fortran")  desc.lang = LANG_FORTRAN;
-            else if (lang == "c")   desc.lang = LANG_C;
-            else if (lang == "c++") desc.lang = LANG_CPP;
-            desc.inputs = inputs;
-            desc.outputs = outputs;
+            if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
+            else if (lang == "c")   user_prior.lang = LANG_C;
+            else if (lang == "c++") user_prior.lang = LANG_CPP;
+            user_prior.inputs = inputs;
+            user_prior.outputs = outputs;
         }
 
 
@@ -697,15 +693,13 @@ namespace Gambit
                         + "' from Python module '" + name + "'. Python error was: " + std::string(e.what())
                     );
                 }
-                user_init_function("prior", "register_prior");
+                user_init_function("register_prior");
 
                 // Add parameter and output information to user function description.
-                t_user_prior_desc &desc = user_prior;
-
-                desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
-                desc.lang = LANG_PYTHON;
-                desc.inputs = inputs;
-                desc.outputs = outputs;
+                user_prior.fcn.python = new pybind11::object(user_module.attr(user_prior.name.c_str()));
+                user_prior.lang = LANG_PYTHON;
+                user_prior.inputs = inputs;
+                user_prior.outputs = outputs;
 
                 // Remove the path to the backend from the Python system path.
                 sys_path_remove(module_path);
