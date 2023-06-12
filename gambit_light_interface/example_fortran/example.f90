@@ -54,8 +54,8 @@ contains
 
 
   ! User-side prior transform function, registered in GAMBIT by init_user_prior below.
-  subroutine user_prior(n_inputs, input, n_outputs, output) bind(c)
-    integer(c_int), value, intent(in) :: n_inputs, n_outputs
+  subroutine user_prior(n_inputs, input, output) bind(c)
+    integer(c_int), value, intent(in) :: n_inputs
     type(c_ptr), intent(in), value :: input, output
     integer :: i
 
@@ -65,7 +65,7 @@ contains
 
     ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
     call c_f_pointer(input, finput, shape=[n_inputs])
-    call c_f_pointer(output, foutput, shape=[n_outputs])
+    call c_f_pointer(output, foutput, shape=[n_inputs])
   
     print *, "example.f90: user_prior: Transforming sample from unit hypercube."
 

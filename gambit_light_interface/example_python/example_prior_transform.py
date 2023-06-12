@@ -8,18 +8,12 @@ sys.path.append(os.path.join(current_dir, "../lib"))
 import gambit_light_interface as gambit_light
 
 
-import numpy as np
-
-def user_prior(input, output):
+def user_prior(input_names, input_vals, output):
 
     print("example_prior_transform.py: user_prior: Transforming sample from unit hypercube.")
 
-    x = np.array(list(input.values()))
-    # print(f"example_prior_transform.py: input = {input}")
-    # print(f"example_prior_transform.py: x = {x}")
-
-    for k,v in input.items():
-        output[k] = 10*v
+    for i,v in enumerate(input_vals):
+        output[i] = v * 10.
 
 
 def init_user_prior(rf_name):

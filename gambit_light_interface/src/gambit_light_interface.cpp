@@ -33,6 +33,8 @@ PYBIND11_MODULE(gambit_light_interface, m)
     m.def("warning", &gambit_light_warning, "report user warning");
     m.def("error", &gambit_light_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
+    pybind11::bind_vector<std::vector<std::string>>(m, "str_vec", pybind11::module_local(false));
+    pybind11::bind_vector<std::vector<double>>(m, "dbl_vec", pybind11::module_local(false));
 }
 #endif
 
@@ -81,7 +83,6 @@ namespace Gambit
                     t_loglike_fcn_python python;
                 #endif
             } fcn;
-            std::vector<std::string> inputs;
             std::vector<std::string> outputs;
         } t_loglike_desc;
 
@@ -105,7 +106,6 @@ namespace Gambit
                     t_prior_fcn_python python;
                 #endif
             } fcn;
-            std::vector<std::string> inputs;
             std::vector<std::string> outputs;
         } t_prior_desc;
 
@@ -204,44 +204,51 @@ namespace Gambit
     namespace gambit_light_interface
     {
 
-        // Function for calling a user library loglike function.
-        double call_user_function(const std::string& loglike_name, const t_loglike_desc &desc, 
-                                  const std::map<std::string,double>& input, std::map<std::string,double>& output,
-                                  std::vector<std::string>& warnings)
+        // Run a given user loglike function
+        double run_user_loglike(const std::string& loglike_name, const std::vector<std::string>& input_names, 
+                              const std::vector<double>& input_vals, std::map<std::string,double>& output, 
+                              std::vector<std::string>& warnings)
         {
             current_user_function_name = loglike_name;
 
-            double retval = 0.0;
-            
+            double loglike = 0.0;
+
+            // Grab the registered info for this loglike function
+            const t_loglike_desc& desc = user_loglikes[loglike_name];
+
+            // We have different ways of calling the loglike function
+            // based on the language of the user library
+
+            // C or Fortran library
             if(desc.lang == LANG_FORTRAN || desc.lang == LANG_C)
             {
-                double *iparams = (double*)alloca(sizeof(double)*desc.inputs.size());
+                const double *iparams = (double*)alloca(sizeof(double)*input_vals.size());
                 double *oparams = (double*)alloca(sizeof(double)*desc.outputs.size());
 
                 // Translate the input to a C array.
-                int index = 0;
-                for (auto& pname : desc.inputs)
-                {
-                    iparams[index++] = input.at(pname);
-                }
+                iparams = input_vals.data();
 
-                if(desc.lang == LANG_FORTRAN) retval = desc.fcn.fortran(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
-                if(desc.lang == LANG_C) retval = desc.fcn.c(desc.inputs.size(), iparams, desc.outputs.size(), oparams);
+                // Call the function from the user library
+                if(desc.lang == LANG_FORTRAN) loglike = desc.fcn.fortran(input_vals.size(), iparams, desc.outputs.size(), oparams);
+                if(desc.lang == LANG_C) loglike = desc.fcn.c(input_vals.size(), iparams, desc.outputs.size(), oparams);
 
                 // Add outputs to the output map
-                index = 0;
+                int index = 0;
                 for (auto& oname : desc.outputs)
                 {
-                    output[oname] = oparams[index++];
+                    output[oname] = oparams[index];
+                    index++;
                 }
             }
 
+            // C++ library
             if(desc.lang == LANG_CPP)
             {
                 std::map<std::string,double> new_output;
 
+                // Call the function from the user library.
                 // This part can throw anything - this will be handled in GAMBIT.
-                retval = desc.fcn.cpp(input, new_output);
+                loglike = desc.fcn.cpp(input_names, input_vals, new_output);
 
                 // A C++ library can in principle return an output map with
                 // any number of elements. We therefore manually extract only
@@ -263,6 +270,7 @@ namespace Gambit
                 }
             }
 
+            // Python library
             #ifdef HAVE_PYBIND11
                 if(desc.lang == LANG_PYTHON)
                 {
@@ -274,7 +282,8 @@ namespace Gambit
                     // TODO: This is silly. Find a better solution.
                     try
                     {
-                        retval = pybind11::cast<double>((*desc.fcn.python)(input, &new_output));
+                        // Call the function from the user library
+                        loglike = pybind11::cast<double>((*desc.fcn.python)(input_names, input_vals, &new_output));
                     }
                     catch (const pybind11::error_already_set& e)
                     {
@@ -323,73 +332,34 @@ namespace Gambit
             
             current_user_function_name = "";
 
-            return retval;
-        }
-
-
-
-        // Run all registered user loglikes
-        void run_user_loglikes(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
-        {
-            double total_loglike = 0.0;
-            using namespace Gambit::gambit_light_interface;
-            for (const auto& fn : user_loglikes)
-            {
-                // If this loglike function is only using a subset of the provided inputs, 
-                // we must construct the restricted input map before calling it.
-                std::map<std::string,double> use_input;
-                for (const std::string& iname : fn.second.inputs)
-                {
-                    use_input[iname] = input.at(iname);
-                }
-
-                // Call the user loglike function
-                double user_loglike = call_user_function(fn.first, fn.second, use_input, output, warnings);
-
-                // Add each separate loglike contribution to the output map.
-                output[fn.first] = user_loglike;
-                total_loglike += user_loglike;
-            }
-
-            // Add the expected "total_loglike" entry.
-            output["total_loglike"] = total_loglike;
+            return loglike;
         }
 
 
 
         // Run the registered user prior
-        void run_user_prior(const std::map<std::string,double>& input, std::map<std::string,double>& output, std::vector<std::string>& warnings)
+        void run_user_prior(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, 
+                            std::vector<double>& output, std::vector<std::string>& warnings)
         {
-
             current_user_function_name = "user-supplied prior transform";
 
             if(user_prior.lang == LANG_FORTRAN || user_prior.lang == LANG_C)
             {
-                double *iparams = (double*)alloca(sizeof(double)*user_prior.inputs.size());
-                double *oparams = (double*)alloca(sizeof(double)*user_prior.outputs.size());
+                // Use C arrays as input. We connect these arrays
+                // directly to the internal arrays of the 'input_vals'
+                // and 'output' vectors. This means the 'output' vector
+                // is directly updated by the user prior.
+                const double *iparams = input_vals.data();
+                double *oparams = output.data();
 
-                // Translate the input to a C array.
-                int index = 0;
-                for (auto& pname : user_prior.inputs)
-                {
-                    iparams[index++] = input.at(pname);
-                }
-
-                if(user_prior.lang == LANG_FORTRAN) user_prior.fcn.fortran(user_prior.inputs.size(), iparams, user_prior.outputs.size(), oparams);
-                if(user_prior.lang == LANG_C) user_prior.fcn.c(user_prior.inputs.size(), iparams, user_prior.outputs.size(), oparams);
-
-                // Add outputs to the output map
-                index = 0;
-                for (auto& oname : user_prior.outputs)
-                {
-                    output[oname] = oparams[index++];
-                }
+                if(user_prior.lang == LANG_FORTRAN) user_prior.fcn.fortran(input_vals.size(), iparams, oparams);
+                if(user_prior.lang == LANG_C) user_prior.fcn.c(input_vals.size(), iparams, oparams);
             }
 
             if(user_prior.lang == LANG_CPP)
             {
                 // This part can throw anything - this will be handled in GAMBIT.
-                user_prior.fcn.cpp(input, output);
+                user_prior.fcn.cpp(input_names, input_vals, output);
             }
 
             #ifdef HAVE_PYBIND11
@@ -401,7 +371,7 @@ namespace Gambit
                     // TODO: This is silly. Find a better solution.
                     try
                     {
-                        (*user_prior.fcn.python)(input, &output);
+                        (*user_prior.fcn.python)(input_names, input_vals, &output);
                     }
                     catch (const pybind11::error_already_set& e)
                     {
@@ -436,7 +406,7 @@ namespace Gambit
 
         void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
                                          const std::string &lang, const std::string &func_name,
-                                         const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
+                                         const std::vector<std::string> &outputs)
         {
             using namespace Gambit::gambit_light_interface;
 
@@ -469,7 +439,6 @@ namespace Gambit
                 if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
                 else if (lang == "c")   user_prior.lang = LANG_C;
                 else if (lang == "c++") user_prior.lang = LANG_CPP;
-                user_prior.inputs = inputs;
                 user_prior.outputs = outputs;
             }
             else
@@ -491,7 +460,6 @@ namespace Gambit
                     else if (lang == "c")   desc.lang = LANG_C;
                     else if (lang == "c++") desc.lang = LANG_CPP;
 
-                    desc.inputs = inputs;
                     desc.outputs = outputs;
                 } 
                 else 
@@ -509,7 +477,7 @@ namespace Gambit
 
         #ifdef HAVE_PYBIND11
             void init_user_lib_Python(const std::string &path, const std::string &init_fun, const std::string &func_name, 
-                                      const std::vector<std::string> &inputs, const std::vector<std::string> &outputs)
+                                      const std::vector<std::string> &outputs)
             {
                 using namespace Gambit::gambit_light_interface;
 
@@ -584,7 +552,6 @@ namespace Gambit
                     // Add parameter and output information to user function description.
                     user_prior.fcn.python = new pybind11::object(user_module.attr(user_prior.name.c_str()));
                     user_prior.lang = LANG_PYTHON;
-                    user_prior.inputs = inputs;
                     user_prior.outputs = outputs;
                 }
                 else
@@ -599,7 +566,6 @@ namespace Gambit
 
                         desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
                         desc.lang = LANG_PYTHON;
-                        desc.inputs = inputs;
                         desc.outputs = outputs;
                     }
                     else 

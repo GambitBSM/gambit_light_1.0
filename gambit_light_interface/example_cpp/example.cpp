@@ -4,10 +4,17 @@
 
 
 // User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
-double user_loglike(const std::map<std::string,double>& input, std::map<std::string,double>& output)
+double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
 {
 
     std::cout << "example.cpp: user_loglike: Computing loglike." << std::endl;
+
+    // Make a map of the inputs?
+    std::map<std::string,double> input;
+    for (size_t i = 0; i < input_names.size(); i++)
+    {
+        input[input_names[i]] = input_vals[i];
+    }
 
     // Error handling: Report an invalid point using gambit_light_invalid_point.
     // gambit_light_invalid_point("This input point is no good.");
@@ -42,13 +49,15 @@ void init_user_loglike(const char *fcn_name, t_gambit_light_register_loglike_fcn
 
 
 // User-side prior transform function, registered in GAMBIT by init_user_prior below.
-void user_prior(const std::map<std::string,double>& input, std::map<std::string,double>& output)
+void user_prior(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::vector<double>& output)
 {
     std::cout << "example.cpp: user_prior: Transforming sample from unit hypercube." << std::endl;
-    for (const auto& kv : input)
+
+    for (size_t i = 0; i < input_vals.size(); i++)
     {
-        output[kv.first] = kv.second * 10;
+        output[i] = input_vals[i] * 10.;
     }
+
 }
 
 

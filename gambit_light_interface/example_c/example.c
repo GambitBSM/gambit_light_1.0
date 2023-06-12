@@ -35,16 +35,14 @@ void init_user_loglike(const char *fcn_name, t_gambit_light_register_loglike_fcn
 
 
 // User-side prior transform function, registered in GAMBIT by init_user_prior below.
-void user_prior(const int n_inputs, const double *input, const int n_outputs, double *output)
+void user_prior(const int n_inputs, const double *input, double *output)
 {
     printf("example.c: user_prior: Transforming sample from unit hypercube.\n");
-    printf("example.c: user_prior: Will loop through content of input array:\n");
+
     for (int i = 0; i < n_inputs; i++)
     {
-        printf("example.c: user_prior: i = %i \n", i);
         output[i] = input[i] * 10;
     }
-    printf("example.c: user_prior: ...done\n");
 }
 
 // User-side initialisation function, called by GAMBIT.

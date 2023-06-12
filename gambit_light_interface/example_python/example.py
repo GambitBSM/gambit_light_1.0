@@ -9,9 +9,14 @@ import gambit_light_interface as gambit_light
 
 
 # User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
-def user_loglike(input, output):
+def user_loglike(input_names, input_vals, output):
 
     print("example.py: user_loglike: Computing loglike.")
+
+    print(f"example.py: DEBUG:  input_names: {input_names},  input_vals: {input_vals}")
+    
+    # Make a dictionary of the inputs?
+    input = {input_names[i]: input_vals[i] for i in range(len(input_names))}
 
     # Error handling: Report an invalid point using gambit_light.invalid_point.
     # gambit_light.invalid_point("This input point is no good.")

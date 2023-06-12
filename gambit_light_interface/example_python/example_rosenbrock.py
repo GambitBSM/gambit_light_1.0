@@ -32,9 +32,12 @@ def loglike(x):
     return -rosenbrock_general(x)
 
 
-def user_loglike(input, output):
+def user_loglike(input_names, input_vals, output):
 
     print("example_rosenbrock.py: user_loglike: Computing loglike.")
+
+    # Make a dictionary of the inputs?
+    input = {input_names[i]: input_vals[i] for i in range(len(input_names))}
 
     x = np.array([input['param_name_1'], input['param_name_2']])
 

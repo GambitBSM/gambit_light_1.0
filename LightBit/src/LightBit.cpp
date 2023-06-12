@@ -23,9 +23,9 @@ namespace Gambit
   namespace gambit_light_interface
   {
     // Functions from the gambit_light_interface library
-    extern void run_user_loglikes(const map_str_dbl&, map_str_dbl&, vec_str&);
-    extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
-    extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
+    extern double run_user_loglike(const std::string&, const std::vector<std::string>&, const std::vector<double>&, map_str_dbl&, vec_str&);
+    extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
+    extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
   }
 }
 
@@ -44,6 +44,7 @@ namespace Gambit
     std::vector<std::string> listed_user_pars;
     std::vector<std::string> listed_model_pars;
     std::map<std::string,std::string> user_to_model_par_names;
+    std::vector<std::string> user_loglikes;
 
     /// @}
 
@@ -55,6 +56,11 @@ namespace Gambit
     void initialisation(bool& result)
     {
       using namespace Pipes::initialisation;
+
+      // _Anders: Currently the "inputs" YAML sections are read, but
+      //          this info is not used for anything.
+      //          We need to use it to call each loglike with the correct
+      //          subset of inputs in the "ouput" module function. 
 
       // Perform the initialisation the first time this function is run.
       static bool initialisation_done = false;
@@ -271,7 +277,7 @@ namespace Gambit
           {
             try
             {
-              Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, inputs, outputs);
+              Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, outputs);
             }
             catch (const std::runtime_error& e)
             {
@@ -287,7 +293,7 @@ namespace Gambit
             {
               try
               {
-                Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, loglike_name, inputs, outputs);
+                Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, loglike_name, outputs);
               }
               catch (const std::runtime_error& e)
               {
@@ -298,6 +304,9 @@ namespace Gambit
               }
             }
           #endif
+
+          // Add loglike_name to list of loglikes
+          user_loglikes.push_back(loglike_name);
         }
 
         initialisation_done = true;
@@ -354,41 +363,74 @@ namespace Gambit
     {
       using namespace Pipes::output;
 
+      double total_loglike = 0.0;
+
       const map_str_dbl& input = *Dep::input;
-      std::vector<std::string> warnings;
 
-      // Call run_user_loglikes from the interface library. 
-      // This will fill the result map (and the 'warnings' vector).
-      try
+      // _Anders: TODO: Make input specific to each loglike function
+      std::vector<std::string> input_names;
+      std::vector<double> input_vals;
+      for (const auto& kv : input)
       {
-        Gambit::gambit_light_interface::run_user_loglikes(input, result, warnings);
-      }
-      catch (const std::runtime_error& e)
-      {
-        std::string errmsg(e.what());
-
-        if (errmsg.substr(0,9) == "[invalid]")
-        {
-          errmsg.erase(0,9);
-          invalid_point().raise(errmsg);
-        }
-        else if (errmsg.substr(0,7) == "[fatal]")
-        {
-          errmsg.erase(0,7);
-          LightBit_error().raise(LOCAL_INFO, errmsg);
-        }
-        else
-        {
-          LightBit_error().raise(LOCAL_INFO, "Caught an unrecognized runtime error: " + errmsg);
-        }
+          input_names.push_back(kv.first);
+          input_vals.push_back(kv.second);
       }
 
-      // Log any warnings that we have collected.
-      for (const std::string& w : warnings) 
+      // Loop over registered user loglikes
+      for (const std::string& loglike_name : user_loglikes)
       {
-        LightBit_warning().raise(LOCAL_INFO, w);
-      }
 
+        double loglike = 0.0;
+        map_str_dbl output;
+        std::vector<std::string> warnings;
+
+        // Call run_user_loglike from the interface library. 
+        // This will fill the result map (and the 'warnings' vector).
+        try
+        {
+          loglike = Gambit::gambit_light_interface::run_user_loglike(loglike_name, input_names, input_vals, output, warnings);
+        }
+        catch (const std::runtime_error& e)
+        {
+          std::string errmsg(e.what());
+
+          if (errmsg.substr(0,9) == "[invalid]")
+          {
+            errmsg.erase(0,9);
+            invalid_point().raise(errmsg);
+          }
+          else if (errmsg.substr(0,7) == "[fatal]")
+          {
+            errmsg.erase(0,7);
+            LightBit_error().raise(LOCAL_INFO, errmsg);
+          }
+          else
+          {
+            LightBit_error().raise(LOCAL_INFO, "Caught an unrecognized runtime error: " + errmsg);
+          }
+        }
+
+        // Log any warnings that we have collected.
+        for (const std::string& w : warnings) 
+        {
+          LightBit_warning().raise(LOCAL_INFO, w);
+        }
+
+        // Fill result map
+        for (const auto& kv : output)
+        {
+          result[kv.first] = kv.second;
+        }
+
+        // Add this loglike contribution to the result map
+        result[loglike_name] = loglike;
+
+        // Add to total loglike
+        total_loglike += loglike;
+
+      } // End loop over user loglikes
+
+      result["total_loglike"] = total_loglike;
     }
 
 

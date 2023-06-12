@@ -30,9 +30,9 @@ namespace Gambit
   namespace gambit_light_interface
   {
     // Functions from the gambit_light_interface library
-    extern void run_user_prior(const map_str_dbl&, map_str_dbl&, vec_str&);
-    extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
-    extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&, const std::vector<std::string>&);
+    extern void run_user_prior(const std::vector<std::string>&, const std::vector<double>&, std::vector<double>&, vec_str&);
+    extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
+    extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
   }
 }
 
@@ -55,14 +55,13 @@ namespace Gambit
                 std::string user_lib = userPriorNode["user_lib"].as<std::string>();
                 std::string init_fun = userPriorNode["init_fun"].as<std::string>();
   
-                std::vector<std::string> inputs = param_names;
                 std::vector<std::string> outputs = param_names;
 
                 if (lang == "c" or lang == "c++" or lang == "fortran")
                 {
                     try
                     {
-                        Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, "[prior]", inputs, outputs);
+                        Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, "[prior]", outputs);
                     }
                     catch (const std::runtime_error& e)
                     {
@@ -78,7 +77,7 @@ namespace Gambit
                     {
                         try
                         {
-                            Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, "[prior]", inputs, outputs);
+                            Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, "[prior]", outputs);
                         }
                         catch (const std::runtime_error& e)
                         {
@@ -92,32 +91,22 @@ namespace Gambit
                 #endif
             }
 
-            void transform(const std::vector<double> &unitpars, std::unordered_map<std::string, double> &outputMap) const override
+            void transform(const std::vector<double>& unitpars, std::unordered_map<std::string,double>& outputMap) const override
             {
                 std::vector<std::string> warnings;
 
-                // Prepare input and result maps, and fill 
-                // the input map with the parameter point.
-                //
-                // TODO: 
-                //   This vector --> map translation can be 
-                //   avoided if we base communication on vectors
-                //   rather than on maps. 
+                // Just some renaming for consistency with other parts of GAMBIT light
+                const std::vector<std::string>& input_names = param_names;
+                const std::vector<double>& input_vals = unitpars;
 
-                std::map<std::string,double> input;
-                std::map<std::string,double> result;
-
-                auto it_vec = unitpars.begin();
-                for (auto it = param_names.begin(), end = param_names.end(); it != end; it++)
-                {
-                    input[*it] = *(it_vec++);
-                }
+                // Initialise output vector to 0.0;
+                std::vector<double> output(input_names.size(), 0.0);
 
                 // Call run_user_prior from the interface library. 
-                // This will fill the result map (and the 'warnings' vector).
+                // This will fill the output map (and the 'warnings' vector).
                 try
                 {
-                    Gambit::gambit_light_interface::run_user_prior(input, result, warnings);
+                    Gambit::gambit_light_interface::run_user_prior(input_names, input_vals, output, warnings);
                 }
                 catch (const std::runtime_error& e)
                 {
@@ -145,10 +134,16 @@ namespace Gambit
                     Scanner::scan_warning().raise(LOCAL_INFO, w);
                 }
 
-                for (const auto& kv : result)
+                // Fill the outputMap
+                for (size_t i = 0; i < input_names.size(); i++)
                 {
-                    outputMap[kv.first] = kv.second;
+                  outputMap[input_names[i]] = output[i];
                 }
+
+                // for (const auto& kv : output)
+                // {
+                //     outputMap[kv.first] = kv.second;
+                // }
             }
 
             std::vector<double> inverse_transform(const std::unordered_map<std::string, double> &physical) const override
