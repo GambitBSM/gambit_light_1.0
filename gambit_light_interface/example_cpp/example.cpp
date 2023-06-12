@@ -31,8 +31,31 @@ double user_loglike(const std::map<std::string,double>& input, std::map<std::str
 
 // User-side initialisation function, called by GAMBIT.
 extern "C"
-void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
+void init_user_loglike(const char *fcn_name, t_gambit_light_register_loglike_fcn rf)
 {
     std::cout << "example.cpp: init_user_loglike: Registering loglike function." << std::endl;
     rf(fcn_name, (void*)user_loglike);
+}
+
+
+
+
+
+// User-side prior transform function, registered in GAMBIT by init_user_prior below.
+void user_prior(const std::map<std::string,double>& input, std::map<std::string,double>& output)
+{
+    std::cout << "example.cpp: user_prior: Transforming sample from unit hypercube." << std::endl;
+    for (const auto& kv : input)
+    {
+        output[kv.first] = kv.second * 10;
+    }
+}
+
+
+// User-side initialisation function, called by GAMBIT.
+extern "C"
+void init_user_prior(t_gambit_light_register_prior_fcn rf)
+{
+    std::cout << "example.cpp: init_user_prior: Registering prior transform function." << std::endl;
+    rf((void*)user_prior);
 }

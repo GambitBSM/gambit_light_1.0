@@ -15,8 +15,8 @@ def user_prior(input, output):
     print("example_prior_transform.py: user_prior: Transforming sample from unit hypercube.")
 
     x = np.array(list(input.values()))
-    print(f"DEBUG: example_prior_transform.py: input = {input}")
-    print(f"DEBUG: example_prior_transform.py: x = {x}")
+    # print(f"example_prior_transform.py: input = {input}")
+    # print(f"example_prior_transform.py: x = {x}")
 
     for k,v in input.items():
         output[k] = 10*v

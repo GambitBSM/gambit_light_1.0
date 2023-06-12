@@ -7,26 +7,51 @@ UserModel:
 
   p1:
     name: param_name_1
-    prior_type: flat
-    range: [0.0, 5.0]
+    # prior_type: flat
+    # range: [0.0, 5.0]
 
   p2:
     name: param_name_2
-    prior_type: flat
-    range: [0.0, 5.0]
+    # prior_type: flat
+    # range: [0.0, 5.0]
 
   p3: 
     name: param_name_3
-    fixed_value: 3.0
+    # fixed_value: 3.0
 
   p4:
     name: param_name_4
-    same_as: UserModel::p1
+    # same_as: UserModel::p1
 
   p5-p7: 
     name: param_name_  # GAMBIT will generate the names "param_name_5", "param_name_6", etc.
-    prior_type: flat
-    range: [-1.0, 1.0]
+    # prior_type: flat
+    # range: [-1.0, 1.0]
+
+
+# Instead of specifying parameter priors individually above, 
+# a user-provided prior transform function can be used by
+# activating the "UserPrior" section below. The user-defined
+# prior function should take care of the prior transform 
+# (from the unit hypercube) for all parameters in use.
+
+UserPrior:
+
+  lang: python
+  user_lib: gambit_light_interface/example_python/example_prior_transform.py
+  init_fun: init_user_prior
+
+  # lang: c
+  # user_lib: gambit_light_interface/example_c/example.so
+  # init_fun: init_user_prior
+
+  # lang: c++
+  # user_lib: gambit_light_interface/example_cpp/example.so
+  # init_fun: init_user_prior
+
+  # lang: fortran
+  # user_lib: gambit_light_interface/example_fortran/example.so
+  # init_fun: init_user_prior
 
 
 UserLogLikes:

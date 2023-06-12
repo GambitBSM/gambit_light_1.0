@@ -55,8 +55,8 @@ namespace Gambit
                 std::string user_lib = userPriorNode["user_lib"].as<std::string>();
                 std::string init_fun = userPriorNode["init_fun"].as<std::string>();
   
-                std::vector<std::string> inputs;
-                std::vector<std::string> outputs;
+                std::vector<std::string> inputs = param_names;
+                std::vector<std::string> outputs = param_names;
 
                 if (lang == "c" or lang == "c++" or lang == "fortran")
                 {

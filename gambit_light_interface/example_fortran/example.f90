@@ -49,4 +49,43 @@ contains
     call c_f_procpointer(rf, frf)
     call frf(fcn_name, c_funloc(user_loglike))
   end subroutine init_user_loglike
+
+
+
+
+  ! User-side prior transform function, registered in GAMBIT by init_user_prior below.
+  subroutine user_prior(n_inputs, input, n_outputs, output) bind(c)
+    integer(c_int), value, intent(in) :: n_inputs, n_outputs
+    type(c_ptr), intent(in), value :: input, output
+    integer :: i
+
+    ! Create pointers to Fortran arrays
+    real(c_double), dimension(:), pointer :: finput
+    real(c_double), dimension(:), pointer :: foutput
+
+    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
+    call c_f_pointer(input, finput, shape=[n_inputs])
+    call c_f_pointer(output, foutput, shape=[n_outputs])
+  
+    print *, "example.f90: user_prior: Transforming sample from unit hypercube."
+
+    do i = 1, n_inputs
+      foutput(i) = finput(i) * 10
+    end do
+    
+  end subroutine user_prior
+
+
+  ! User-side initialisation function, called by GAMBIT.
+  subroutine init_user_prior(rf) bind(c)
+    type(c_funptr), intent(in), value :: rf
+    procedure(gambit_light_register_prior_fcn), pointer :: frf
+
+    print *, "example.f90: init_user_prior: Registering prior transform function."
+
+    ! Convert c function to fortran function, and call it.
+    call c_f_procpointer(rf, frf)
+    call frf(c_funloc(user_prior))
+  end subroutine init_user_prior
+
 end module user_mod
