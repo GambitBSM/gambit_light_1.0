@@ -48,6 +48,43 @@ namespace Gambit
 
     /// @}
 
+
+
+    /// \name Helper functions
+    /// @{
+
+    // Get the permutation needed to sort a vector containing 
+    // parameter names "p1", "p2", ...
+    std::vector<int> get_model_pars_sort_permutation(const std::vector<std::string>& vec)
+    {
+      std::vector<int> indices(vec.size());
+      std::iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, 2, ...
+      std::sort(indices.begin(), indices.end(),
+          [&](const int& a, const int& b) 
+          {
+            int int_a = std::stoi(vec[a].substr(1));  // E.g. "p10" --> 10
+            int int_b = std::stoi(vec[b].substr(1));  // E.g. "p100" --> 100
+            return (int_a < int_b);
+          }
+      );
+      return indices;
+    }
+
+    // Apply a given permutation to a vector of strings.
+    void apply_permutation(std::vector<std::string>& vec, const std::vector<int>& indices)
+    {
+      std::vector<std::string> temp_vec(vec.size());
+      for (size_t i = 0; i < vec.size(); i++) 
+      {
+        temp_vec[i] = vec[indices[i]];
+      }
+      vec = temp_vec;
+    }
+
+    /// @}
+
+
+
     /// \name Module functions
     /// @{
 
@@ -134,6 +171,13 @@ namespace Gambit
           listed_model_pars.push_back(model_par_name);
           user_to_model_par_names[user_par_name] = model_par_name;
         }
+
+        // Sort listed_model_pars in the order "p0", "p1" , ..., "p99", "p100", ...
+        // Apply the same permutation to the listed_user_pars vector.
+        std::vector<int> indices = get_model_pars_sort_permutation(listed_model_pars);
+        apply_permutation(listed_model_pars, indices);
+        apply_permutation(listed_user_pars, indices);
+
 
         // Check consistency and collect settings from the "UserLogLikes" section.
         for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
