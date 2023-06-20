@@ -41,7 +41,9 @@ jobs:
       run: |
         echo "Building Backends required for tests"
         cd BUILD
-        make -j $(( $(sysctl -n hw.ncpu)/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso rivet contur
+        make -j $(( $(sysctl -n hw.ncpu)/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso
+        make rivet
+        make contur
         echo "Running cmake again, since this is required for ColliderBit/pythia"
         cmake ..
     - name: Build Gambit
