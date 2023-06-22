@@ -81,7 +81,8 @@ jobs:
       run: |
         echo "Building all Backends"
         cd BUILD
-        make -j $(( $(sysctl -n hw.ncpu)/2 )) backends
+        #make -j $(( $(sysctl -n hw.ncpu)/2 )) backends
+        make backends
     #- name: Build standalones
     #  run: |
     #    echo "Test the building of the standalones"
