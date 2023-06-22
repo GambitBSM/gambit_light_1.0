@@ -42,7 +42,14 @@ jobs:
       run: |
         echo "Building Backends"
         cd BUILD
-        make -j $(( $(sysctl -n hw.ncpu)/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso
+        #make -j $(( $(sysctl -n hw.ncpu)/2 )) pythia higgssignals nulike ATLAS_FullLikes susyhit heplike superiso
+        make pythia
+        make higgssignals
+        make nulike
+        make ATLAS_FullLikes
+        make susyhit
+        make heplike
+        make superiso
         make rivet
         make contur
         echo "Running cmake again, since this is required for ColliderBit/pythia"
