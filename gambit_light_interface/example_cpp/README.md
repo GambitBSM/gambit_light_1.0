@@ -53,8 +53,8 @@ _See the example code in `example.cpp`._
    ```
    * Here `cpp_user_loglike` is simply a label you choose for your target function. It will be used in GAMBIT output files, log messages, etc. 
    * The `init_fun` setting must match the name of the initialisation function in your library (here `init_user_loglike`).
-   * In the above example, the target function will receive three input parameters via the `input` map, and GAMBIT will attempt to extract three output quantities from the `output` map filled by the target function.
-   * The input parameter names (`param_name_1`, etc.) correspond to parameters defined in the GAMBIT configuration file. These names will be used for the string keys in the `input` parameter map.
+   * In the above example, the target function will receive three input parameters via the `input_names` and `input_vals` vectors, and GAMBIT will attempt to extract three output quantities from the `output` map filled by the target function.
+   * The input parameter names (`param_name_1`, etc.) correspond to parameters defined in the GAMBIT configuration file. These names will be used for the names in the `input_names` vector.
    * The output names (`c_user_loglike_output_1`, etc.) are the string keys that GAMBIT will look for to extract outputs from the `output` map.
 
    See `yaml_files/gambit_light_example.yaml` for a complete GAMBIT configuration file.
