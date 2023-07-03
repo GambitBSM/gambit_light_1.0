@@ -89,7 +89,8 @@ namespace Gambit
         // A map between loglike names and the corresponding t_loglike_desc instances.
         // NOTE: init_priority attribute is needed to make sure that the map is initialised
         // when the dlopen calls the so init function. Verified to work on GCC, intel, and clang.
-        std::map<std::string, t_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
+        // std::map<std::string, t_loglike_desc> user_loglikes __attribute__ ((init_priority (128)));
+        std::map<std::string, t_loglike_desc> user_loglikes;
 
         // A struct to hold info about a user prior transformation function
         typedef struct
