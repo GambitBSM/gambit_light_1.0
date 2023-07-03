@@ -9,10 +9,11 @@ _See the example code in `example.cpp`._
 
 2. Add to your code a target/log-likelihood function with the following signature:
    ```cpp
-   double user_loglike(const std::map<std::string,double>& input, std::map<std::string,double>& output)
+   double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
    ```
    _Arguments_:
-   * `input`: A string-to-double map with the input parameters.
+   * `input_names`: A vector of strings with the names of the input parameters.
+   * `input_vals`: A vector of doubles with the values of the input parameters.
    * `output`: A reference to a string-to-double map that the target function can fill with any additional output quantities.
 
    _Return value_: The target/log-likelihood value.
