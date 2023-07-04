@@ -318,15 +318,19 @@ namespace Gambit
         // "Priors" node that overrides the old priorsNode variable
         if (has_UserPrior_node)
         {
-          if (!userPriorNode["lang"].IsDefined()
+          // Check that the required entries are present
+          if (userPriorNode.size() != 3 
+              || !userPriorNode["lang"].IsDefined()
               || !userPriorNode["user_lib"].IsDefined()
               || !userPriorNode["init_fun"].IsDefined())
           {
             inifile_error().raise(LOCAL_INFO, 
-              "Error while parsing the UserPrior settings: One or more of the expected entries "
-              "'lang', 'user_lib' and 'init_fun' are missing."
+              "Error while parsing the UserPrior settings: The UserPrior section must contain "
+              "exactly the three entries 'lang', 'user_lib' and 'init_fun'. (Multiple instances " 
+              "are not allowed.)"
             );
           }
+          
           YAML::Node newPriorsNode;
           newPriorsNode["gambit_light_prior"] = userPriorNode;
           userPriorNode["prior_type"] = "userprior";

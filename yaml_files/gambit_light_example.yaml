@@ -29,10 +29,10 @@ UserModel:
     # range: [-1.0, 1.0]
 
 
-# Instead of specifying parameter priors individually above, 
-# a user-provided prior transform function can be used by
-# activating the "UserPrior" section below. The user-defined
-# prior function should take care of the prior transform 
+# Instead of specifying individual parameter priors above, 
+# a user-provided prior transform function can be used via 
+# the "UserPrior" section below. The user-defined prior 
+# function should take care of the prior transform 
 # (from the unit hypercube) for all parameters in use.
 
 UserPrior:
