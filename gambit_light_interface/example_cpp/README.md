@@ -27,7 +27,7 @@ _See the example code in `example.cpp`._
    GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
    ```
    **Note:** The purpose of this macro is to construct a C-style registration function that GAMBIT can connect to without worrying about the 
-   name mangling for C++ library symbol names. GAMBIT will use this function to recieve a pointer to the actual target function `user_loglike`.
+   name mangling for C++ library symbol names. GAMBIT will use this function to obtain a pointer to the actual target function `user_loglike`.
 
 
 4. Build your C++ code as a shared library. Make sure to include the `gambit_light_interface/include` directory containing `gambit_light_interface.h`. Example:
