@@ -1,3 +1,5 @@
+include 'gambit_light_interface_mod.f90'
+
 module user_mod
   use iso_c_binding
   use gambit_light_interface_mod
@@ -38,18 +40,17 @@ contains
 
 
   ! User-side initialisation function, called by GAMBIT.
-  subroutine init_user_loglike(fcn_name, rf) bind(c)
+  subroutine gambit_light_register_loglike_user_loglike(fcn_name, rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     type(c_ptr), intent(in), value:: fcn_name
     procedure(gambit_light_register_fcn), pointer :: frf
 
-    print *, "example.f90: init_user_loglike: Registering loglike function."
+    print *, "example.f90: gambit_light_register_loglike_user_loglike: Registering loglike function."
 
     ! Convert c function to fortran function, and call it.
     call c_f_procpointer(rf, frf)
     call frf(fcn_name, c_funloc(user_loglike))
-  end subroutine init_user_loglike
-
+  end subroutine gambit_light_register_loglike_user_loglike
 
 
 
@@ -77,15 +78,15 @@ contains
 
 
   ! User-side initialisation function, called by GAMBIT.
-  subroutine init_user_prior(rf) bind(c)
+  subroutine gambit_light_register_prior_user_prior(rf) bind(c)
     type(c_funptr), intent(in), value :: rf
     procedure(gambit_light_register_prior_fcn), pointer :: frf
 
-    print *, "example.f90: init_user_prior: Registering prior transform function."
+    print *, "example.f90: gambit_light_register_prior_user_prior: Registering prior transform function."
 
     ! Convert c function to fortran function, and call it.
     call c_f_procpointer(rf, frf)
     call frf(c_funloc(user_prior))
-  end subroutine init_user_prior
+  end subroutine gambit_light_register_prior_user_prior
 
 end module user_mod

@@ -14,10 +14,3 @@ def user_prior(input_names, input_vals, output):
 
     for i,v in enumerate(input_vals):
         output[i] = v * 10.
-
-
-def init_user_prior(rf_name):
-    print("example_prior_transform.py: init_user_prior: Registering prior transform function.")
-    rf = getattr(gambit_light, rf_name)
-    rf("user_prior")
-

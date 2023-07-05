@@ -24,14 +24,7 @@ double user_loglike(const int n_inputs, const double *input, const int n_outputs
     return input[0] + input[1] + input[2];
 }
 
-// User-side initialisation function, called by GAMBIT.
-void init_user_loglike(const char *fcn_name, t_gambit_light_register_loglike_fcn rf)
-{
-    printf("example.c: init_user_loglike: Registering loglike function.\n");
-    rf(fcn_name, user_loglike);
-}
-
-
+GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 
 
 // User-side prior transform function, registered in GAMBIT by init_user_prior below.
@@ -45,9 +38,4 @@ void user_prior(const int n_inputs, const double *input, double *output)
     }
 }
 
-// User-side initialisation function, called by GAMBIT.
-void init_user_prior(t_gambit_light_register_prior_fcn rf)
-{
-    printf("example.c: init_user_prior: Registering prior transform function.\n");
-    rf(user_prior);
-}
+GAMBIT_LIGHT_REGISTER_PRIOR(user_prior)

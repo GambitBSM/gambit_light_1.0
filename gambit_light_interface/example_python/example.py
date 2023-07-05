@@ -36,9 +36,3 @@ def user_loglike(input_names, input_vals, output):
 
     return input["param_name_1"] + input["param_name_2"] + input["param_name_4"]
 
-
-# User-side initialisation function, called by GAMBIT.
-def init_user_loglike(fcn_name, rf_name):
-    print("example.py: init_user_loglike: Registering loglike function.")
-    rf = getattr(gambit_light, rf_name)
-    rf(fcn_name, "user_loglike")

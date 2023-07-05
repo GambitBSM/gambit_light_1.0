@@ -38,6 +38,44 @@ typedef int (*t_gambit_light_register_loglike_fcn)(const char*, void*);
 typedef int (*t_gambit_light_register_prior_fcn)(void*);
 
 // Typedefs for user-side library initialisation functions.
-typedef void (*t_init_fcn_loglike)(const char*, t_gambit_light_register_loglike_fcn);
-typedef void (*t_init_fcn_prior)(t_gambit_light_register_prior_fcn);
+typedef void (*t_fcn_loglike)(const char*, t_gambit_light_register_loglike_fcn);
+typedef void (*t_fcn_prior)(t_gambit_light_register_prior_fcn);
 
+
+// C++ and C macros for registering a user-side log-likelihood function
+#ifdef __cplusplus  // C++ version, with 'extern "C"'
+    #define GAMBIT_LIGHT_REGISTER_LOGLIKE(FUNC_NAME)                             \
+    extern "C"                                                                   \
+    void gambit_light_register_loglike_##FUNC_NAME (const char *fcn_name, t_gambit_light_register_loglike_fcn rf)  \
+    {                                                                            \
+        std::cout << "GAMBIT_LIGHT_REGISTER_LOGLIKE macro: "                     \
+                  << "Registering loglike function FUNC_NAME" << std::endl;      \
+        rf(fcn_name, (void*)FUNC_NAME);                                          \
+    }
+#else  // C version, without 'extern "C"'
+    #define GAMBIT_LIGHT_REGISTER_LOGLIKE(FUNC_NAME)                             \
+    void gambit_light_register_loglike_##FUNC_NAME (const char *fcn_name, t_gambit_light_register_loglike_fcn rf)  \
+    {                                                                            \
+        printf("GAMBIT_LIGHT_REGISTER_LOGLIKE macro: Registering loglike function FUNC_NAME\n"); \
+        rf(fcn_name, (void*)FUNC_NAME);                                          \
+    }
+#endif
+
+// C++ and C macros for registering a user-side prior function
+#ifdef __cplusplus  // C++ version, with 'extern "C"'
+    #define GAMBIT_LIGHT_REGISTER_PRIOR(FUNC_NAME)                               \
+    extern "C"                                                                   \
+    void gambit_light_register_prior_##FUNC_NAME (t_gambit_light_register_prior_fcn rf)  \
+    {                                                                            \
+        std::cout << "GAMBIT_LIGHT_REGISTER_PRIOR macro: "                       \
+                  << "Registering prior function FUNC_NAME" << std::endl;        \
+        rf((void*)FUNC_NAME);                                                    \
+    }
+#else  // C version, without 'extern "C"'
+    #define GAMBIT_LIGHT_REGISTER_PRIOR(FUNC_NAME)                               \
+    void gambit_light_register_prior_##FUNC_NAME (t_gambit_light_register_prior_fcn rf)  \
+    {                                                                            \
+        printf("GAMBIT_LIGHT_REGISTER_PRIOR macro: Registering prior function FUNC_NAME\n"); \
+        rf((void*)FUNC_NAME);                                                    \
+    }
+#endif

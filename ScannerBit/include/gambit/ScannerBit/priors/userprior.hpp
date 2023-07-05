@@ -53,7 +53,7 @@ namespace Gambit
         
                 std::string lang = userPriorNode["lang"].as<std::string>();
                 std::string user_lib = userPriorNode["user_lib"].as<std::string>();
-                std::string init_fun = userPriorNode["init_fun"].as<std::string>();
+                std::string func_name = userPriorNode["func_name"].as<std::string>();
   
                 std::vector<std::string> outputs = param_names;
 
@@ -61,7 +61,7 @@ namespace Gambit
                 {
                     try
                     {
-                        Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, "[prior]", outputs);
+                        Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, func_name, lang, "[prior]", outputs);
                     }
                     catch (const std::runtime_error& e)
                     {
@@ -77,7 +77,7 @@ namespace Gambit
                     {
                         try
                         {
-                            Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, "[prior]", outputs);
+                            Gambit::gambit_light_interface::init_user_lib_Python(user_lib, func_name, "[prior]", outputs);
                         }
                         catch (const std::runtime_error& e)
                         {

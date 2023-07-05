@@ -322,11 +322,11 @@ namespace Gambit
           if (userPriorNode.size() != 3 
               || !userPriorNode["lang"].IsDefined()
               || !userPriorNode["user_lib"].IsDefined()
-              || !userPriorNode["init_fun"].IsDefined())
+              || !userPriorNode["func_name"].IsDefined())
           {
             inifile_error().raise(LOCAL_INFO, 
               "Error while parsing the UserPrior settings: The UserPrior section must contain "
-              "exactly the three entries 'lang', 'user_lib' and 'init_fun'. (Multiple instances " 
+              "exactly the three entries 'lang', 'user_lib' and 'func_name'. (Multiple instances " 
               "are not allowed.)"
             );
           }

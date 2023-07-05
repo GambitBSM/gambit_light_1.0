@@ -19,16 +19,10 @@
 #ifdef HAVE_PYBIND11
 #include <pybind11/pybind11.h>
 #include <pybind11/stl_bind.h>
-extern "C"
-int gambit_light_register_python(const char *loglike_name, const char *python_fcn);
-extern "C"
-int gambit_light_register_prior_python(const char *python_fcn);
 
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light_interface, m)
 {
-    m.def("register_loglike", &gambit_light_register_python, "register a python user log-likelihood function");
-    m.def("register_prior", &gambit_light_register_prior_python, "register a python user prior transform function");
     m.def("invalid_point", &gambit_light_invalid_point, "report an invalid input point");
     m.def("warning", &gambit_light_warning, "report user warning");
     m.def("error", &gambit_light_error, "report user error");
@@ -160,21 +154,6 @@ int gambit_light_register(const char *loglike_name, void *fcn)
 }
 
 
-#ifdef HAVE_PYBIND11
-    // Callback to register the user log-likelihood functions from Python: pass function name as string.
-    extern "C"
-    int gambit_light_register_python(const char *loglike_name, const char *python_fcn)
-    {
-        using namespace Gambit::gambit_light_interface;
-        t_loglike_desc desc;
-        desc.name = std::string(python_fcn);
-        user_loglikes.insert({loglike_name, desc});
-        std::cout << OUTPUT_PREFIX << "Registering Python loglike '" << loglike_name << "'." << std::endl;
-        return 0;
-    }
-#endif
-
-
 // Callback to register the user log-likelihood functions: pass function address.
 extern "C"
 int gambit_light_register_prior(void *fcn)
@@ -184,19 +163,6 @@ int gambit_light_register_prior(void *fcn)
     std::cout << OUTPUT_PREFIX << "Registering prior transform function." << std::endl;
     return 0;
 }
-
-
-#ifdef HAVE_PYBIND11
-    // Callback to register a user prior function from Python: pass function name as string.
-    extern "C"
-    int gambit_light_register_prior_python(const char *python_fcn)
-    {
-        using namespace Gambit::gambit_light_interface;
-        user_prior.name = std::string(python_fcn);
-        std::cout << OUTPUT_PREFIX << "Registering Python prior transform function." << std::endl;
-        return 0;
-    }
-#endif
 
 
 
@@ -405,13 +371,16 @@ namespace Gambit
 
 
 
-        void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &init_fun,
-                                         const std::string &lang, const std::string &func_name,
+        void init_user_lib_C_CXX_Fortran(const std::string &path, const std::string &func_name,
+                                         const std::string &lang, const std::string &entry_name,
                                          const std::vector<std::string> &outputs)
         {
             using namespace Gambit::gambit_light_interface;
 
-            // Load the init symbol from the user library.
+            bool is_prior = false;
+            if (entry_name == "[prior]") is_prior = true;
+
+            // Load the symbol for the registration function from the user library.
             void *handle = dlopen(path.c_str(), RTLD_LAZY);
             if(!handle)
             {
@@ -420,21 +389,31 @@ namespace Gambit
 
             dlerror();
 
+            std::string symbol_name;
+            if (is_prior)
+            {
+                symbol_name = "gambit_light_register_prior_" + func_name;
+            }
+            else
+            {
+                symbol_name = "gambit_light_register_loglike_" + func_name;                
+            }
+
             char *error;
-            void* vptr = dlsym(handle, init_fun.c_str());
+            void* vptr = dlsym(handle, symbol_name.c_str());
             if ((error = dlerror()) != NULL)
             {
-                throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load init function: " + std::string(error));
+                throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load function: " + std::string(error));
             }
 
             // Are we registering a prior transform or a loglike function?
-            if (func_name == "[prior]")
+            if (is_prior)
             {
-                t_init_fcn_prior user_init_function;
-                *(void**) (&user_init_function) = vptr;
+                t_fcn_prior user_function;
+                *(void**) (&user_function) = vptr;
 
-                // Call user init function.
-                (*user_init_function)(gambit_light_register_prior);
+                // Call registration function.
+                (*user_function)(gambit_light_register_prior);
 
                 // Fill in the rest of the function info in the struct 'user_prior'
                 if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
@@ -444,18 +423,18 @@ namespace Gambit
             }
             else
             {
-                t_init_fcn_loglike user_init_function;
-                *(void**) (&user_init_function) = vptr;
+                t_fcn_loglike user_function;
+                *(void**) (&user_function) = vptr;
 
-                // Call user init function.
-                (*user_init_function)(func_name.c_str(), gambit_light_register);
+                // Call registration function.
+                (*user_function)(entry_name.c_str(), gambit_light_register);
 
-                // At this point func_name should be a key in user_loglikes, registered by the user.
-                if(user_loglikes.find(func_name) != user_loglikes.end())
+                // At this point entry_name should be a key in user_loglikes, registered by the user.
+                if(user_loglikes.find(entry_name) != user_loglikes.end())
                 {
 
                     // Add parameter and output information to user loglike description.
-                    t_loglike_desc &desc = user_loglikes[func_name];
+                    t_loglike_desc &desc = user_loglikes[entry_name];
 
                     if (lang == "fortran")  desc.lang = LANG_FORTRAN;
                     else if (lang == "c")   desc.lang = LANG_C;
@@ -466,9 +445,8 @@ namespace Gambit
                 else 
                 {
                     throw std::runtime_error(
-                        std::string(OUTPUT_PREFIX) + "The loglike '" + func_name
-                        + "' listed in the config file has not been registered through an init function. "
-                        + "Check your config file."
+                        std::string(OUTPUT_PREFIX) + "The loglike '" + entry_name
+                        + "' listed in the config file is not recognized. "
                     );
                 }
             }
@@ -477,10 +455,13 @@ namespace Gambit
 
 
         #ifdef HAVE_PYBIND11
-            void init_user_lib_Python(const std::string &path, const std::string &init_fun, const std::string &func_name, 
+            void init_user_lib_Python(const std::string &path, const std::string &func_name, const std::string &entry_name, 
                                       const std::vector<std::string> &outputs)
             {
                 using namespace Gambit::gambit_light_interface;
+
+                bool is_prior = false;
+                if (entry_name == "[prior]") is_prior = true;
 
                 // Bail now if the backend is not present.
                 std::ifstream f(path.c_str());
@@ -530,54 +511,40 @@ namespace Gambit
                     );
                 }
 
-                // Look for the user init function and call it.
-                pybind11::object user_init_function;
+                // Look for the user function.
+                pybind11::object user_function;
                 try
                 {
-                    user_init_function = user_module.attr(init_fun.c_str());
+                    user_function = user_module.attr(func_name.c_str());
                 }
                 catch (const std::exception& e)
                 {
                     sys_path_remove(module_path);
                     throw std::runtime_error(
-                        std::string(OUTPUT_PREFIX) + "Failed to load function '" + init_fun 
+                        std::string(OUTPUT_PREFIX) + "Failed to load function '" + func_name 
                         + "' from Python module '" + name + "'. Python error was: " + std::string(e.what())
                     );
                 }
 
                 // Are we registering a prior transform or a loglike function?
-                if (func_name == "[prior]")
+                if (is_prior)
                 {
-                    user_init_function("register_prior");
-
-                    // Add parameter and output information to user function description.
-                    user_prior.fcn.python = new pybind11::object(user_module.attr(user_prior.name.c_str()));
+                    user_prior.name = func_name;
+                    user_prior.fcn.python = new pybind11::object(user_module.attr(func_name.c_str()));
                     user_prior.lang = LANG_PYTHON;
                     user_prior.outputs = outputs;
+                    std::cout << OUTPUT_PREFIX << "Registering Python prior transform function '" << user_prior.name << "'." << std::endl;
                 }
                 else
                 {
-                    user_init_function(func_name.c_str(), "register_loglike");
+                    t_loglike_desc desc;
+                    desc.name = func_name;
+                    desc.fcn.python = new pybind11::object(user_module.attr(func_name.c_str()));
+                    desc.lang = LANG_PYTHON;
+                    desc.outputs = outputs;
 
-                    // At this point func_name should be a key in user_loglikes, registered by the user.
-                    if(user_loglikes.find(func_name) != user_loglikes.end())
-                    {
-                        // Add parameter and output information to user function description.
-                        t_loglike_desc &desc = user_loglikes[func_name];
-
-                        desc.fcn.python = new pybind11::object(user_module.attr(desc.name.c_str()));
-                        desc.lang = LANG_PYTHON;
-                        desc.outputs = outputs;
-                    }
-                    else 
-                    {
-                        throw std::runtime_error(
-                            std::string(OUTPUT_PREFIX) + "The Python loglike '" + func_name
-                            + "' listed in the config file has not been registered through an init function. "
-                            + "Check your config file."
-                        );
-                    }
-
+                    user_loglikes.insert({entry_name, desc});
+                    std::cout << OUTPUT_PREFIX << "Registering Python loglike '" << entry_name << "'." << std::endl;
                 }
 
                 // Remove the path to the backend from the Python system path.

@@ -35,15 +35,7 @@ double user_loglike(const std::vector<std::string>& input_names, const std::vect
     return input.at("param_name_2") + input.at("param_name_3");
 }
 
-
-// User-side initialisation function, called by GAMBIT.
-extern "C"
-void init_user_loglike(const char *fcn_name, t_gambit_light_register_loglike_fcn rf)
-{
-    std::cout << "example.cpp: init_user_loglike: Registering loglike function." << std::endl;
-    rf(fcn_name, (void*)user_loglike);
-}
-
+GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 
 
 
@@ -60,11 +52,4 @@ void user_prior(const std::vector<std::string>& input_names, const std::vector<d
 
 }
 
-
-// User-side initialisation function, called by GAMBIT.
-extern "C"
-void init_user_prior(t_gambit_light_register_prior_fcn rf)
-{
-    std::cout << "example.cpp: init_user_prior: Registering prior transform function." << std::endl;
-    rf((void*)user_prior);
-}
+GAMBIT_LIGHT_REGISTER_PRIOR(user_prior)

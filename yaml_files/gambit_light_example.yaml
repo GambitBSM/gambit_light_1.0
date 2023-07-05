@@ -37,21 +37,21 @@ UserModel:
 
 UserPrior:
 
-  lang: python
-  user_lib: gambit_light_interface/example_python/example_prior_transform.py
-  init_fun: init_user_prior
+  # lang: python
+  # user_lib: gambit_light_interface/example_python/example_prior_transform.py
+  # func_name: user_prior
 
   # lang: c
   # user_lib: gambit_light_interface/example_c/example.so
-  # init_fun: init_user_prior
+  # func_name: user_prior
 
   # lang: c++
   # user_lib: gambit_light_interface/example_cpp/example.so
-  # init_fun: init_user_prior
+  # func_name: user_prior
 
-  # lang: fortran
-  # user_lib: gambit_light_interface/example_fortran/example.so
-  # init_fun: init_user_prior
+  lang: fortran
+  user_lib: gambit_light_interface/example_fortran/example.so
+  func_name: user_prior
 
 
 UserLogLikes:
@@ -63,7 +63,7 @@ UserLogLikes:
   c_user_loglike:
     lang: c
     user_lib: gambit_light_interface/example_c/example.so
-    init_fun: init_user_loglike
+    func_name: user_loglike
     input:
       - param_name_1
       - param_name_2
@@ -77,7 +77,7 @@ UserLogLikes:
   cpp_user_loglike:
     lang: c++
     user_lib: gambit_light_interface/example_cpp/example.so
-    init_fun: init_user_loglike
+    func_name: user_loglike
     input:
       - param_name_2
       - param_name_3
@@ -90,7 +90,7 @@ UserLogLikes:
   fortran_user_loglike:
     lang: fortran
     user_lib: gambit_light_interface/example_fortran/example.so
-    init_fun: init_user_loglike
+    func_name: user_loglike
     input:
       - param_name_1
       - param_name_2
@@ -101,7 +101,7 @@ UserLogLikes:
   py_user_loglike:
     lang: python
     user_lib: gambit_light_interface/example_python/example.py
-    init_fun: init_user_loglike
+    func_name: user_loglike
     input:
       - param_name_1
       - param_name_2
@@ -115,7 +115,7 @@ UserLogLikes:
   py_user_loglike_rosenbrock:
     lang: python
     user_lib: gambit_light_interface/example_python/example_rosenbrock.py
-    init_fun: init_user_loglike
+    func_name: user_loglike
     input:
       - param_name_1
       - param_name_2
@@ -202,7 +202,7 @@ KeyValues:
 
   rng:
     generator: ranlux48
-    seed: -1
+    seed: 14235 # -1
 
   print_timing_data: true
 

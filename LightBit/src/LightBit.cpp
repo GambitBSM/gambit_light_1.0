@@ -105,7 +105,7 @@ namespace Gambit
       {
         std::string user_lib;
         std::string loglike_name;
-        std::string init_fun;
+        std::string func_name;
         std::string lang;
         std::vector<std::string> all_outputs;
 
@@ -113,7 +113,7 @@ namespace Gambit
         YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
         // Check for unknown options or typos in the "UserLogLikes" section.
-        const static std::vector<std::string> known_userloglike_options = {"lang", "user_lib", "init_fun", "input", "output"};
+        const static std::vector<std::string> known_userloglike_options = {"lang", "user_lib", "func_name", "input", "output"};
         for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
         {
           std::string loglike_name = it->first.as<std::string>();
@@ -197,14 +197,14 @@ namespace Gambit
           }
           user_lib = userLogLikesEntry["user_lib"].as<std::string>();
 
-          if (not userLogLikesEntry["init_fun"].IsDefined())
+          if (not userLogLikesEntry["func_name"].IsDefined())
           {
             LightBit_error().raise(LOCAL_INFO,
               "Error while parsing the UserLogLikes settings: "
-              "'init_fun' not specified in config file."
+              "'func_name' not specified in config file."
             );
           }
-          init_fun = userLogLikesEntry["init_fun"].as<std::string>();
+          func_name = userLogLikesEntry["func_name"].as<std::string>();
 
           if (not userLogLikesEntry["lang"].IsDefined())
           {
@@ -314,14 +314,14 @@ namespace Gambit
 
           logger() << "Configuration for the loglike '" << loglike_name << "':" << endl;
           logger() << "  user_lib: " << user_lib << endl;
-          logger() << "  init_fun: " << init_fun << endl;
+          logger() << "  func_name: " << func_name << endl;
           logger() << "  lang:     " << lang << EOM;
 
           if (lang == "c" or lang == "c++" or lang == "fortran")
           {
             try
             {
-              Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, init_fun, lang, loglike_name, outputs);
+              Gambit::gambit_light_interface::init_user_lib_C_CXX_Fortran(user_lib, func_name, lang, loglike_name, outputs);
             }
             catch (const std::runtime_error& e)
             {
@@ -337,7 +337,7 @@ namespace Gambit
             {
               try
               {
-                Gambit::gambit_light_interface::init_user_lib_Python(user_lib, init_fun, loglike_name, outputs);
+                Gambit::gambit_light_interface::init_user_lib_Python(user_lib, func_name, loglike_name, outputs);
               }
               catch (const std::runtime_error& e)
               {
