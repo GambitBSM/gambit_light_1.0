@@ -8,7 +8,7 @@ sys.path.append(os.path.join(current_dir, "../lib"))
 import gambit_light_interface as gambit_light
 
 
-# User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
+# User-side log-likelihood function, which can be called by GAMBIT-light
 def user_loglike(input_names, input_vals, output):
 
     print("example.py: user_loglike: Computing loglike.")
@@ -22,7 +22,7 @@ def user_loglike(input_names, input_vals, output):
     # gambit_light.invalid_point("This input point is no good.")
 
     # Error handling: Report a warning using gambit_light.warning.
-    # gambit_light.warning("Some warning.")
+    gambit_light.warning("Some warning.")
 
     # Error handling: Report an error using gambit_light.error.
     # gambit_light.error("Some error.")

@@ -3,7 +3,7 @@
 #include "gambit_light_interface.h"
 
 
-// User-side log-likelihood function.
+// User-side log-likelihood function, which can be called by GAMBIT-light.
 double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
 {
 
@@ -39,7 +39,7 @@ GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 
 
 
-// User-side prior transform function.
+// User-side prior transform function, which can be called by GAMBIT-light.
 void user_prior(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::vector<double>& output)
 {
     std::cout << "example.cpp: user_prior: Transforming sample from unit hypercube." << std::endl;

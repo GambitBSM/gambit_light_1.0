@@ -7,6 +7,7 @@ _See the example code in `example.cpp`._
    #include "gambit_light_interface.h"
    ```
 
+
 2. Add to your code a target/log-likelihood function with the following signature:
    ```cpp
    double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
@@ -18,21 +19,22 @@ _See the example code in `example.cpp`._
 
    _Return value_: The target/log-likelihood value.
 
+   You can give this function any name you prefer -- here we used `user_loglike` as an example.
 
-3. Add a small initialisation function that registers the target function (in this example `user_loglike`) with GAMBIT-light:
+
+3. Just below your target function, add the following macro call:
    ```cpp
-   extern "C"
-   void init_user_loglike(const char *fcn_name, gambit_light_register_loglike_fcn rf)
-   {
-     rf(fcn_name, (void*)user_loglike);
-   }
+   GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
    ```
-   **Note:** The line `extern "C"` is needed to make sure that the library symbol name for this initialisation function will simply be the function name "init_user_loglike", instead of some decorated symbol name like "_Z17init_user_loglikePKcPFiS0_PvE".
+   **Note:** The purpose of this macro is to construct a C-style registration function that GAMBIT can connect to without worrying about the 
+   name mangling for C++ library symbol names. GAMBIT will use this function to recieve a pointer to the actual target function `user_loglike`.
+
 
 4. Build your C++ code as a shared library. Make sure to include the `gambit_light_interface/include` directory containing `gambit_light_interface.h`. Example:
    ```
    g++ example.cpp -I /your/path/to/gambit_light_interface/include -shared -fPIC -o example.so
    ``` 
+
 
 5. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:
    ```yaml
@@ -41,7 +43,7 @@ _See the example code in `example.cpp`._
      cpp_user_loglike:
        lang: c++
        user_lib: gambit_light_interface/example_cpp/example.so
-       init_fun: init_user_loglike
+       func_name: user_loglike
        input:
          - param_name_1
          - param_name_2
@@ -52,7 +54,7 @@ _See the example code in `example.cpp`._
         - cpp_user_loglike_output_3
    ```
    * Here `cpp_user_loglike` is simply a label you choose for your target function. It will be used in GAMBIT output files, log messages, etc. 
-   * The `init_fun` setting must match the name of the initialisation function in your library (here `init_user_loglike`).
+   * The `func_name` setting must match the name of the target function in your library (here `user_loglike`).
    * In the above example, the target function will receive three input parameters via the `input_names` and `input_vals` vectors, and GAMBIT will attempt to extract three output quantities from the `output` map filled by the target function.
    * The input parameter names (`param_name_1`, etc.) correspond to parameters defined in the GAMBIT configuration file. These names will be used for the names in the `input_names` vector.
    * The output names (`c_user_loglike_output_1`, etc.) are the string keys that GAMBIT will look for to extract outputs from the `output` map.

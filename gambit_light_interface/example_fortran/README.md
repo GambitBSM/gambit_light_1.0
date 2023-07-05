@@ -5,6 +5,8 @@ _See the example code in `example.f90`._
 1. Prepare a module that will contain your target/log-likelihood function. Here's an example for a module called `user_mod`:
 
    ```.f90
+   include 'gambit_light_interface_mod.f90'
+
    module user_mod
      use iso_c_binding
      use gambit_light_interface_mod
@@ -14,10 +16,11 @@ _See the example code in `example.f90`._
 
      ! Your target function will go here. 
 
-     ! A small initialisation subroutine will go here.
-
    end module user_mod
    ```
+
+   Note the inclusion of the file `gambit_light_interface_mod.f90` at the top.
+
 
 2. Add to your module a target/log-likelihood function with the following signature:
    
@@ -29,18 +32,18 @@ _See the example code in `example.f90`._
 
    _Return value_: The target/log-likelihood value.
 
-   Here is a minimal example for a target function called `user_loglike`:
+   Here is a minimal example for such a target function called `user_loglike`:
 
    ```.f90
      real(c_double) function user_loglike(n_inputs, input, n_outputs, output) bind(c)
        integer(c_int), value, intent(in) :: n_inputs, n_outputs
        type(c_ptr), intent(in), value :: input, output
 
-       ! Create pointers to Fortran arrays
+       ! Create pointers to Fortran arrays.
        real(c_double), dimension(:), pointer :: finput
        real(c_double), dimension(:), pointer :: foutput
 
-       ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
+       ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput).
        call c_f_pointer(input, finput, shape=[n_inputs])
        call c_f_pointer(output, foutput, shape=[n_outputs])
     
@@ -56,34 +59,20 @@ _See the example code in `example.f90`._
    ```
 
 
-3. Add a small initialisation subroutine that registers the target function (in this example `user_loglike`) with GAMBIT-light:
-   ```.f90
-     subroutine init_user_loglike(fcn_name, rf) bind(c)
-       type(c_funptr), intent(in), value :: rf
-       type(c_ptr), intent(in), value:: fcn_name
-       procedure(gambit_light_register_fcn), pointer :: frf
-       
-       call c_f_procpointer(rf, frf)
-       call frf(fcn_name, c_funloc(user_loglike))
-     end subroutine init_user_loglike
+3. Now build a shared library from your Fortran code (and the included `gambit_light_interface_mod.f90`). Example:
    ```
-
-
-4. Now build a shared library from your Fortran code and `gambit_light_interface_mod.f90`. Example:
-   ```
-   gfortran -c gambit_light_interface_mod.f90
    gfortran example.f90 -shared -fPIC -o example.so
    ```
 
 
-5. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:
+4. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:
    ```yaml
    UserLogLikes:
 
      fortran_user_loglike:
        lang: fortran
        user_lib: gambit_light_interface/example_fortran/example.so
-       init_fun: init_user_loglike
+       func_name: user_loglike
        input:
          - param_name_1
          - param_name_2
@@ -92,7 +81,7 @@ _See the example code in `example.f90`._
         - fortran_user_loglike_output_2
    ```
    * Here `fortran_user_loglike` is simply a label you choose for your target function. It will be used in GAMBIT output files, log messages, etc.
-   * The `init_fun` setting must match the name of the initialisation function in your library (here `init_user_loglike`).
+   * The `func_name` setting must match the name of the target function in your library (here `user_loglike`).
    * In the above example, the target function expects two input parameters and computes two output quantities in addition to the return value.
    * The input parameter names (`param_name_1`, etc.) correspond to parameters defined in the GAMBIT configuration file.
    * The output names (`fortran_user_loglike_output_1`, etc.) are the names that will be assigned to the output quantities in the GAMBIT output.

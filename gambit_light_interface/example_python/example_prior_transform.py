@@ -8,6 +8,7 @@ sys.path.append(os.path.join(current_dir, "../lib"))
 import gambit_light_interface as gambit_light
 
 
+# User-side prior transform function, which can be called by GAMBIT-light.
 def user_prior(input_names, input_vals, output):
 
     print("example_prior_transform.py: user_prior: Transforming sample from unit hypercube.")

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "gambit_light_interface.h"
 
-// User-side log-likelihood function.
+
+// User-side log-likelihood function, which can be called by GAMBIT-light.
 double user_loglike(const int n_inputs, const double *input, const int n_outputs, double *output)
 {
 
@@ -24,7 +25,7 @@ double user_loglike(const int n_inputs, const double *input, const int n_outputs
 }
 
 
-// User-side prior transform function.
+// User-side prior transform function, which can be called by GAMBIT-light.
 void user_prior(const int n_inputs, const double *input, double *output)
 {
     printf("example.c: user_prior: Transforming sample from unit hypercube.\n");

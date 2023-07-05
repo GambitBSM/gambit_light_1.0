@@ -7,16 +7,16 @@ module user_mod
 
 contains
   
-  ! User-side log-likelihood function
+  ! User-side log-likelihood function, which can be called by GAMBIT-light.
   real(c_double) function user_loglike(n_inputs, input, n_outputs, output) bind(c)
     integer(c_int), value, intent(in) :: n_inputs, n_outputs
     type(c_ptr), intent(in), value :: input, output
 
-    ! Create pointers to Fortran arrays
+    ! Create pointers to Fortran arrays.
     real(c_double), dimension(:), pointer :: finput
     real(c_double), dimension(:), pointer :: foutput
 
-    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
+    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput).
     call c_f_pointer(input, finput, shape=[n_inputs])
     call c_f_pointer(output, foutput, shape=[n_outputs])
   
@@ -40,17 +40,17 @@ contains
 
 
 
-  ! User-side prior transform function
+  ! User-side prior transform function, which can be called by GAMBIT-light.
   subroutine user_prior(n_inputs, input, output) bind(c)
     integer(c_int), value, intent(in) :: n_inputs
     type(c_ptr), intent(in), value :: input, output
     integer :: i
 
-    ! Create pointers to Fortran arrays
+    ! Create pointers to Fortran arrays.
     real(c_double), dimension(:), pointer :: finput
     real(c_double), dimension(:), pointer :: foutput
 
-    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput)
+    ! Connect the C arrays (input, output) to the Fortran arrays (finput, foutput).
     call c_f_pointer(input, finput, shape=[n_inputs])
     call c_f_pointer(output, foutput, shape=[n_inputs])
   
