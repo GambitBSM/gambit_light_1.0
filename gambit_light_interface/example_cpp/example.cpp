@@ -3,7 +3,7 @@
 #include "gambit_light_interface.h"
 
 
-// User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
+// User-side log-likelihood function.
 double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
 {
 
@@ -20,7 +20,7 @@ double user_loglike(const std::vector<std::string>& input_names, const std::vect
     // gambit_light_invalid_point("This input point is no good.");
 
     // Error handling: Report a string warning using gambit_light_warning.
-    // gambit_light_warning("Some warning.");
+    gambit_light_warning("Some warning.");
 
     // Error handling: Report an error using gambit_light_error.
     // gambit_light_error("Some error.");
@@ -39,8 +39,7 @@ GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 
 
 
-
-// User-side prior transform function, registered in GAMBIT by init_user_prior below.
+// User-side prior transform function.
 void user_prior(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::vector<double>& output)
 {
     std::cout << "example.cpp: user_prior: Transforming sample from unit hypercube." << std::endl;

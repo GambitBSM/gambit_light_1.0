@@ -149,7 +149,6 @@ int gambit_light_register(const char *loglike_name, void *fcn)
     t_loglike_desc desc;
     desc.fcn.typeless_ptr = fcn;
     user_loglikes.insert({loglike_name, desc});
-    std::cout << OUTPUT_PREFIX << "Registering loglike '" << loglike_name << "'." << std::endl;
     return 0;
 }
 
@@ -160,7 +159,6 @@ int gambit_light_register_prior(void *fcn)
 {
     using namespace Gambit::gambit_light_interface;
     user_prior.fcn.typeless_ptr = fcn;
-    std::cout << OUTPUT_PREFIX << "Registering prior transform function." << std::endl;
     return 0;
 }
 
@@ -384,71 +382,116 @@ namespace Gambit
             void *handle = dlopen(path.c_str(), RTLD_LAZY);
             if(!handle)
             {
-                throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load dynamic library: " + std::string(dlerror()));
+                throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load dynamic library '" + path + "': " + std::string(dlerror()));
             }
 
             dlerror();
 
-            std::string symbol_name;
-            if (is_prior)
+            if (lang == "c" || lang == "fortran")
             {
-                symbol_name = "gambit_light_register_prior_" + func_name;
-            }
-            else
-            {
-                symbol_name = "gambit_light_register_loglike_" + func_name;                
-            }
+                std::string symbol_name = func_name;
 
-            char *error;
-            void* vptr = dlsym(handle, symbol_name.c_str());
-            if ((error = dlerror()) != NULL)
-            {
-                throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load function: " + std::string(error));
-            }
-
-            // Are we registering a prior transform or a loglike function?
-            if (is_prior)
-            {
-                t_fcn_prior user_function;
-                *(void**) (&user_function) = vptr;
-
-                // Call registration function.
-                (*user_function)(gambit_light_register_prior);
-
-                // Fill in the rest of the function info in the struct 'user_prior'
-                if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
-                else if (lang == "c")   user_prior.lang = LANG_C;
-                else if (lang == "c++") user_prior.lang = LANG_CPP;
-                user_prior.outputs = outputs;
-            }
-            else
-            {
-                t_fcn_loglike user_function;
-                *(void**) (&user_function) = vptr;
-
-                // Call registration function.
-                (*user_function)(entry_name.c_str(), gambit_light_register);
-
-                // At this point entry_name should be a key in user_loglikes, registered by the user.
-                if(user_loglikes.find(entry_name) != user_loglikes.end())
+                char *error;
+                void* vptr = dlsym(handle, symbol_name.c_str());
+                if ((error = dlerror()) != NULL)
                 {
-
-                    // Add parameter and output information to user loglike description.
-                    t_loglike_desc &desc = user_loglikes[entry_name];
-
-                    if (lang == "fortran")  desc.lang = LANG_FORTRAN;
-                    else if (lang == "c")   desc.lang = LANG_C;
-                    else if (lang == "c++") desc.lang = LANG_CPP;
-
-                    desc.outputs = outputs;
-                } 
-                else 
-                {
-                    throw std::runtime_error(
-                        std::string(OUTPUT_PREFIX) + "The loglike '" + entry_name
-                        + "' listed in the config file is not recognized. "
-                    );
+                    throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load function '" + func_name + "' for entry '" + entry_name + "': " + std::string(error));
                 }
+
+                // Are we registering a prior transform or a loglike function?
+                if (is_prior)
+                {
+                    if (lang == "c")   user_prior.lang = LANG_C;
+                    else if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
+                    user_prior.fcn.typeless_ptr = vptr;
+                    user_prior.outputs = outputs;
+                    std::cout << OUTPUT_PREFIX << "Registering prior transform function '" << func_name << "'." << std::endl;
+                }
+                else
+                {
+                    t_loglike_desc desc;
+                    if (lang == "c")   desc.lang = LANG_C;
+                    else if (lang == "fortran")  desc.lang = LANG_FORTRAN;
+                    desc.fcn.typeless_ptr = vptr;
+                    desc.outputs = outputs;
+                    user_loglikes.insert({entry_name, desc});
+                    std::cout << OUTPUT_PREFIX << "Registering function '" << func_name << "' for the loglike '" << entry_name << "'." << std::endl;
+                }
+            }
+            else if (lang == "c++")
+            {
+                std::string symbol_name;
+                if (is_prior)
+                {
+                    symbol_name = "gambit_light_register_prior_" + func_name;
+                }
+                else
+                {
+                    symbol_name = "gambit_light_register_loglike_" + func_name;                
+                }
+
+                char *error;
+                void* vptr = dlsym(handle, symbol_name.c_str());
+                if ((error = dlerror()) != NULL)
+                {
+                    throw std::runtime_error(std::string(OUTPUT_PREFIX) + "Could not load function '" + func_name + "' for entry '" + entry_name + "': " + std::string(error));
+                }
+
+                // Are we registering a prior transform or a loglike function?
+                if (is_prior)
+                {
+                    t_fcn_prior user_function;
+                    *(void**) (&user_function) = vptr;
+
+                    // Call registration function.
+                    (*user_function)(gambit_light_register_prior);
+
+                    // Fill in the rest of the function info in the struct 'user_prior'
+                    if (lang == "fortran")  user_prior.lang = LANG_FORTRAN;
+                    else if (lang == "c")   user_prior.lang = LANG_C;
+                    else if (lang == "c++") user_prior.lang = LANG_CPP;
+                    user_prior.outputs = outputs;
+
+                    std::cout << OUTPUT_PREFIX << "Registering prior transform function '" << func_name << "'." << std::endl;
+                }
+                else
+                {
+                    t_fcn_loglike user_function;
+                    *(void**) (&user_function) = vptr;
+
+                    // Call registration function.
+                    (*user_function)(entry_name.c_str(), gambit_light_register);
+
+                    std::cout << OUTPUT_PREFIX << "Registering function '" << func_name << "' for the loglike '" << entry_name << "'." << std::endl;
+
+                    // At this point entry_name should be a key in user_loglikes, registered by the user.
+                    if(user_loglikes.find(entry_name) != user_loglikes.end())
+                    {
+
+                        // Add parameter and output information to user loglike description.
+                        t_loglike_desc &desc = user_loglikes[entry_name];
+
+                        if (lang == "fortran")  desc.lang = LANG_FORTRAN;
+                        else if (lang == "c")   desc.lang = LANG_C;
+                        else if (lang == "c++") desc.lang = LANG_CPP;
+
+                        desc.outputs = outputs;
+                    } 
+                    else 
+                    {
+                        throw std::runtime_error(
+                            std::string(OUTPUT_PREFIX) + "The loglike '" + entry_name
+                            + "' listed in the config file is not recognized. "
+                        );
+                    }
+                }
+            }
+            else
+            {
+                throw std::runtime_error(
+                    std::string(OUTPUT_PREFIX) + "'" + lang + "' is not "
+                    + "a supported language for user libraries."
+                );
             }
         }
 
@@ -533,7 +576,7 @@ namespace Gambit
                     user_prior.fcn.python = new pybind11::object(user_module.attr(func_name.c_str()));
                     user_prior.lang = LANG_PYTHON;
                     user_prior.outputs = outputs;
-                    std::cout << OUTPUT_PREFIX << "Registering Python prior transform function '" << user_prior.name << "'." << std::endl;
+                    std::cout << OUTPUT_PREFIX << "Registering prior transform function '" << user_prior.name << "'." << std::endl;
                 }
                 else
                 {
@@ -542,9 +585,8 @@ namespace Gambit
                     desc.fcn.python = new pybind11::object(user_module.attr(func_name.c_str()));
                     desc.lang = LANG_PYTHON;
                     desc.outputs = outputs;
-
                     user_loglikes.insert({entry_name, desc});
-                    std::cout << OUTPUT_PREFIX << "Registering Python loglike '" << entry_name << "'." << std::endl;
+                    std::cout << OUTPUT_PREFIX << "Registering function '" << func_name << "' for the loglike '" << entry_name << "'." << std::endl;
                 }
 
                 // Remove the path to the backend from the Python system path.

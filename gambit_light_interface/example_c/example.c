@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include "gambit_light_interface.h"
 
-
-// User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
+// User-side log-likelihood function.
 double user_loglike(const int n_inputs, const double *input, const int n_outputs, double *output)
 {
 
@@ -12,7 +11,7 @@ double user_loglike(const int n_inputs, const double *input, const int n_outputs
     // gambit_light_invalid_point("This input point is no good.");
 
     // Error handling: Report a warning using gambit_light_warning.
-    // gambit_light_warning("Some warning.");
+    gambit_light_warning("Some warning.");
 
     // Error handling: Report an error using gambit_light_error.
     // gambit_light_error("Some error.");
@@ -24,10 +23,8 @@ double user_loglike(const int n_inputs, const double *input, const int n_outputs
     return input[0] + input[1] + input[2];
 }
 
-GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 
-
-// User-side prior transform function, registered in GAMBIT by init_user_prior below.
+// User-side prior transform function.
 void user_prior(const int n_inputs, const double *input, double *output)
 {
     printf("example.c: user_prior: Transforming sample from unit hypercube.\n");
@@ -38,4 +35,3 @@ void user_prior(const int n_inputs, const double *input, double *output)
     }
 }
 
-GAMBIT_LIGHT_REGISTER_PRIOR(user_prior)

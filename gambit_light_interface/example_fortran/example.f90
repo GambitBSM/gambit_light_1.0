@@ -7,7 +7,7 @@ module user_mod
 
 contains
   
-  ! User-side log-likelihood function, registered in GAMBIT by init_user_loglike below.
+  ! User-side log-likelihood function
   real(c_double) function user_loglike(n_inputs, input, n_outputs, output) bind(c)
     integer(c_int), value, intent(in) :: n_inputs, n_outputs
     type(c_ptr), intent(in), value :: input, output
@@ -26,7 +26,7 @@ contains
     ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
 
     ! Error handling: Report a warning using gambit_light_warning.
-    ! call gambit_light_warning('Some warning.'//c_null_char)
+    call gambit_light_warning('Some warning.'//c_null_char)
     
     ! Error handling: Report an error using gambit_light_error.
     ! call gambit_light_error('Some error.'//c_null_char)
@@ -39,22 +39,8 @@ contains
   end function user_loglike
 
 
-  ! User-side initialisation function, called by GAMBIT.
-  subroutine gambit_light_register_loglike_user_loglike(fcn_name, rf) bind(c)
-    type(c_funptr), intent(in), value :: rf
-    type(c_ptr), intent(in), value:: fcn_name
-    procedure(gambit_light_register_fcn), pointer :: frf
 
-    print *, "example.f90: gambit_light_register_loglike_user_loglike: Registering loglike function."
-
-    ! Convert c function to fortran function, and call it.
-    call c_f_procpointer(rf, frf)
-    call frf(fcn_name, c_funloc(user_loglike))
-  end subroutine gambit_light_register_loglike_user_loglike
-
-
-
-  ! User-side prior transform function, registered in GAMBIT by init_user_prior below.
+  ! User-side prior transform function
   subroutine user_prior(n_inputs, input, output) bind(c)
     integer(c_int), value, intent(in) :: n_inputs
     type(c_ptr), intent(in), value :: input, output
@@ -75,18 +61,5 @@ contains
     end do
     
   end subroutine user_prior
-
-
-  ! User-side initialisation function, called by GAMBIT.
-  subroutine gambit_light_register_prior_user_prior(rf) bind(c)
-    type(c_funptr), intent(in), value :: rf
-    procedure(gambit_light_register_prior_fcn), pointer :: frf
-
-    print *, "example.f90: gambit_light_register_prior_user_prior: Registering prior transform function."
-
-    ! Convert c function to fortran function, and call it.
-    call c_f_procpointer(rf, frf)
-    call frf(c_funloc(user_prior))
-  end subroutine gambit_light_register_prior_user_prior
 
 end module user_mod
