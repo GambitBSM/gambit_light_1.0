@@ -190,7 +190,6 @@ Scanner:
       maxiter: -1                         # Max no. of iterations, a negative value means infinity
       maximise: false                     # Whether to run a maximisation algorithm once the run is finished
       outfile: true                       # Write output files?
-      print_parameters_in_native_output: true  # Add the scanned parameters to the native output?
       seed: -1                            # Seed for random number generator. Negative means seed from system time.
 
     multinest:
