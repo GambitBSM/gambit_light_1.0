@@ -19,6 +19,11 @@
 #          (p.scott@imperial.ac.uk)
 #  \date 2014 Nov, Dec
 #
+#  \author Tomas Gonzalo
+#          (gonzalo@physik.rwth-aachen.de)
+#  \date 2019 Oct
+#  \date 2021 Mar
+#
 #  \author Christopher Chang
 #          (christopher.chang@uqconnect.edu.au)
 #  \date 2021 Feb

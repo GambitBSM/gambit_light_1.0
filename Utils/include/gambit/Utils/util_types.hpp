@@ -33,6 +33,7 @@
 ///          (t.e.gonzalo@fys.uio.no)
 ///  \date 2016 May, Dec
 ///  \date 2018 Oct
+///  \date 2019 Oct
 ///  \date 2020 May
 ///
 /// \author Aaron Vincent
@@ -50,6 +51,7 @@
 #include <cstring>
 #include <complex>
 #include <set>
+#include <memory>
 
 #include "gambit/Utils/standalone_error_handlers.hpp"
 #include "gambit/Utils/variadic_functions.hpp"
@@ -99,6 +101,10 @@ namespace Gambit
   typedef std::set<std::string> set_str;
   /// Shorthand for a set of strings
   typedef std::vector<std::pair<std::string,std::string> > vec_pair_str_str;
+
+  // Shorthand for vector of shared pointers
+  template <typename T>
+  using vector_shared_ptr = std::vector<std::shared_ptr<T>>;
 
   /// Shorthand for a pointer to a void function with no arguments
   typedef void (*fptr_void)();

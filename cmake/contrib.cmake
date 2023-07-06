@@ -20,7 +20,11 @@
 #
 # \author Tomas Gonzalo
 #         (tomas.gonzalo@monash.edu)
-# \dae 2019 June
+# \dae 2019 June, Oct
+#
+# \author Tomasz Procter
+#         (t.procter.1@research.gla.ac.uk)
+# \date June 2021
 #
 #  \author Anders Kvellestad
 #          (anders.kvellestad@fys.uio.no)
