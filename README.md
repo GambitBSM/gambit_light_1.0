@@ -1,7 +1,7 @@
 GAMBIT-light
 ============
 
-GAMBIT-light is a powerful yet easy-to-use tool for computationally difficult statistical fits and global optimisation tasks, with user-supplied target/likelihood functions connected as Python, C, C++ or Fortran libraries. 
+GAMBIT-light is a powerful yet easy-to-use tool for computationally difficult statistical fits and optimisation tasks. The user can provide their target/likelihood function as a Python, C, C++ or Fortran library.
 
 Some features of GAMBIT-light:
 
@@ -12,7 +12,7 @@ Some features of GAMBIT-light:
   - Safe shutdown and resuming of aborted runs
   - Run configuration via a simple YAML file
 
-GAMBIT-light is a spin-off project from GAMBIT (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool designed for performing large-scale statistical fits of new models in particle physics and astrophysics.
+GAMBIT-light is a spin-off project from GAMBIT (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool for large-scale statistical fits in particle physics and astrophysics.
 
 
 Citation(s)
@@ -108,7 +108,7 @@ For step-by-step instructions on how to connect your own Python/C/C++/Fortran co
 Running GAMBIT-light
 --
 
-A GAMBIT-light run is configured with a single YAML file. An commented example is provided in `yaml_files/gambit_light_example.yaml`. To run GAMBIT with this example configuration do
+A GAMBIT-light run is configured with a single YAML file. A fully commented example is provided in `yaml_files/gambit_light_example.yaml`. You can run GAMBIT-light with this example configuration by doing
 
 ```
   ./gambit -f yaml_files/gambit_light_example.yaml
@@ -119,7 +119,7 @@ To see a full list of command-line options, do
   ./gambit --help
 ```
 
-When using an MPI-parallelised scanner, start GAMBIT with `mpiexec` or `mpirun`, e.g.
+When using an MPI-parallelised scanner, start GAMBIT-light with `mpiexec` or `mpirun`, e.g.
 
 ```
   mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
