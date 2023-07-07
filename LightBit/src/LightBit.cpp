@@ -23,7 +23,7 @@ namespace Gambit
   namespace gambit_light_interface
   {
     // Functions from the gambit_light_interface library
-    extern double run_user_loglike(const std::string&, const std::vector<std::string>&, const std::vector<double>&, map_str_dbl&, vec_str&);
+    extern double run_user_loglike(const std::string&, const std::vector<std::string>&, const std::vector<double>&, std::map<std::string,double>&, std::vector<std::string>&);
     extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
     extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
   }
@@ -403,13 +403,13 @@ namespace Gambit
     // This function will run the gambit_light_interface library 
     // and collect all the results from all the connected user libraries
     // in one map<string,double>.
-    void output(map_str_dbl& result)
+    void output(std::map<std::string,double>& result)
     {
       using namespace Pipes::output;
 
       double total_loglike = 0.0;
 
-      const map_str_dbl& input = *Dep::input;
+      const std::map<std::string,double>& input = *Dep::input;
 
       // _Anders: TODO: Make input specific to each loglike function
       std::vector<std::string> input_names;
@@ -425,7 +425,7 @@ namespace Gambit
       {
 
         double loglike = 0.0;
-        map_str_dbl output;
+        std::map<std::string,double> output;
         std::vector<std::string> warnings;
 
         // Call run_user_loglike from the interface library. 

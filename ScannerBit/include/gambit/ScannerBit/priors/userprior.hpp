@@ -30,7 +30,7 @@ namespace Gambit
   namespace gambit_light_interface
   {
     // Functions from the gambit_light_interface library
-    extern void run_user_prior(const std::vector<std::string>&, const std::vector<double>&, std::vector<double>&, vec_str&);
+    extern void run_user_prior(const std::vector<std::string>&, const std::vector<double>&, std::vector<double>&, std::vector<std::string>&);
     extern void init_user_lib_C_CXX_Fortran(const std::string&, const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
     extern void init_user_lib_Python(const std::string&, const std::string&, const std::string&, const std::vector<std::string>&);
   }
