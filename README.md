@@ -70,12 +70,12 @@ Note that cmake might fail to find some dependencies on some systems without gui
 Here is a basic example of how to build GAMBIT-light and full collection of "scanners" (sampling/optimisation libraries):
 
 ```
-  mkdir build
-  cd build
-  cmake -DCMAKE_BUILD_TYPE=Release -DWITH_MPI=On -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_Fortran_COMPILER=gfortran-11 ..
-  make -jN scanners   # where N is the number of cores to use for the build, e.g. 4
-  cmake ..            # this step is needed for GAMBIT to detect the built scanners
-  make -jN gambit
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DWITH_MPI=On -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_Fortran_COMPILER=gfortran-11 ..
+make -jN scanners   # where N is the number of cores to use for the build, e.g. 4
+cmake ..            # this step is needed for GAMBIT to detect the built scanners
+make -jN gambit
 ```
 
 (If you prefer to turn off compiler optimisations, use `-DCMAKE_BUILD_TYPE=None` instead of `-DCMAKE_BUILD_TYPE=Release`.)
@@ -83,18 +83,18 @@ Here is a basic example of how to build GAMBIT-light and full collection of "sca
 Instead of building all the scanners (`make -jN scanners`) you can build each scanner you need individually, e.g.
 
 ```
-  make -jN diver
-  make -jN multinest
-  make -jN polychord
+make -jN diver
+make -jN multinest
+make -jN polychord
 ```
 
 If for some reason you need to restart the build process, you can clean out the previous build as follows:
 
 ```
-  cd build
-  make nuke-all
-  cd ..
-  rm -r build
+cd build
+make nuke-all
+cd ..
+rm -r build
 ```
 
 
@@ -111,19 +111,21 @@ Running GAMBIT-light
 A GAMBIT-light run is configured with a single YAML file. A fully commented example is provided in `yaml_files/gambit_light_example.yaml`. You can run GAMBIT-light with this example configuration by doing
 
 ```
-  ./gambit -f yaml_files/gambit_light_example.yaml
+./gambit -f yaml_files/gambit_light_example.yaml
 ```
 
 To see a full list of command-line options, do 
 ```
-  ./gambit --help
+./gambit --help
 ```
 
 When using an MPI-parallelised scanner, start GAMBIT-light with `mpiexec` or `mpirun`, e.g.
 
 ```
-  mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
+mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
 ```
+
+for a run with 4 MPI processes.
 
 
 
