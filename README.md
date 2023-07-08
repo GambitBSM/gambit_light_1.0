@@ -52,9 +52,8 @@ OPTIONAL:
 
  - HDF5 (for use of the hdf5 printer)
  - MPI (required for parallel sampling)
- - axel (speeds up downloads of backends and scanners)
+ - axel (speeds up downloads of scanners)
  - Python modules:
-    - numpy 1.12 or greater (required for using any python backend)
     - h5py (required to use hdf5 utilities located in gambit/Printers/scripts)
 
 
