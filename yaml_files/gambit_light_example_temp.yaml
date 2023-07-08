@@ -1,32 +1,23 @@
-#####################################
-## GAMBIT_light configuration example
-#####################################
-
 UserModel:
 
   p1:
     name: param_name_1
     prior_type: flat
     range: [0.0, 5.0]
-
   p2:
     name: param_name_2
     prior_type: flat
     range: [0.0, 5.0]
-
   p3: 
     name: param_name_3
     fixed_value: 3.0
-
   p4:
     name: param_name_4
     same_as: UserModel::p1
-
   p5-p7: 
     name: param_name_ 
     prior_type: flat
     range: [-1.0, 1.0]
-
 
 UserLogLikes:
 
