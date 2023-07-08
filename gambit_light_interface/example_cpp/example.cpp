@@ -1,13 +1,8 @@
-#include <stdexcept>
-#include <iostream>
 #include "gambit_light_interface.h"
-
 
 // User-side log-likelihood function, which can be called by GAMBIT-light.
 double user_loglike(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::map<std::string,double>& output)
 {
-
-    std::cout << "example.cpp: user_loglike: Computing loglike." << std::endl;
 
     // Make a map of the inputs?
     std::map<std::string,double> input;
@@ -28,11 +23,15 @@ double user_loglike(const std::vector<std::string>& input_names, const std::vect
     // Error handling, alternative to using gambit_light_error: Throw a runtime_error.
     // throw std::runtime_error("Some runtime_error.");
 
+    // Compute loglike
+    double loglike = input.at("param_name_2") + input.at("param_name_3");
+
+    // Save some extra outputs
     output["cpp_user_loglike_output_1"] = 1;
     output["cpp_user_loglike_output_2"] = 2;
     output["cpp_user_loglike_output_3"] = 3;
 
-    return input.at("param_name_2") + input.at("param_name_3");
+    return loglike;
 }
 
 GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
@@ -42,13 +41,10 @@ GAMBIT_LIGHT_REGISTER_LOGLIKE(user_loglike)
 // User-side prior transform function, which can be called by GAMBIT-light.
 void user_prior(const std::vector<std::string>& input_names, const std::vector<double>& input_vals, std::vector<double>& output)
 {
-    std::cout << "example.cpp: user_prior: Transforming sample from unit hypercube." << std::endl;
-
     for (size_t i = 0; i < input_vals.size(); i++)
     {
         output[i] = input_vals[i] * 10.;
     }
-
 }
 
 GAMBIT_LIGHT_REGISTER_PRIOR(user_prior)

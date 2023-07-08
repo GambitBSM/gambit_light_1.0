@@ -20,8 +20,6 @@ contains
     call c_f_pointer(input, finput, shape=[n_inputs])
     call c_f_pointer(output, foutput, shape=[n_outputs])
   
-    print *, "example.f90: user_loglike: Computing loglike."
-
     ! Error handling: Report an invalid point usiong gambit_light_invalid_point.
     ! call gambit_light_invalid_point('This input point is no good.'//c_null_char)
 
@@ -31,10 +29,12 @@ contains
     ! Error handling: Report an error using gambit_light_error.
     ! call gambit_light_error('Some error.'//c_null_char)
 
+    ! Compute loglike
+    user_loglike = finput(1) * finput(1) + finput(2) * finput(2)
+
+    ! Save some extra outputs
     foutput(1) = 10 * finput(1)
     foutput(2) = 10 * finput(2)
-    
-    user_loglike = finput(1) * finput(1) + finput(2) * finput(2)
 
   end function user_loglike
 
@@ -54,8 +54,7 @@ contains
     call c_f_pointer(input, finput, shape=[n_inputs])
     call c_f_pointer(output, foutput, shape=[n_inputs])
   
-    print *, "example.f90: user_prior: Transforming sample from unit hypercube."
-
+    ! Perform prior transformation
     do i = 1, n_inputs
       foutput(i) = finput(i) * 10
     end do

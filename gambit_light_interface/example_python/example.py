@@ -11,10 +11,6 @@ import gambit_light_interface as gambit_light
 # User-side log-likelihood function, which can be called by GAMBIT-light
 def user_loglike(input_names, input_vals, output):
 
-    print("example.py: user_loglike: Computing loglike.")
-
-    print(f"example.py: DEBUG:  input_names: {input_names},  input_vals: {input_vals}")
-    
     # Make a dictionary of the inputs?
     input = {input_names[i]: input_vals[i] for i in range(len(input_names))}
 
@@ -30,9 +26,20 @@ def user_loglike(input_names, input_vals, output):
     # Error handling: Error handling, alternative to using gambit_light.error: Throw an exception.
     # raise Exception("Some exception.")
 
+    # Compute loglike
+    loglike = input["param_name_1"] + input["param_name_2"] + input["param_name_4"]
+
+    # Save some extra outputs
     output["py_user_loglike_output_1"] = 1
     output["py_user_loglike_output_2"] = 2
     output["py_user_loglike_output_3"] = 3
 
-    return input["param_name_1"] + input["param_name_2"] + input["param_name_4"]
+    return loglike
+
+
+# User-side prior transform function, which can be called by GAMBIT-light.
+def user_prior(input_names, input_vals, output):
+
+    for i,v in enumerate(input_vals):
+        output[i] = v * 10.
 
