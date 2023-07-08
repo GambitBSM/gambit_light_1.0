@@ -1,7 +1,7 @@
 GAMBIT-light
 ============
 
-GAMBIT-light is a powerful yet easy-to-use tool for computationally difficult statistical fits and optimisation tasks. The user can provide their target/likelihood function as a Python, C, C++ or Fortran library.
+**GAMBIT-light** is a powerful yet easy-to-use tool for computationally difficult statistical fits and optimisation tasks. The user can provide their target/likelihood function as a Python, C, C++ or Fortran library.
 
 Some features of GAMBIT-light:
 
@@ -12,7 +12,7 @@ Some features of GAMBIT-light:
   - Safe shutdown and resuming of aborted runs
   - Run configuration via a simple YAML file
 
-GAMBIT-light is a spin-off project from GAMBIT (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool for large-scale statistical fits in particle physics and astrophysics.
+GAMBIT-light is a spin-off project from **GAMBIT** (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool for large-scale statistical fits in particle physics and astrophysics.
 
 
 Citation(s)
@@ -61,11 +61,11 @@ OPTIONAL:
 Building GAMBIT-light
 --
 
-GAMBIT-light itself is a C++ code that you only have to build once. Afterwards you connect your own target/likelihood function code to GAMBIT-light as a runtime plugin, in the form of a Python code or a C/C++/Fortran shared library. 
+GAMBIT-light itself is a C++ code. You build it once, and afterwards you connect your own target/likelihood function code to GAMBIT-light as a runtime plugin, in the form of a Python code or a C/C++/Fortran shared library. 
 
-GAMBIT-light supports Linux and Mac OSX. (On Windows, you can run it through WSL or Cygwin.) A full walkthrough of how to install all dependencies and build GAMBIT-light with AppleClang on OSX can be found in the file README_OSX.md.
+GAMBIT-light supports Linux and Mac OSX. (On Windows you can run it through WSL or Cygwin.) A full walkthrough of how to install all dependencies and build GAMBIT-light with AppleClang on OSX can be found in the file `README_OSX.md`.
 
-Note that cmake might fail to find some dependencies on some systems without guidance. If you encounter problems configuring or building GAMBIT-light, have a look in BUILD_OPTIONS.md for a list of commonly used build options.
+Note that CMake might fail to find some dependencies on some systems without guidance. If you encounter problems configuring or building GAMBIT-light, have a look in `BUILD_OPTIONS.md` for a list of commonly used build options.
 
 Here is a basic example of how to build GAMBIT-light and full collection of "scanners" (sampling/optimisation libraries):
 
