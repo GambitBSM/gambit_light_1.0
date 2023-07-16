@@ -97,13 +97,6 @@ rm -r build
 ```
 
 
-Connecting your own target/likelihood function
---
-
-For step-by-step instructions on how to connect your own Python/C/C++/Fortran code to GAMBIT-light, see the README files and example codes in the 
-`gambit_light_interface/example_*` directories.
-
-
 Running GAMBIT-light
 --
 
@@ -125,6 +118,14 @@ mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
 ```
 
 for a run with 4 MPI processes.
+
+
+
+Connecting your own target/likelihood function
+--
+
+For step-by-step instructions on how to connect your own Python/C/C++/Fortran code to GAMBIT-light, see the README files and example codes in the 
+`gambit_light_interface/example_*` directories.
 
 
 
