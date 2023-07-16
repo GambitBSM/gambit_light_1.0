@@ -14,7 +14,7 @@ UserModel:
 UserPrior:
 
   lang: python
-  user_lib: gambit_light_interface/example_python/example_prior_transform.py
+  user_lib: gambit_light_interface/example_python/example.py
   func_name: user_prior
 
 UserLogLikes:
