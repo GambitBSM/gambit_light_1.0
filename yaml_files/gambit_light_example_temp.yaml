@@ -28,17 +28,17 @@ UserLogLikes:
       - py_user_loglike_output_2
       - py_user_loglike_output_3
 
-  cpp_user_loglike:
-    lang: c++
-    user_lib: gambit_light_interface/example_cpp/example.so
-    func_name: user_loglike
-    input:
-      - param_name_2
-      - param_name_3
-    output:
-      - cpp_user_loglike_output_1
-      - cpp_user_loglike_output_2
-      - cpp_user_loglike_output_3
+  # cpp_user_loglike:
+  #   lang: c++
+  #   user_lib: gambit_light_interface/example_cpp/example.so
+  #   func_name: user_loglike
+  #   input:
+  #     - param_name_2
+  #     - param_name_3
+  #   output:
+  #     - cpp_user_loglike_output_1
+  #     - cpp_user_loglike_output_2
+  #     - cpp_user_loglike_output_3
 
 
 Printer:
