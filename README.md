@@ -66,7 +66,7 @@ GAMBIT-light supports Linux and Mac OSX. (On Windows you can run it through WSL 
 
 Note that CMake might fail to find some dependencies on some systems without guidance. If you encounter problems configuring or building GAMBIT-light, have a look in `BUILD_OPTIONS.md` for a list of commonly used build options.
 
-Here is a basic example of how to build GAMBIT-light and full collection of "scanners" (sampling/optimisation libraries):
+Here is a basic example of how to build GAMBIT-light and the full collection of "scanners" (sampling/optimisation libraries):
 
 ```
 mkdir build
@@ -106,7 +106,7 @@ A GAMBIT-light run is configured with a single YAML file. A fully commented exam
 ./gambit -f yaml_files/gambit_light_example.yaml
 ```
 
-To see a full list of command-line options, do 
+To see a complete list of command-line options, do 
 ```
 ./gambit --help
 ```
