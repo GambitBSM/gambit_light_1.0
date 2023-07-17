@@ -469,8 +469,8 @@ endif()
 # Add doxygen build as an external project
 add_custom_target(docs WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND doxygen doc/doxygen.conf)
 
-# Work out which modules to include in the compile
-retrieve_bits(GAMBIT_BITS ${PROJECT_SOURCE_DIR} "${itch}" "Loud")
+# Set the modules to include in the compile
+set(GAMBIT_BITS "SpecBit;LightBit")
 
 # Include contributed packages
 include(cmake/contrib.cmake)
@@ -579,6 +579,7 @@ set(GAMBIT_ALL_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECTS:
 
 # Set compilation targets for GAMBIT modules
 foreach(bit ${GAMBIT_BITS})
+  message("DEBUG: bit = ${bit}")
   add_subdirectory(${bit})
   set(GAMBIT_BIT_OBJECTS ${GAMBIT_BIT_OBJECTS} "$<TARGET_OBJECTS:${bit}>")
   # Add dependencies that need to be built before any bit
