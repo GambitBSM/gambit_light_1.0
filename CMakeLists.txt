@@ -578,7 +578,7 @@ set(GAMBIT_BASIC_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECT
 set(GAMBIT_ALL_COMMON_OBJECTS "${GAMBIT_BASIC_COMMON_OBJECTS}" $<TARGET_OBJECTS:Models> $<TARGET_OBJECTS:Backends> $<TARGET_OBJECTS:Elements>)
 
 # Set the modules to include in the compile
-set(GAMBIT_BITS "SpecBit;LightBit")
+set(GAMBIT_BITS "ScannerBit;LightBit")
 
 # Set compilation targets for GAMBIT modules
 foreach(bit ${GAMBIT_BITS})
