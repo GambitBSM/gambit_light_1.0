@@ -582,7 +582,6 @@ set(GAMBIT_BITS "ScannerBit;LightBit")
 
 # Set compilation targets for GAMBIT modules
 foreach(bit ${GAMBIT_BITS})
-  message("DEBUG: bit = ${bit}")
   add_subdirectory(${bit})
   set(GAMBIT_BIT_OBJECTS ${GAMBIT_BIT_OBJECTS} "$<TARGET_OBJECTS:${bit}>")
   # Add dependencies that need to be built before any bit
