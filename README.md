@@ -37,8 +37,8 @@ GAMBIT-light is built using the CMake system. The following libraries and packag
 
 COMPULSORY:
 
- - gcc >= 5.1 / llvm clang >= 10 / AppleClang >= 13 / icc >= 15.0.2
- - gfortran >= 5.1 / ifort >=15.0.2
+ - gcc >= 9 / llvm clang >= 10 / AppleClang >= 13 / icc >= 15.0.2
+ - gfortran >= 9 / ifort >=15.0.2
  - Cmake 2.8.12 or greater
  - Python 3
  - Python modules: yaml, future, os, re, datetime, sys, getopt, shutil and itertools.
