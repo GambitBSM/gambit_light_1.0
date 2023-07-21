@@ -12,18 +12,20 @@
 #include <string.h>
 #include <dlfcn.h>
 
+#ifdef HAVE_PYBIND11
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+PYBIND11_MAKE_OPAQUE(std::vector<std::string>);
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
+PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
+#endif
+
 #include "gambit_light_interface.h"
 
 #define OUTPUT_PREFIX "gambit_light_interface: "
 
 #ifdef HAVE_PYBIND11
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
-
-PYBIND11_MAKE_OPAQUE(std::vector<std::string>);
-PYBIND11_MAKE_OPAQUE(std::vector<double>);
-PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light_interface, m)
 {
     m.def("invalid_point", &gambit_light_invalid_point, "report an invalid input point");
