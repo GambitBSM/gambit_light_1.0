@@ -18,8 +18,11 @@
 
 #ifdef HAVE_PYBIND11
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
+PYBIND11_MAKE_OPAQUE(std::vector<std::string>);
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
 PYBIND11_MAKE_OPAQUE(std::map<std::string, double>);
 PYBIND11_MODULE(gambit_light_interface, m)
 {
@@ -336,11 +339,32 @@ namespace Gambit
                     // TODO: This is silly. Find a better solution.
                     try
                     {
+
+                        std::cerr << "DEBUG: Will now call a Python prior transform function with the following arguments:" << std::endl;
+                        std::cerr << "DEBUG: input_names:" << std::endl;
+                        for (const std::string& s : input_names)
+                        {
+                            std::cerr << "DEBUG:   - " << s << std::endl;
+                        }
+                        std::cerr << "DEBUG: input_vals:" << std::endl;
+                        for (const double& d : input_vals)
+                        {
+                            std::cerr << "DEBUG:   - " << d << std::endl;
+                        }
+                        std::cerr << "DEBUG: output:" << std::endl;
+                        for (const double& d : output)
+                        {
+                            std::cerr << "DEBUG:   - " << d << std::endl;
+                        }
+
                         (*user_prior.fcn.python)(input_names, input_vals, &output);
                     }
                     catch (const pybind11::error_already_set& e)
                     {
                         std::string errmsg(e.what());
+
+                        std::cerr << "DEBUG: " << errmsg << std::endl;
+
                         if (errmsg.substr(0,11) == "Exception: ")
                         {
                             errmsg.erase(0,11);
