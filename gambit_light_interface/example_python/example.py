@@ -40,6 +40,10 @@ def user_loglike(input_names, input_vals, output):
 # User-side prior transform function, which can be called by GAMBIT-light.
 def user_prior(input_names, input_vals, output):
 
+    print("DEBUG: type(input_names): ", type(input_names))
+    print("DEBUG: input_names: ", input_names)
+
     for i,v in enumerate(input_vals):
         output[i] = v * 10.
 
+    return 1
