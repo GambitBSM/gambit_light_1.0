@@ -357,8 +357,10 @@ namespace Gambit
                             std::cerr << "DEBUG:   - " << d << std::endl;
                         }
 
+                        std::vector<std::string> input_names_copy = input_names;
                         // (*user_prior.fcn.python)(input_names, input_vals, &output);
-                        int status = pybind11::cast<int>((*user_prior.fcn.python)(input_names, input_vals, &output));
+                        // int status = pybind11::cast<int>((*user_prior.fcn.python)(input_names, input_vals, &output));
+                        int status = pybind11::cast<int>((*user_prior.fcn.python)(input_names_copy, input_vals, &output));
                     }
                     catch (const pybind11::error_already_set& e)
                     {
