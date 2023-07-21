@@ -173,8 +173,8 @@ else()  # pybind is not ditched
     set(itch "${itch};pybind11")
     set(DITCH_PYBIND 1)
   else() # pybind is not ditched and the PythonLibs were found. Can now actually look for pybind.
-    set(MIN_pybind11_VERSION "2.10.1")
-    set(PREFERRED_pybind11_VERSION "2.10.1")
+    set(MIN_pybind11_VERSION "2.11.1")
+    set(PREFERRED_pybind11_VERSION "2.11.1")
     set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
     include_directories("${PYTHON_INCLUDE_DIRS}")
     find_package(pybind11 QUIET)
