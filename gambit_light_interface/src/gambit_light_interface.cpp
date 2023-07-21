@@ -33,7 +33,7 @@ PYBIND11_MODULE(gambit_light_interface, m)
     m.def("error", &gambit_light_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
     pybind11::bind_vector<std::vector<std::string>>(m, "str_vec", pybind11::module_local(false));
-    pybind11::bind_vector<std::vector<double>>(m, "dbl_vec", pybind11::module_local(false));
+    pybind11::bind_vector<std::vector<double>>(m, "dbl_vec", pybind11::module_local(true));
 }
 #endif
 
