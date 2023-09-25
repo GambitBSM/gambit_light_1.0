@@ -33,7 +33,7 @@ PYBIND11_MODULE(gambit_light_interface, m)
     m.def("error", &gambit_light_error, "report user error");
     pybind11::bind_map<std::map<std::string, double>>(m, "str_dbl_map", pybind11::module_local(false));
     pybind11::bind_vector<std::vector<std::string>>(m, "str_vec", pybind11::module_local(false));
-    pybind11::bind_vector<std::vector<double>>(m, "dbl_vec", pybind11::module_local(false), pybind11::buffer_protocol());
+    pybind11::bind_vector<std::vector<double>>(m, "dbl_vec", pybind11::module_local(false));
 }
 #endif
 
@@ -353,23 +353,29 @@ namespace Gambit
                         {
                             std::cerr << "DEBUG:   - " << d << std::endl;
                         }
-                        std::cerr << "DEBUG: output:" << std::endl;
+                        std::cerr << "DEBUG: output (before):" << std::endl;
                         for (const double& d : output)
                         {
                             std::cerr << "DEBUG:   - " << d << std::endl;
                         }
 
-                        // DEBUG
-                        pybind11::list input_names_list;
-                        for (const std::string& s : input_names)
-                        {
-                            input_names_list.append(std::string(s));
-                        }
+                        // // DEBUG
+                        // pybind11::list input_names_list;
+                        // for (const std::string& s : input_names)
+                        // {
+                        //     input_names_list.append(std::string(s));
+                        // }
 
-                        // (*user_prior.fcn.python)(input_names, input_vals, &output);
+                        (*user_prior.fcn.python)(input_names, input_vals, &output);
                         // int status = pybind11::cast<int>((*user_prior.fcn.python)(input_names, input_vals, &output));
                         // int status = pybind11::cast<int>((*user_prior.fcn.python)(input_names_copy, input_vals, &output));
-                        (*user_prior.fcn.python)(input_names_list, input_vals, &output);
+                        // (*user_prior.fcn.python)(input_names_list, input_vals, &output);
+
+                        std::cerr << "DEBUG: output (after):" << std::endl;
+                        for (const double& d : output)
+                        {
+                            std::cerr << "DEBUG:   - " << d << std::endl;
+                        }
                     }
                     catch (const pybind11::error_already_set& e)
                     {

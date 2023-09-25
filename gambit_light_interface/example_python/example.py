@@ -46,4 +46,3 @@ def user_prior(input_names, input_vals, output):
     for i,v in enumerate(input_vals):
         output[i] = v * 10.
 
-    return 1
