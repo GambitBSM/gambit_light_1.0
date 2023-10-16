@@ -129,6 +129,26 @@ For step-by-step instructions on how to connect your own Python/C/C++/Fortran co
 
 
 
+Common issues
+--
+
+- If you have multiple versions of Python installed on your system, or you are working with a Python virtual environment, it is recommended to manually set the paths to the specific Python library and header files that GAMBIT-light should use. This can be done via the flags `PYTHON_INCLUDE_DIR` and `PYTHON_LIBRARIES` in the cmake command. Example:
+  ```
+  cmake -DPYTHON_INCLUDE_DIR=/usr/include/python3.10 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.10.so  (the rest of the cmake command)
+  ```
+
+- GAMBIT-light can fail to build or run properly if the build system finds multiple versions of the HDF5 library. The most common source of this problem is that the Python package `h5py` have been built against a HDF5 version that is different from the version already installed on the system. One solution can then be to reinstall `h5py` as follows:
+  ```
+  pip3 uninstall h5py
+  pip3 install --no-binary=h5py h5py
+  ```
+  Or, to specify the specific version of HDF5 that h5py should be built against:
+  ```
+  pip3 uninstall h5py
+  HDF5_VERSION=1.10.7 pip3 install --no-binary=h5py h5py  
+  ```
+
+
 Licensing
 --
 
