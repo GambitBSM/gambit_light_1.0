@@ -606,6 +606,7 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts
 add_library(${light_interface_name} SHARED "${light_interface_dir}/src/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
+  SUFFIX ".so"  # This library will be loaded as a Python module, so it must be .so also on MacOS
   LIBRARY_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
   ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
 )
