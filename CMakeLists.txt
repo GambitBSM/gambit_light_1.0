@@ -173,8 +173,8 @@ else()  # pybind is not ditched
     set(itch "${itch};pybind11")
     set(DITCH_PYBIND 1)
   else() # pybind is not ditched and the PythonLibs were found. Can now actually look for pybind.
-    set(MIN_pybind11_VERSION "2.10.1")
-    set(PREFERRED_pybind11_VERSION "2.10.1")
+    set(MIN_pybind11_VERSION "2.11.1")
+    set(PREFERRED_pybind11_VERSION "2.11.1")
     set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
     include_directories("${PYTHON_INCLUDE_DIRS}")
     find_package(pybind11 QUIET)
@@ -616,6 +616,7 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utils/scripts
 add_library(${light_interface_name} SHARED "${light_interface_dir}/src/gambit_light_interface.cpp")
 set_target_properties(${light_interface_name} PROPERTIES
   PREFIX ""
+  SUFFIX ".so"  # This library will be loaded as a Python module, so it must be .so also on MacOS
   LIBRARY_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
   ARCHIVE_OUTPUT_DIRECTORY "${light_interface_dir}/lib"
 )
