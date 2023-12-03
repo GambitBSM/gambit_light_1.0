@@ -346,6 +346,16 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STR
   endif()
 endif()
 
+# Check for Eigen
+find_package(Eigen3 3.1.0)
+if(EIGEN3_FOUND)
+  include_directories("${EIGEN3_INCLUDE_DIR}")
+  message("-- Eigen version: ${EIGEN3_VERSION}")
+else()
+  message("${BoldRed}   Eigen v3.1.0 or greater not found.${ColourReset}")
+  message(FATAL_ERROR "\nGAMBIT requires Eigen v3.1.0 or greater. You can specify the path to Eigen3 using the cmake flag -D EIGEN3_INCLUDE_DIR=/path/to/eigen.")
+endif()
+
 # Check for OpenMP
 find_package(OpenMP QUIET)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")

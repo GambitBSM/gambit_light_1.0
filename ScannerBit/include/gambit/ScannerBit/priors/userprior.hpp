@@ -12,7 +12,7 @@
 //
 ///  \author Anders Kvellestad
 ///          (anders.kvellestad@fys.uio.no)
-///  \date Jun 2023
+///  \date Jun, Dec 2023
 ///
 ///  *********************************************
 
@@ -91,13 +91,34 @@ namespace Gambit
                 #endif
             }
 
-            void transform(const std::vector<double>& unitpars, std::unordered_map<std::string,double>& outputMap) const override
+            double log_prior_density(const std::unordered_map<std::string, double> &) const override 
+            { 
+                Scanner::scan_error().raise(LOCAL_INFO, 
+                    "The 'log_prior_density' functionality for user-supplied priors "
+                    "is not yet implemented in GAMBIT-light. Please use a scanner "
+                    "that does not rely on this functionality."
+                );
+
+                // TODO: Allow user to register a function for the log prior density
+                //       and call that function here.
+
+                // Placeholder return statement
+                return 1.; 
+            }
+
+            void transform(hyper_cube_ref<double> unitpars, std::unordered_map<std::string,double>& outputMap) const override
             {
                 std::vector<std::string> warnings;
 
-                // Just some renaming for consistency with other parts of GAMBIT light
+                // Use names consistent with other parts of GAMBIT light
                 const std::vector<std::string>& input_names = param_names;
-                const std::vector<double>& input_vals = unitpars;
+                std::vector<double> input_vals(unitpars.size());
+
+                // Initialise input_vals
+                for (int i = 0, end = unitpars.size(); i < end; ++i)
+                {
+                    input_vals[i] = unitpars[i];
+                }
 
                 // Initialise output vector to 0.0;
                 std::vector<double> output(input_names.size(), 0.0);
@@ -139,16 +160,10 @@ namespace Gambit
                 {
                   outputMap[input_names[i]] = output[i];
                 }
-
-                // for (const auto& kv : output)
-                // {
-                //     outputMap[kv.first] = kv.second;
-                // }
             }
 
-            std::vector<double> inverse_transform(const std::unordered_map<std::string, double> &physical) const override
+            void inverse_transform(const std::unordered_map<std::string, double> &physical, hyper_cube_ref<double> unit) const override
             {
-
                 Scanner::scan_error().raise(LOCAL_INFO, 
                     "The 'inverse_transform' functionality for user-supplied priors "
                     "is not yet implemented in GAMBIT-light. Please use a scanner "
@@ -158,13 +173,11 @@ namespace Gambit
                 // TODO: Allow user to register an inverse transform function
                 //       and call that here.
 
-                // Dummy code that just returns the point without transforming it
-                std::vector<double> u;
-                for (const auto& n : param_names)
+                // Placeholder code that just sets the hyper_cube_ref equal to the physical parameter point.
+                for (int i = 0, end = this->size(); i < end; ++i)
                 {
-                    u.push_back(physical.at(n));
+                    unit[i] = physical.at(param_names[i]);
                 }
-                return u;
             }
 
         };

@@ -44,6 +44,7 @@ COMPULSORY:
  - Python modules: yaml, future, os, re, datetime, sys, getopt, shutil and itertools.
  - git
  - Boost 1.48 or greater
+ - Eigen 3.1.0 or greater
  - GNU Scientific Library (GSL) 2.1 or greater
  - LAPACK
  - pkg-config
@@ -71,7 +72,7 @@ Here is a basic example of how to build GAMBIT-light and the full collection of 
 ```
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DWITH_MPI=On -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_Fortran_COMPILER=gfortran-11 ..
+cmake -DCMAKE_BUILD_TYPE=Release -DEIGEN3_INCLUDE_DIR=/path/to/eigen -DWITH_MPI=On -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_Fortran_COMPILER=gfortran-11 ..
 make -jN scanners   # where N is the number of cores to use for the build, e.g. 4
 cmake ..            # this step is needed for GAMBIT to detect the built scanners
 make -jN gambit
