@@ -95,8 +95,8 @@ namespace Gambit
             { 
                 Scanner::scan_error().raise(LOCAL_INFO, 
                     "The 'log_prior_density' functionality for user-supplied priors "
-                    "is not yet implemented in GAMBIT-light. Please use a scanner "
-                    "that does not rely on this functionality."
+                    "is not yet implemented in GAMBIT-light. Please use a scanner that"
+                    "does not rely on this functionality or use one of the default priors."
                 );
 
                 // TODO: Allow user to register a function for the log prior density
@@ -166,8 +166,8 @@ namespace Gambit
             {
                 Scanner::scan_error().raise(LOCAL_INFO, 
                     "The 'inverse_transform' functionality for user-supplied priors "
-                    "is not yet implemented in GAMBIT-light. Please use a scanner "
-                    "that does not rely on this functionality."
+                    "is not yet implemented in GAMBIT-light. Please use a scanner that"
+                    "does not rely on this functionality or use one of the default priors."
                 );
 
                 // TODO: Allow user to register an inverse transform function
