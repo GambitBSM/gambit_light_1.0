@@ -26,8 +26,6 @@ def loglike(x):
 # User-side log-likelihood function, which can be called by GAMBIT-light.
 def user_loglike(input_names, input_vals, output):
 
-    print("example_rosenbrock.py: user_loglike: Computing loglike.")
-
     # Make a dictionary of the inputs?
     input = {input_names[i]: input_vals[i] for i in range(len(input_names))}
 
