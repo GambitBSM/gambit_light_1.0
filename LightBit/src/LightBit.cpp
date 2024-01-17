@@ -16,6 +16,7 @@
 
 #include "gambit/Elements/gambit_module_headers.hpp"
 #include "gambit/LightBit/LightBit_rollcall.hpp"
+#include "gambit/LightBit/LightBit_types.hpp"
 #include "gambit_light_interface.h"
 
 namespace Gambit
@@ -94,10 +95,10 @@ namespace Gambit
     {
       using namespace Pipes::initialisation;
 
-      // _Anders: Currently the "inputs" YAML sections are read, but
-      //          this info is not used for anything.
-      //          We need to use it to call each loglike with the correct
-      //          subset of inputs in the "ouput" module function. 
+      // TODO: Currently the "inputs" YAML sections are read, but
+      // this info is not used for anything. We need to use it to 
+      // call each loglike with the correct subset of inputs when 
+      // called from the "ouput" module function.
 
       // Perform the initialisation the first time this function is run.
       static bool initialisation_done = false;
@@ -360,20 +361,22 @@ namespace Gambit
     }
 
 
-    // This function constructs the map of named input parameters that 
-    // the 'output' function below passes on to the gambit_light_interface library.
-    void input(std::map<std::string,double>& result)
+    // This function constructs the parameter_point instance needed by 
+    // the 'output' function which calls the gambit_light_interface library.
+    void input_point(parameter_point& result)
     {
-      using namespace Pipes::input;
+      using namespace Pipes::input_point;
 
       // Only the first time this function is run: 
-      // Construct a map with pointers to the parameter values in Param
-      static std::map<std::string,const double*> param_pointer_map;
+      // Construct static vectors with parameter names and 
+      // pointers to the parameter values in Param.
+      static std::vector<std::string> input_names;
+      static std::vector<const double*> input_val_ptrs;
       static bool first = true;
 
       if (first)
       {
-        // For each parameter, add a pointer in param_pointer_map that points
+        // For each parameter, add a pointer input_val_ptrs
         // to the corresponding parameter value in Param
         for (const std::string& user_par_name: listed_user_pars)
         {
@@ -385,19 +388,29 @@ namespace Gambit
               "Valid parameters are 'p0', 'p1', 'p2', ..."
             );
           }
-          param_pointer_map[user_par_name] = Param[model_par_name].operator->();
+          input_names.push_back(user_par_name);
+          input_val_ptrs.push_back(Param[model_par_name].operator->());
         }
 
         first = false;
       }
 
-      // Every time this function is run: 
-      // Fill the result map using the param_pointer_map
-      for (auto& kv: param_pointer_map) 
+      // Every time this function is run: Fill the result variable (parameter_point instance)
+      result.clear();
+      for (size_t i=0; i < input_names.size(); ++i)
       {
-        result[kv.first] = *kv.second;
+        result.append(input_names[i], *input_val_ptrs[i]);
       }
     }
+
+
+    void input(map_str_dbl& result)
+    {
+      using namespace Pipes::input;
+      const parameter_point& input_pt = *Dep::input_point;
+      result = input_pt.get_map();
+    }
+
 
 
     // This function will run the gambit_light_interface library 
@@ -409,16 +422,12 @@ namespace Gambit
 
       double total_loglike = 0.0;
 
-      const std::map<std::string,double>& input = *Dep::input;
+      // const std::map<std::string,double>& input = *Dep::input;
+      const parameter_point& input_pt = *Dep::input_point;
 
-      // _Anders: TODO: Make input specific to each loglike function
-      std::vector<std::string> input_names;
-      std::vector<double> input_vals;
-      for (const auto& kv : input)
-      {
-          input_names.push_back(kv.first);
-          input_vals.push_back(kv.second);
-      }
+      // TODO: Make input specific to each loglike function
+      std::vector<std::string> input_names = input_pt.get_names();
+      std::vector<double> input_vals = input_pt.get_vals();
 
       // Loop over registered user loglikes
       for (const std::string& loglike_name : user_loglikes)
