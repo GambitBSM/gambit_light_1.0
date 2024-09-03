@@ -75,7 +75,7 @@ namespace Gambit
     void apply_permutation(std::vector<std::string>& vec, const std::vector<int>& indices)
     {
       std::vector<std::string> temp_vec(vec.size());
-      for (size_t i = 0; i < vec.size(); i++) 
+      for (std::size_t i = 0; i < vec.size(); i++) 
       {
         temp_vec[i] = vec[indices[i]];
       }
@@ -113,13 +113,27 @@ namespace Gambit
         YAML::Node userModelNode = runOptions->getNode("UserModel");
         YAML::Node userLogLikesNode = runOptions->getNode("UserLogLikes");
 
+        // Due to the yaml-cpp iterator bug discussed here https://github.com/jbeder/yaml-cpp/issues/833, 
+        // we will need some iterator variables we can "manually" increment while looping over YAML nodes.
+        // (We use this workaround: https://github.com/jbeder/yaml-cpp/issues/833#issuecomment-943794962 )
+        YAML::const_iterator it1;
+        YAML::const_iterator it2;
+        std::size_t size1;
+        std::size_t size2;
+
         // Check for unknown options or typos in the "UserLogLikes" section.
         const static std::vector<std::string> known_userloglike_options = {"lang", "user_lib", "func_name", "input", "output"};
-        for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
+
+        it1 = userLogLikesNode.begin();
+        size1 = userLogLikesNode.size();
+        for (std::size_t i = 0; i < size1; ++i)
         {
-          std::string loglike_name = it->first.as<std::string>();
-          const YAML::Node& userLogLikesEntry = it->second;
-          for(YAML::const_iterator it2 = userLogLikesEntry.begin(); it2 != userLogLikesEntry.end(); ++it2)
+          std::string loglike_name = it1->first.as<std::string>();
+          const YAML::Node& userLogLikesEntry = it1->second;
+
+          it2 = userLogLikesEntry.begin();
+          size2 = userLogLikesEntry.size();
+          for (std::size_t j = 0; j < size2; ++j)
           {
             std::string option_name = it2->first.as<std::string>();
             if (std::find(known_userloglike_options.begin(), known_userloglike_options.end(), option_name) == known_userloglike_options.end())
@@ -130,19 +144,23 @@ namespace Gambit
                 "(Maybe a typo?)"
               );
             }
+            ++it2;
           }
+          ++it1;
         }
 
         // Collect all parameter names listed in the "UserModel" section (and check for duplicates).
-        for(YAML::const_iterator it = userModelNode.begin(); it != userModelNode.end(); ++it)
+        it1 = userModelNode.begin();
+        size1 = userModelNode.size();
+        for (std::size_t i = 0; i < size1; ++i)
         {
           // Get the UserModel parameter name
-          std::string model_par_name = it->first.as<std::string>();
+          std::string model_par_name = it1->first.as<std::string>();
 
           // If there's a "name" entry for this parameter, use it.
           // If not, just use the model_par_name.
           std::string user_par_name = model_par_name;
-          const YAML::Node& par_node = it->second;
+          const YAML::Node& par_node = it1->second;
           if (par_node["name"].IsDefined())
           {
             user_par_name = par_node["name"].as<std::string>();
@@ -171,6 +189,8 @@ namespace Gambit
           listed_user_pars.push_back(user_par_name);
           listed_model_pars.push_back(model_par_name);
           user_to_model_par_names[user_par_name] = model_par_name;
+
+          ++it1;
         }
 
         // Sort listed_model_pars in the order "p0", "p1" , ..., "p99", "p100", ...
@@ -181,10 +201,12 @@ namespace Gambit
 
 
         // Check consistency and collect settings from the "UserLogLikes" section.
-        for(YAML::const_iterator it = userLogLikesNode.begin(); it != userLogLikesNode.end(); ++it)
+        it1 = userLogLikesNode.begin();
+        size1 = userLogLikesNode.size();
+        for (std::size_t i = 0; i < size1; ++i)
         {
-          std::string loglike_name = it->first.as<std::string>();
-          const YAML::Node& userLogLikesEntry = it->second;
+          std::string loglike_name = it1->first.as<std::string>();
+          const YAML::Node& userLogLikesEntry = it1->second;
 
           std::vector<std::string> inputs;
           std::vector<std::string> outputs;
@@ -237,10 +259,11 @@ namespace Gambit
 
           if (userLogLikesEntry["input"].IsDefined())
           {
-            const YAML::Node& inputNode = userLogLikesEntry["input"];
-            for (std::size_t i = 0; i < inputNode.size(); i++)
+            const YAML::Node& input_node = userLogLikesEntry["input"];
+            size2 = input_node.size();
+            for (std::size_t j = 0; j < size2; j++)
             {
-              std::string input_par_name = inputNode[i].as<std::string>();
+              std::string input_par_name = input_node[j].as<std::string>();
 
               // Check for duplicate parameter names in the "input" section.
               bool in_inputs = std::find(inputs.begin(), inputs.end(), input_par_name) != inputs.end();
@@ -295,10 +318,11 @@ namespace Gambit
 
           if (userLogLikesEntry["output"].IsDefined())
           {
-            const YAML::Node& node_output = userLogLikesEntry["output"];
-            for (std::size_t i = 0; i < node_output.size(); i++)
+            const YAML::Node& output_node = userLogLikesEntry["output"];
+            size2 = output_node.size();
+            for (std::size_t j = 0; j < size2; j++)
             {
-              std::string output_name = node_output[i].as<std::string>();
+              std::string output_name = output_node[j].as<std::string>();
               // Throw error if there already exists an output with the same output_name
               if (std::find(all_outputs.begin(), all_outputs.end(), output_name) != all_outputs.end())
               {
@@ -352,6 +376,8 @@ namespace Gambit
 
           // Add loglike_name to list of loglikes
           user_loglikes.push_back(loglike_name);
+
+          ++it1;
         }
 
         initialisation_done = true;
@@ -397,7 +423,7 @@ namespace Gambit
 
       // Every time this function is run: Fill the result variable (parameter_point instance)
       result.clear();
-      for (size_t i=0; i < input_names.size(); ++i)
+      for (std::size_t i=0; i < input_names.size(); ++i)
       {
         result.append(input_names[i], *input_val_ptrs[i]);
       }
