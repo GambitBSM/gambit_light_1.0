@@ -220,6 +220,13 @@ Scanner:
       burn_in: 0                          # Number of burn-in points that are not considered in the convergence.
       # chain_number:                     # The number of MCMC chains. Default is 1 + projection_dimension + number of MPI processes.
 
+    jswarm:
+      plugin: jswarm
+      NP: 400
+      adaptive_phi: true
+      adaptive_omega: true
+      verbosity: 2
+
     minuit2:
       plugin: minuit2
       tolerance: 0.0001                   # Stopping tolerance on parameters
