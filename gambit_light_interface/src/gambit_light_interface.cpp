@@ -529,7 +529,12 @@ namespace Gambit
                     }
                     catch (const std::runtime_error& e)
                     {
-                        std::cout << OUTPUT_PREFIX << "Did not start Python interpreter: " << e.what() << std::endl;
+                        // If the interpreter has already started, we can safely ignore this error message
+                        if (strcmp(e.what(),"The interpreter is already running") != 0)
+                        {
+                          std::cout << OUTPUT_PREFIX << "Did not start Python interpreter: " << e.what() << std::endl;
+                          throw e;
+                        }
                     }
                 }
 
