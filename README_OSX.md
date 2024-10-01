@@ -7,7 +7,7 @@ We assume in this walkthrough that you want to use the AppleClang compiler that 
 
 Install dependencies
 --
-Install clang
+- Install clang
 ```
 Xcode-select --install
 ```
@@ -24,14 +24,14 @@ NB: You must use the system python3 (and pip3 in the steps below)! In case of do
 ```
 instead.
 
-Install homebrew
+- Install homebrew
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-Install dependencies
+- Install dependencies
 ```
 brew install cmake
 brew install gfortran
@@ -45,14 +45,13 @@ brew install hdf5@1.10
 pip3 install numpy
 pip3 install pyyaml
 ```
-Optional:
-- If you want scanners to be parallelised
+- Optional: If you want scanners to be parallelised
 ```
 brew install openmpi
 brew install mpi4py
 ```
 
-Fix paths:
+- Fix paths:
 ```
 echo 'export PATH="/opt/homebrew/opt/hdf5@1.10/bin:$PATH"' >> ~/.zprofile
 . ~/.zprofile
@@ -60,11 +59,9 @@ echo 'export PATH="/opt/homebrew/opt/hdf5@1.10/bin:$PATH"' >> ~/.zprofile
 
 Build GAMBIT-light
 --
-GAMBIT-light itself is a C++ code. You build it once, and afterwards you connect your own target/likelihood function code to GAMBIT-light as a runtime plugin, in the form of a Python code or a C/C++/Fortran shared library.
+** Follow instructions in README.md. **
 
-Follow instructions in README.md.
-
-Note that CMake might fail to find some dependencies on some systems without guidance. If you encounter problems configuring or building GAMBIT-light, have a look in BUILD_OPTIONS.md for a list of commonly used build options. 
+Note that CMake might fail to find some dependencies on some systems without guidance, especially OSX systems. If you encounter problems configuring or building GAMBIT-light, have a look in BUILD_OPTIONS.md for a list of commonly used build options. 
 
 Example cmake command:
 ```
@@ -74,15 +71,7 @@ cmake -D PYTHON_EXECUTABLE=/usr/bin/python3 -D PYTHON_LIBRARY=/Library/Developer
 Key optional extras:
   `-D WITH_MPI=ON` if you want scanners to be parallelised
 
-
-Running GAMBIT-light
---
-A GAMBIT-light run is configured with a single YAML file. A fully commented example is provided in yaml_files/gambit_light_example.yaml. You can run GAMBIT-light with this example configuration by doing
-```
-./gambit -f yaml_files/gambit_light_example.yaml
-```
-
-Common Issues
+Common OSX Issues
 --
 
 - **HDF5 Issues**. OSX systems typically fail when useing the HDF5 printer. This presents as different error messages on different systems, and we do not have a solution. If encountering such issues, one can change the printer to `cout` or `ascii` in the YAML file.
