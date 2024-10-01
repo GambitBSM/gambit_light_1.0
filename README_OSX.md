@@ -59,7 +59,7 @@ echo 'export PATH="/opt/homebrew/opt/hdf5@1.10/bin:$PATH"' >> ~/.zprofile
 
 Build GAMBIT-light
 --
-** Follow instructions in README.md. **
+**Follow instructions in README.md.**
 
 Note that CMake might fail to find some dependencies on some systems without guidance, especially OSX systems. If you encounter problems configuring or building GAMBIT-light, have a look in BUILD_OPTIONS.md for a list of commonly used build options. 
 
