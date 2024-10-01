@@ -149,7 +149,7 @@ Common issues
   pip3 uninstall h5py
   HDF5_VERSION=1.10.7 pip3 install --no-binary=h5py h5py  
   ```
-
+  NOTE: On some systems the HDF5 printer throws a segmentation fault. One solution is to change to the HDF5_v1 printer, which has worked in some cases. 
 
 Licensing
 --
