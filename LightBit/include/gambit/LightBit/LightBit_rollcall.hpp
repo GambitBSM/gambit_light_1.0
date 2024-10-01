@@ -20,6 +20,7 @@
 #include "gambit/cmake/cmake_variables.hpp"
 #include "gambit/Elements/shared_types.hpp"
 #include "gambit/Utils/util_types.hpp"
+#include "gambit/LightBit/LightBit_types.hpp"
 
 #define MODULE LightBit
 START_MODULE
@@ -32,12 +33,20 @@ START_MODULE
     #undef FUNCTION
   #undef CAPABILITY
 
+  #define CAPABILITY input_point
+  START_CAPABILITY
+    #define FUNCTION input_point
+    START_FUNCTION(parameter_point)
+    DEPENDENCY(initialisation, bool)
+    ALLOW_MODELS(UserModel)
+    #undef FUNCTION
+  #undef CAPABILITY
+
   #define CAPABILITY input
   START_CAPABILITY
     #define FUNCTION input
     START_FUNCTION(map_str_dbl)
-    DEPENDENCY(initialisation, bool)
-    ALLOW_MODELS(UserModel)
+    DEPENDENCY(input_point, parameter_point)
     #undef FUNCTION
   #undef CAPABILITY
 
@@ -45,7 +54,7 @@ START_MODULE
   START_CAPABILITY
     #define FUNCTION output
     START_FUNCTION(map_str_dbl)
-    DEPENDENCY(input, map_str_dbl)
+    DEPENDENCY(input_point, parameter_point)
     #undef FUNCTION
   #undef CAPABILITY
 

@@ -8,11 +8,19 @@ sys.path.append(os.path.join(current_dir, "../lib"))
 import gambit_light_interface as gambit_light
 
 
+# User-side prior transform function, which can be called by GAMBIT-light.
+def user_prior(input_names, input_vals, output):
+
+    # Do the prior transform
+    for i,v in enumerate(input_vals):
+        output[i] = v * 10.
+
+
 # User-side log-likelihood function, which can be called by GAMBIT-light
 def user_loglike(input_names, input_vals, output):
 
     # Make a dictionary of the inputs?
-    input = {input_names[i]: input_vals[i] for i in range(len(input_names))}
+    input_dict = {input_names[i]: input_vals[i] for i in range(len(input_names))}
 
     # Error handling: Report an invalid point using gambit_light.invalid_point.
     # gambit_light.invalid_point("This input point is no good.")
@@ -27,7 +35,7 @@ def user_loglike(input_names, input_vals, output):
     # raise Exception("Some exception.")
 
     # Compute loglike
-    loglike = input["param_name_1"] + input["param_name_2"] + input["param_name_4"]
+    loglike = input_dict["param_name_1"] + input_dict["param_name_2"] + input_dict["param_name_4"]
 
     # Save some extra outputs
     output["py_user_loglike_output_1"] = 1
@@ -35,11 +43,4 @@ def user_loglike(input_names, input_vals, output):
     output["py_user_loglike_output_3"] = 3
 
     return loglike
-
-
-# User-side prior transform function, which can be called by GAMBIT-light.
-def user_prior(input_names, input_vals, output):
-
-    for i,v in enumerate(input_vals):
-        output[i] = v * 10.
 
