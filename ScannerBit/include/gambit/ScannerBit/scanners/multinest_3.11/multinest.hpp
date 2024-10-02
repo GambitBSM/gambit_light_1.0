@@ -1,1 +1,0 @@
-../multinest_3.10/multinest.hpp
