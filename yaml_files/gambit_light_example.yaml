@@ -220,6 +220,26 @@ Scanner:
       burn_in: 0                          # Number of burn-in points that are not considered in the convergence.
       # chain_number:                     # The number of MCMC chains. Default is 1 + projection_dimension + number of MPI processes.
 
+    jswarm:
+      plugin: jswarm
+      NP: 400                             # Population size (individuals per generation)
+      adaptive_phi: true                  # Use self-optimising adaptive choices for phi1 and phi2
+      adaptive_omega: true                # Use self-optimising adaptive choices for omega
+      verbosity: 2                        # Output verbosity: 0=only error messages, 1=basic info, 2=generation-level info, 3+=particle-level info
+      maxgen: 5000                        # Maximum number of generations
+      omega: 0.7298                       # Inertial weight (default is Constriction Coefficient PSO)
+      phi1: 1.5                           # Cognitive weight (default is Constriction Coefficient PSO)
+      phi2: 1.5                           # Social weight (default is Constriction Coefficient PSO)
+      bndry: 3                            # Boundary constraint: 1=brick wall, 2=random re-initialization, 3=reflection
+      convthresh: 1.e-3                   # Threshold for gen-level convergence: smoothed fractional improvement in the mean personal best population value
+      convsteps: 10                       # Number of steps to smooth over when checking convergence
+      savecount: 1                        # Save progress every savecount generations
+      init_population_strategy: 2         # Initialisation strategy: 0=one shot, 1=n-shot, 2=n-shot with error if no valid vectors found.
+      init_stationary: false              # Initialise particle velocities to to zero
+      max_initialisation_attempts: 10000  # Maximum number of times to try to find a valid vector for each slot in the initial population.
+      allow_new_settings: false           # Allow settings to be overridden with new values when resuming
+      save_particles_natively: false      # Save full particle data from every generation
+
     minuit2:
       plugin: minuit2
       tolerance: 0.0001                   # Stopping tolerance on parameters
