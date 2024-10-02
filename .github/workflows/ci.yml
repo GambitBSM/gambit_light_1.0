@@ -2,9 +2,9 @@ name: Gambit Light Mac CI
 
 on:
   push:
-    branches: []
+    branches: [ master ]
   pull_request:
-    branches: [ gambit_light_sync ]
+    branches: [ master, gambit_light_sync ]
 
 jobs:
   # A job that builds GAMBIT + scanners, tests the command-line interface 
