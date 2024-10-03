@@ -26,8 +26,8 @@ _See the example code in `example.c`._
 3. Build your C code as a shared library. Make sure to include the `gambit_light_interface/include` directory containing `gambit_light_interface.h`. Example:
    ```
    gcc example.c -I /your/path/to/gambit_light_interface/include -shared -fPIC -o example.so
-   ``` 
-   on Mac, you may need to include the -undefined dynamic_lookup flag to make sure it compiles with undefined symbols
+   ```
+   **Note:** On Mac, you may need to add the flag `-undefined dynamic_lookup` to the `gcc` command to make sure it builds happily even if some symbols (correctly) are undefined.
 
 
 4. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:
