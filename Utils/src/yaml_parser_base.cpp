@@ -327,7 +327,8 @@ namespace Gambit
             inifile_error().raise(LOCAL_INFO, 
               "Error while parsing the UserPrior settings: The UserPrior section must contain "
               "exactly the three entries 'lang', 'user_lib' and 'func_name'. (Multiple instances " 
-              "are not allowed.)"
+              "are not allowed.) Either include these three entries, or specify all priors in the "
+              "UserModel section."
             );
           }
           
