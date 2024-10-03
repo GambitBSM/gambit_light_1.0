@@ -69,7 +69,7 @@ Note that CMake might fail to find some dependencies on some systems without gui
 
 Here is a basic example of how to build GAMBIT-light and the full collection of "scanners" (sampling/optimisation libraries):
 
-```
+```console
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DEIGEN3_INCLUDE_DIR=/path/to/eigen -DWITH_MPI=On -DCMAKE_CXX_COMPILER=g++-11 -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_Fortran_COMPILER=gfortran-11 ..
@@ -82,7 +82,7 @@ make -jN gambit
 
 Instead of building all the scanners (`make -jN scanners`) you can build each scanner you need individually, e.g.
 
-```
+```console
 make -jN diver
 make -jN multinest
 make -jN polychord
@@ -90,7 +90,7 @@ make -jN polychord
 
 If for some reason you need to restart the build process, you can clean out the previous build as follows:
 
-```
+```console
 cd build
 make nuke-all
 cd ..
@@ -103,18 +103,18 @@ Running GAMBIT-light
 
 A GAMBIT-light run is configured with a single YAML file. A fully commented example is provided in `yaml_files/gambit_light_example.yaml`. You can run GAMBIT-light with this example configuration by doing
 
-```
+```console
 ./gambit -f yaml_files/gambit_light_example.yaml
 ```
 
 To see a complete list of command-line options, do 
-```
+```console
 ./gambit --help
 ```
 
 When using an MPI-parallelised scanner, start GAMBIT-light with `mpiexec` or `mpirun`, e.g.
 
-```
+```console
 mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
 ```
 
@@ -134,22 +134,31 @@ Common issues
 --
 
 - **Multiple Python installations**: If you have multiple versions of Python installed on your system, or you are working with a Python virtual environment, it is recommended to manually set the paths to the specific Python library and header files that GAMBIT-light should use. This can be done via the flags `PYTHON_INCLUDE_DIR` and `PYTHON_LIBRARIES` in the cmake command, e.g. like this:
-  ```
+  ```console
   cmake -DPYTHON_INCLUDE_DIR=/usr/include/python3.10 -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.10.so (the rest of the cmake command) ..
   ```
   If needed, the `PYTHON_EXECUTABLE` flag can be used to ensure that GAMBIT-light also uses the correct Python executable, e.g. `-DPYTHON_EXECUTABLE=/usr/bin/python3`.
 
 - **Multiple HDF5 libraries**: GAMBIT-light can fail to build or run due to conflicting versions of the HDF5 library. The most common source of this problem is that the Python package `h5py` has been built against an HDF5 version that differs from the version already installed on the system. One solution can be to reinstall `h5py` as follows:
-  ```
+  ```console
   pip3 uninstall h5py
   pip3 install --no-binary=h5py h5py
   ```
   If needed, you can specify the specific HDF5 version that h5py should be built against:
+  ```console
+  $ pip3 uninstall h5py
+  $ HDF5_VERSION=1.10.7 pip3 install --no-binary=h5py h5py  
   ```
-  pip3 uninstall h5py
-  HDF5_VERSION=1.10.7 pip3 install --no-binary=h5py h5py  
+- **HDF5-related segmentation fault**: GAMBIT-light has two separate systems ("printers") for writing HDF5 output files. If using the YAML file option 
+  ```yaml
+  Printer:
+    printer: hdf5
   ```
-  NOTE: On some systems the HDF5 printer throws a segmentation fault. One solution is to change to the HDF5_v1 printer, which has worked in some cases. 
+  leads to a segmentation fault (this issue is most commonly seen on Mac), then try switiching to the older HDF5 printer by using
+  ```yaml
+  Printer:
+    printer: hdf5_v1
+  ```
 
 Licensing
 --
