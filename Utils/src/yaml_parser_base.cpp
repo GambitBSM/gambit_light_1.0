@@ -169,21 +169,6 @@ namespace Gambit
 
       // Special treatment for GAMBIT-light
       #ifdef GAMBIT_LIGHT
-        bool has_UserModel_node = root["UserModel"].IsDefined();
-        bool has_UserLogLikes_node = root["UserLogLikes"].IsDefined();
-        if (!has_UserModel_node)
-        {
-          inifile_error().raise(LOCAL_INFO, 
-              "Error. Could not find UserModel entry in ini file."
-            );
-        }
-        if (!has_UserLogLikes_node)
-        {
-          inifile_error().raise(LOCAL_INFO, 
-              "Error. Could not find UserLogLikes entry in ini file."
-            );
-        }
-      
         userModelNode = root["UserModel"];
         userLogLikesNode = root["UserLogLikes"];
 
@@ -362,13 +347,6 @@ namespace Gambit
         // Force the "like: LogLike" option for all listed scanner plugins,
         // to match the "purpose: LogLike" in the pre-defined ObsLikes section 
         // for GAMBIT-light.
-        bool has_Scanner_node = root["Scanner"].IsDefined();
-        if (!has_Scanner_node)
-        {
-          inifile_error().raise(LOCAL_INFO, 
-              "Error. Could not find Scanner entry in ini file."
-            );
-        }
         YAML::Node listed_scanner_plugins = scannerNode["scanners"];
         for(YAML::const_iterator it = listed_scanner_plugins.begin(); it != listed_scanner_plugins.end(); ++it)
         {
