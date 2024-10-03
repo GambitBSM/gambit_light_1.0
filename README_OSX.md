@@ -45,7 +45,7 @@ brew install hdf5@1.10
 pip3 install numpy
 pip3 install pyyaml
 ```
-- Optional: If you want scanners to be parallelised
+- Optional: For parallel sampling
 ```
 brew install openmpi
 brew install mpi4py
