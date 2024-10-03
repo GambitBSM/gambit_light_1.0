@@ -34,7 +34,7 @@ _See the example code in `example.cpp`._
    ```
    g++ example.cpp -I /your/path/to/gambit_light_interface/include -shared -fPIC -o example.so
    ``` 
-   on Mac, you may need to include the -undefined dynamic_lookup flag to make sure it compiles with undefined symbols
+   **Note:** On Mac, you may need to add the flag `-undefined dynamic_lookup` to the `g++` command to make sure the library builds happily even if some symbols (correctly) are undefined.
 
 
 5. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:
