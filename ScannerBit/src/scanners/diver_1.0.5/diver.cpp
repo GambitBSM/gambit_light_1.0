@@ -2,7 +2,7 @@
 //  *********************************************
 ///  \file
 ///
-///  ScannerBit interface to Diver 1.0.2
+///  ScannerBit interface to Diver 1.0.5
 ///
 ///  *********************************************
 ///
@@ -10,7 +10,7 @@
 ///
 ///  \author Pat Scott
 ///          (p.scott@imperial.ac.uk)
-///  \date 2017 June
+///  \date 2017 June, Nov
 ///
 ///  *********************************************
 
@@ -18,7 +18,7 @@
 #include <limits>
 #include <fstream>
 
-#include "gambit/ScannerBit/scanners/diver/1.0.2/diver.hpp"
+#include "gambit/ScannerBit/scanners/diver_1.0.5/diver.hpp"
 #include "gambit/Utils/yaml_options.hpp"
 #include "gambit/Utils/util_types.hpp"
 #include "gambit/Utils/util_functions.hpp"
@@ -28,12 +28,12 @@
 /// Interface to ScannerBit
 /// =================================================
 
-scanner_plugin(diver, version(1, 0, 2))
+scanner_plugin(diver, version(1, 0, 5))
 {
 
   // Access Diver stuff and standard Gambit things
   using namespace Gambit;
-  using namespace Gambit::Diver_1_0_2;
+  using namespace Gambit::Diver_1_0_5;
 
   // Error thrown if the following entries are not present in the inifile
   reqd_inifile_entries("NP");
@@ -123,45 +123,37 @@ scanner_plugin(diver, version(1, 0, 2))
     int    savecount           = get_inifile_value<int>   ("savecount",          1);      // Save progress every savecount generations
     bool   native_output       = get_inifile_value<bool>  ("full_native_output", true);   // Output .raw file (Diver native sample output format)
     int    init_pop_strategy   = get_inifile_value<int>   ("init_population_strategy", 2);// Initialisation strategy: 0=one shot, 1=n-shot, 2=n-shot with error if no valid vectors found.
+    bool   discard_unfit_points= get_inifile_value<bool>  ("discard_unfit_points", false);// Recalculate any trial vector whose fitness is above max_acceptable_value
     int    max_ini_attempts    = get_inifile_value<int>   ("max_initialisation_attempts", 10000); // Maximum number of times to try to find a valid vector for each slot in the initial population.
-    double max_acceptable_value= get_inifile_value<double>("max_acceptable_value",0.9999*gl0); // Maximum function value to accept for the initial generation if init_population_strategy > 0.
+    double max_acceptable_value= get_inifile_value<double>("max_acceptable_value",0.9999*gl0); // Maximum function value to accept for the initial gen if init_population_strategy > 0, or any gen if discard_unfit_points=T.
     int    verbose             = get_inifile_value<int>   ("verbosity",          0);      // Output verbosity: 0=only error messages, 1=basic info, 2=civ-level info, 3+=population info
+    int    seed                = get_inifile_value<int>   ("seed",               -1);     // Base seed for random number generation; non-positive means seed from the system clock
     double (*prior)(const double[], const int, void*&) =                         NULL;    // Pointer to prior function, only used if doBayesian = true.
     void*  context             = &data;                                                   // Pointer to GAMBIT likelihood function and printers, passed through to objective function.
 
     // Copy the contents of root to a char array.
-    char path[root.length()+1];
-    strcpy(path, root.c_str());
+    std::vector<char> path(root.length()+1);
+    strcpy(&path[0], root.c_str());
 
     // Unit cube boundaries
-    double lowerbounds[nPar];                                                             // Lower boundaries of parameter space to scan
-    double upperbounds[nPar];                                                             // Upper boundaries of parameter space to scan
-    for (int i = 0; i < nPar; i++)
-    {
-      lowerbounds[i] = 0.0;
-      upperbounds[i] = 1.0;
-    }
+    std::vector<double> lowerbounds(nPar, 0.0);                                                             // Lower boundaries of parameter space to scan
+    std::vector<double> upperbounds(nPar, 1.0);                                                             // Upper boundaries of parameter space to scan
 
     // Scale factors
     std::vector<double> Fvec = get_inifile_value<std::vector<double> >("F", initVector<double>(0.7));
     int nF = Fvec.size();                                                                 // Size of the array indicating scale factors
-    double F[nF];                                                                         // Scale factor(s).
-    std::copy(Fvec.begin(), Fvec.end(), F);
 
     // Discrete parameters
-    int discrete[nDiscrete];                                                              // Indices of discrete parameters, Fortran style, i.e. starting at 1!!
-    for (int i = 0; i < nDiscrete; i++)
-    {
-      discrete[i] = 0; //TODO Needs to be set automatically somehow?  Not yet sure how to deal with discrete parameters in GAMBIT.
-    }
+    std::vector<int> discrete(nDiscrete, 0);                                                              // Indices of discrete parameters, Fortran style, i.e. starting at 1!!
+    //TODO Needs to be set automatically somehow?  Not yet sure how to deal with discrete parameters in GAMBIT.
 
     // Run Diver
     if (data.likelihood_function->getRank() == 0) cout << "Starting Diver run..." << std::endl;
-    cdiver(&objective, nPar, lowerbounds, upperbounds, path, nDerived, nDiscrete,
-           discrete, partitionDiscrete, maxciv, maxgen, NP, nF, F, Cr, lambda, current,
+    cdiver(&objective, nPar, &lowerbounds[0], &upperbounds[0], &path[0], nDerived, nDiscrete,
+           &discrete[0], partitionDiscrete, maxciv, maxgen, NP, nF, &Fvec[0], Cr, lambda, current,
            expon, bndry, jDE, lambdajDE, convthresh, convsteps, removeDuplicates, doBayesian,
            prior, maxNodePop, Ztolerance, savecount, resume, native_output, init_pop_strategy,
-           max_ini_attempts, max_acceptable_value, context, verbose);
+           discard_unfit_points, max_ini_attempts, max_acceptable_value, seed, context, verbose);
     if (data.likelihood_function->getRank() == 0) cout << "Diver run finished!" << std::endl;
     return 0;
 
@@ -176,7 +168,7 @@ scanner_plugin(diver, version(1, 0, 2))
 namespace Gambit
 {
 
-  namespace Diver_1_0_2
+  namespace Diver_1_0_5
   {
 
     //Function to be minimized.  Corresponds to -ln(Likelihood).  Redirects to the target of context pointer.

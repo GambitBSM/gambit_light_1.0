@@ -63,6 +63,7 @@ _See the example code in `example.f90`._
    ```
    gfortran example.f90 -shared -fPIC -o example.so
    ```
+   **Note:** On Mac, you may need to add the flag `-undefined dynamic_lookup` to the `gfortran` command to make sure the library builds happily even if some symbols (correctly) are undefined.
 
 
 4. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:

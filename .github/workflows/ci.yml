@@ -1,0 +1,48 @@
+name: Gambit Light Mac CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master, gambit_light_sync ]
+
+jobs:
+  # A job that builds GAMBIT + scanners, tests the command-line interface 
+  # and runs a minimal test run with spartan.yaml
+  gambit_light_build:
+    runs-on: [self-hosted, macOS, Arm64]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [Arm64]
+    defaults:
+      run:
+        shell: bash -eo pipefail {0}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up build environment
+      run: |
+        mkdir -p BUILD
+        cd BUILD
+    - name: Configure with cmake
+      run: |
+        cd BUILD/
+        cmake -D PYTHON_EXECUTABLE=/usr/bin/python3 -D PYTHON_LIBRARY=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Python3 -D PYTHON_INCLUDE_DIR=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Headers -DCMAKE_CXX_FLAGS="-rdynamic" -DWITH_MPI=ON ..
+    - name: Build scanners
+      run: |
+        cd BUILD/
+        make -j $(( $(sysctl -n hw.ncpu)/2 )) scanners
+        cmake ..
+    - name: Build Gambit
+      run: |
+        cd BUILD
+        # Now build Gambit
+        make -j $(( $(sysctl -n hw.ncpu)/2 )) gambit
+    - name: CLI test
+      run: |
+        ./gambit -h
+    - name: Run spartan.yaml
+      run: |
+        sed -i "" 's/ hdf5/ cout/g' yaml_files/gambit_light_example.yaml
+        ./gambit -rf yaml_files/gambit_light_example.yaml

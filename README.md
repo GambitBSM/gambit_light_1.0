@@ -35,7 +35,7 @@ Supported Compilers and Library Dependencies
 
 GAMBIT-light is built using the CMake system. The following libraries and packages must be installed prior to configuration:
 
-COMPULSORY:
+**COMPULSORY**:
 
  - gcc >= 9 / llvm clang >= 10 / AppleClang >= 13 / icc >= 15.0.2
  - gfortran >= 9 / ifort >=15.0.2
@@ -49,7 +49,7 @@ COMPULSORY:
  - LAPACK
  - pkg-config
 
-OPTIONAL:
+**OPTIONAL**:
 
  - HDF5 (for use of the hdf5 printer)
  - MPI (required for parallel sampling)
@@ -158,7 +158,7 @@ The BSD license below applies to all source files in the GAMBIT-light distributi
 
 License
 --
-Copyright (c) 2017-2023, The GAMBIT Collaboration
+Copyright (c) 2017-2024, The GAMBIT Collaboration
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
