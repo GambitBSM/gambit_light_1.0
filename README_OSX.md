@@ -8,54 +8,54 @@ We assume in this walkthrough that you want to use the AppleClang compiler that 
 Install dependencies
 --
 - Install clang
-```
-Xcode-select --install
-```
+  ```console
+  Xcode-select --install
+  ```
 
-Upgrade to latest version of pip (numpy will fail to install if you don't)
-```
-python3 -m pip install --upgrade pip
-```
-
-NB: You must use the system python3 (and pip3 in the steps below)! In case of doubt (if you have installed other python versions) check with 'which python3' and 'which pip3' what python3/pip3 points to, and use 
-```
-/full/path/to/the/system/python3
-/full/path/to/the/system/pip3
-```
-instead.
+- Upgrade to latest version of pip (numpy will fail to install if you don't)
+  ```console
+  python3 -m pip install --upgrade pip
+  ```
+  Note: You must use the system python3 (and pip3 in the steps below)! In case of doubt (if you have installed other python versions) check with 'which python3' and 'which pip3' what python3 and pip3 points to, and use 
+  ```console
+  /full/path/to/the/system/python3
+  /full/path/to/the/system/pip3
+  ```
+  instead.
 
 - Install homebrew
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
+  ```console
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  ```
 
 - Install dependencies
-```
-brew install cmake
-brew install gfortran
-brew install libx11
-brew install boost
-brew install eigen
-brew install libomp
-brew install gsl
-brew install ossp-uuid
-brew install hdf5@1.10
-pip3 install numpy
-pip3 install pyyaml
-```
+  ```console
+  brew install cmake
+  brew install gfortran
+  brew install libx11
+  brew install boost
+  brew install eigen
+  brew install libomp
+  brew install gsl
+  brew install ossp-uuid
+  brew install hdf5@1.10
+  pip3 install numpy
+  pip3 install pyyaml
+  ```
+
 - Optional: For parallel sampling
-```
-brew install openmpi
-brew install mpi4py
-```
+  ```console
+  brew install openmpi
+  brew install mpi4py
+  ```
 
 - Fix paths:
-```
-echo 'export PATH="/opt/homebrew/opt/hdf5@1.10/bin:$PATH"' >> ~/.zprofile
-. ~/.zprofile
-```
+  ```console
+  echo 'export PATH="/opt/homebrew/opt/hdf5@1.10/bin:$PATH"' >> ~/.zprofile
+  . ~/.zprofile
+  ```
 
 Build GAMBIT-light
 --
@@ -64,7 +64,7 @@ Build GAMBIT-light
 Note that CMake might fail to find some dependencies on some systems without guidance, especially OSX systems. If you encounter problems configuring or building GAMBIT-light, have a look in BUILD_OPTIONS.md for a list of commonly used build options. 
 
 Example cmake command:
-```
+```console
 cmake -D PYTHON_EXECUTABLE=/usr/bin/python3 -D PYTHON_LIBRARY=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Python3 -D PYTHON_INCLUDE_DIR=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Headers ..
 ```
 
@@ -74,8 +74,7 @@ Key optional extras:
 Common OSX Issues
 --
 
-- **HDF5 Issues**. OSX systems typically fail when useing the HDF5 printer. This presents as different error messages on different systems, and we do not have a solution. If encountering such issues, one can change the printer to `cout` or `ascii` in the YAML file.
-
+- **HDF5 Issues**: GAMBIT-light on OSX systems can fail when using the HDF5 printer, i.e. when running GAMBIT-light with a YAML file containing the option `printer: hdf5`. This is a know issue. If this problem occurs, try to revert to an older version of the HDF5 printer by using the YAML option `printer: hdf5_v1`. If this does not work, another option is to write output to text files, with `printer: ascii`, or directly to screen, with `printer: cout`.
 
 
 
