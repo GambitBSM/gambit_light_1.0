@@ -39,7 +39,7 @@
 #************************************************
 
 # Define minimum cmake version
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 # Define minimum compiler versions
 set(MIN_GCC_VERSION 5.1)
@@ -76,10 +76,15 @@ foreach(p
   endif()
 endforeach()
 
-if(POLICY CMP0148)
-  cmake_policy(SET CMP0148 OLD)
-endif()
-
+# Set certain policies to OLD
+foreach(p
+  CMP0148 # CMake 3.27
+  CMP0167 # CMake 3.30
+  )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} OLD)
+  endif()
+endforeach()
 
 # Set the project name, enabling C, C++ and Fortran support
 project(gambit C CXX Fortran)
