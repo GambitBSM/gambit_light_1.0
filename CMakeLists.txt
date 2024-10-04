@@ -70,12 +70,16 @@ foreach(p
   CMP0063 # CMake 3.3.2
   CMP0068 # CMake 3.9.1
   CMP0074 # CMake 3.12
-  CMP0148 # CMake 3.27
   )
   if(POLICY ${p})
     cmake_policy(SET ${p} NEW)
   endif()
 endforeach()
+
+if(POLICY CMP0148)
+  cmake_policy(SET CMP0148 OLD)
+endif()
+
 
 # Set the project name, enabling C, C++ and Fortran support
 project(gambit C CXX Fortran)
