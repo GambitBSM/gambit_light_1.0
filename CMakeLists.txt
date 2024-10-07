@@ -470,6 +470,9 @@ else()
   set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 endif()
 
+# Allow global symbols in the GAMBIT executable to resolve references in dynamically loaded libraries
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
+
 # Check for optional packages and disable sections of GAMBIT accordingly
 include(cmake/optional.cmake)
 
