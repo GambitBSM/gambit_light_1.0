@@ -466,16 +466,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
 # Check for optional packages and disable sections of GAMBIT accordingly
 include(cmake/optional.cmake)
 
-# Look for the latest tag and use it to set the version number.  If there is no such tag, use the tarball info file.
+# Look for the latest tag and use it to set the version number.  If there is no such tag, use the version_info.cmake file.
 find_package(Git)
+set(FOUND_GAMBIT_VERSION_FROM_GIT_TAG FALSE)
 if(GIT_FOUND)
   get_version_from_git(GAMBIT_VERSION_MAJOR GAMBIT_VERSION_MINOR GAMBIT_VERSION_REVISION
                        GAMBIT_VERSION_PATCH GAMBIT_VERSION_FULL)
-  if (GAMBIT_VERSION_MAJOR)
+  if (GAMBIT_VERSION_MAJOR OR GAMBIT_VERSION_MINOR)
     message("${BoldYellow}   GAMBIT version detected from git tag: ${GAMBIT_VERSION_FULL}${ColourReset}")
+    set(FOUND_GAMBIT_VERSION_FROM_GIT_TAG TRUE)
   endif()
 endif()
-if(NOT GIT_FOUND OR NOT GAMBIT_VERSION_MAJOR)
+if(NOT GIT_FOUND OR NOT FOUND_GAMBIT_VERSION_FROM_GIT_TAG)
   message("${BoldYellow}   GAMBIT version not detected via git.  Reverting to cmake/version_info.cmake.${ColourReset}")
   include(cmake/version_info.cmake)
 endif()
