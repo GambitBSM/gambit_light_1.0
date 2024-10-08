@@ -476,8 +476,8 @@ if(GIT_FOUND)
   endif()
 endif()
 if(NOT GIT_FOUND OR NOT GAMBIT_VERSION_MAJOR)
-  message("${BoldYellow}   GAMBIT version not detected via git.  Reverting to cmake/tarball_info.cmake.${ColourReset}")
-  include(cmake/tarball_info.cmake)
+  message("${BoldYellow}   GAMBIT version not detected via git.  Reverting to cmake/version_info.cmake.${ColourReset}")
+  include(cmake/version_info.cmake)
 endif()
 
 # Add doxygen build as an external project

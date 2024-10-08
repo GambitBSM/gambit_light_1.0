@@ -32,7 +32,7 @@
 __attribute__((constructor))
 static void initializer()
 {
-  printf("%s", "\n\x1b[1;33mGAMBIT " STRINGIFY(GAMBIT_VERSION_MAJOR) "." STRINGIFY(GAMBIT_VERSION_MINOR) "." STRINGIFY(GAMBIT_VERSION_REVISION));
+  printf("%s", "\n\x1b[1;33mGAMBIT-light " STRINGIFY(GAMBIT_VERSION_MAJOR) "." STRINGIFY(GAMBIT_VERSION_MINOR) "." STRINGIFY(GAMBIT_VERSION_REVISION));
   if (strcmp(GAMBIT_VERSION_PATCH, "") != 0) printf("%s", "-" GAMBIT_VERSION_PATCH);
   printf("\nhttp://gambitbsm.org\n\n\x1b[0m");
   #ifndef EXCLUDE_RESTFRAMES
