@@ -31,9 +31,10 @@ _See the example code in `example.cpp`._
 
 
 4. Build your C++ code as a shared library. Make sure to include the `gambit_light_interface/include` directory containing `gambit_light_interface.h`. Example:
-   ```
+   ```console
    g++ example.cpp -I /your/path/to/gambit_light_interface/include -shared -fPIC -o example.so
    ``` 
+   **Note:** On Mac, you may need to add the flag `-undefined dynamic_lookup` to the `g++` command to make sure the library builds happily even if some symbols (correctly) are undefined.
 
 
 5. Add an entry for your target function in the `UserLogLikes` section of your GAMBIT configuration file. Example:

@@ -39,7 +39,7 @@
 #************************************************
 
 # Define minimum cmake version
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
 # Define minimum compiler versions
 set(MIN_GCC_VERSION 5.1)
@@ -73,6 +73,16 @@ foreach(p
   )
   if(POLICY ${p})
     cmake_policy(SET ${p} NEW)
+  endif()
+endforeach()
+
+# Set certain policies to OLD
+foreach(p
+  CMP0148 # CMake 3.27
+  CMP0167 # CMake 3.30
+  )
+  if(POLICY ${p})
+    cmake_policy(SET ${p} OLD)
   endif()
 endforeach()
 
@@ -173,8 +183,8 @@ else()  # pybind is not ditched
     set(itch "${itch};pybind11")
     set(DITCH_PYBIND 1)
   else() # pybind is not ditched and the PythonLibs were found. Can now actually look for pybind.
-    set(MIN_pybind11_VERSION "2.11.1")
-    set(PREFERRED_pybind11_VERSION "2.11.1")
+    set(MIN_pybind11_VERSION "2.13.6")
+    set(PREFERRED_pybind11_VERSION "2.13.6")
     set(pybind11_CONTRIB_DIR "${PROJECT_SOURCE_DIR}/contrib/pybind11")
     include_directories("${PYTHON_INCLUDE_DIRS}")
     find_package(pybind11 QUIET)
@@ -450,15 +460,8 @@ set(BACKEND_GNU99_FLAGS "${BACKEND_C_FLAGS} -std=gnu99")
 # Should we use pragmas to suppress common compiler warnings from external libraries?
 option(SUPPRESS_LIBRARY_WARNINGS "Suppress common compiler warnings due to external libraries" ON)
 
-# Make symbols hidden by default when compiling GAMBIT source files only
-if(${CMAKE_MAJOR_VERSION} MATCHES "2")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fvisibility=hidden")
-else()
-  set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-  set(CMAKE_Fortran_VISIBILITY_PRESET hidden)
-  set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
-endif()
+# Allow global symbols in the GAMBIT executable to resolve references in dynamically loaded libraries
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
 
 # Check for optional packages and disable sections of GAMBIT accordingly
 include(cmake/optional.cmake)
