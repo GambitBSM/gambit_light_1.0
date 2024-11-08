@@ -1,4 +1,4 @@
-name: Gambit-light Mac CI
+name: Gambit-light Linux CI on Wino
 
 on:
   push:
@@ -10,11 +10,11 @@ jobs:
   # A job that builds GAMBIT + scanners, tests the command-line interface 
   # and runs a minimal test run with spartan.yaml
   gambit_light_build:
-    runs-on: [self-hosted, macOS, Arm64]
+    runs-on: [self-hosted, Linux, X64]
     strategy:
       fail-fast: false
       matrix:
-        arch: [Arm64]
+        arch: [X64]
     defaults:
       run:
         shell: bash -eo pipefail {0}
@@ -28,21 +28,20 @@ jobs:
     - name: Configure with cmake
       run: |
         cd BUILD/
-        cmake -D PYTHON_EXECUTABLE=/usr/bin/python3 -D PYTHON_LIBRARY=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Python3 -D PYTHON_INCLUDE_DIR=/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Headers -DCMAKE_CXX_FLAGS="-rdynamic" -DWITH_MPI=ON ..
+        cmake -DPYTHON_LIBRARY=/usr/lib64/libpython3.9.so -DPYTHON_INCLUDE_DIR=/usr/include/python3.9 -DEIGEN3_INCLUDE_DIR=/mn/fys-server1/a1/chrichan/Packages/Eigen/eigen3 -DSQLite3_INCLUDE_DIR=/scratch2/shared/sqlite/include -DSQLite3_LIBRARY=/scratch2/shared/sqlite/lib/libsqlite3.so -DWITH_MPI=ON ..
     - name: Build scanners
       run: |
         cd BUILD/
-        make -j $(( $(sysctl -n hw.ncpu)/2 )) scanners
+        make -j28 scanners
         cmake ..
     - name: Build Gambit
       run: |
         cd BUILD
-        # Now build Gambit
-        make -j $(( $(sysctl -n hw.ncpu)/2 )) gambit
+        make -j28 gambit
     - name: CLI test
       run: |
         ./gambit -h
     - name: Run spartan.yaml
       run: |
-        sed -i "" 's/ hdf5_v1/ cout/g' yaml_files/gambit_light_example.yaml
+        # sed -i "" 's/ hdf5_v1/ cout/g' yaml_files/gambit_light_example.yaml
         ./gambit -rf yaml_files/gambit_light_example.yaml
