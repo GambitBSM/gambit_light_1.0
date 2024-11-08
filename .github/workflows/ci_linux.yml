@@ -28,7 +28,7 @@ jobs:
     - name: Configure with cmake
       run: |
         cd BUILD/
-        cmake -DPYTHON_LIBRARY=/usr/lib64/libpython3.9.so -DPYTHON_INCLUDE_DIR=/usr/include/python3.9 -DSQLite3_INCLUDE_DIR=/scratch2/shared/sqlite/include -DSQLite3_LIBRARY=/scratch2/shared/sqlite/lib/libsqlite3.so -DWITH_MPI=ON ..
+        cmake -DPYTHON_LIBRARY=/usr/lib64/libpython3.9.so -DPYTHON_INCLUDE_DIR=/usr/include/python3.9 -DEIGEN3_INCLUDE_DIR=/mn/fys-server1/a1/chrichan/Packages/Eigen/eigen3 -DSQLite3_INCLUDE_DIR=/scratch2/shared/sqlite/include -DSQLite3_LIBRARY=/scratch2/shared/sqlite/lib/libsqlite3.so -DWITH_MPI=ON ..
     - name: Build scanners
       run: |
         cd BUILD/
