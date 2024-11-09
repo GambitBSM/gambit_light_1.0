@@ -23,11 +23,8 @@ Please cite the following GAMBIT papers if you use GAMBIT-light:
  - GAMBIT Collaboration: P. Athron, et al., **GAMBIT**: The Global and Modular Beyond-the-Standard-Model Inference Tool, Eur. Phys. J. C 77 (2017) 784, arXiv:1705.07908
  - GAMBIT Scanner Workgroup: G. D. Martinez, et al., Comparison of statistical sampling methods with **ScannerBit**, the GAMBIT scanning module, Eur. Phys. J. C 77 (2017) 761, arXiv:1705.07959
 
+GAMBIT-light contains interfaces to several external codes, in particular optimisation or sampling tools. Please cite as appropriate when you use those codes.
 
-GAMBIT-light contains interfaces to some external codes, along with scripts for downloading and configuring them. Please cite as appropriate if you use those codes:
-
- - **Multinest:** F. Feroz, M. P. Hobson, M. Bridges, MULTINEST: an efficient and robust Bayesian inference tool for cosmology and particle physics, MNRAS 398 (2009) 1601–1614, arXiv:0809.3437
- - **PolyChord:** W. J. Handley, M. P. Hobson, M. P. A. N. Lasenby, POLYCHORD: next-generation nested sampling, MNRAS 453 (2015) 4384, arXiv:1506.00171
 
 
 Supported Compilers and Library Dependencies
