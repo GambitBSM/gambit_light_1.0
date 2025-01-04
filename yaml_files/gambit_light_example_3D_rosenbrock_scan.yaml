@@ -385,7 +385,7 @@ Logger:
 
 KeyValues:
 
-  default_output_path: "runs/gambit_light_example"
+  default_output_path: "runs/gambit_light_example_3D_rosenbrock_scan"
 
   debug: false
 
