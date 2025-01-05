@@ -73,17 +73,6 @@ UserLogLikes:
       - py_user_loglike_output_3
 
 
-  py_user_loglike_rosenbrock:
-    lang: python
-    user_lib: gambit_light_interface/example_python/example_rosenbrock.py
-    func_name: user_loglike
-    input:
-      - param_name_1
-      - param_name_2
-    output:
-      - py_user_loglike_rosenbrock_output_1
-
-
   # c_user_loglike:
   #   lang: c
   #   user_lib: gambit_light_interface/example_c/example.so

@@ -32,6 +32,6 @@ def user_loglike(input_names, input_vals, output):
     x = np.array([input["x1"], input["x2"]])
 
     # Store some more output?
-    # output["py_user_loglike_rosenbrock_output_1"] = 10;
+    # output["my_output_1"] = 10;
 
     return loglike(x)

@@ -23,7 +23,7 @@ UserLogLikes:
     func_name: user_loglike
     # Store some more output from the user_loglike function?
     # output:
-    #   - py_user_loglike_rosenbrock_output_1
+    #   - my_output_1
 
 
 Printer:
