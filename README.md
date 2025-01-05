@@ -135,7 +135,7 @@ pip install ./gambit_plotting_tools
 Fully worked example from scan to plotting
 --
 
-This example performs a two-parameter scan that uses the (negative) Rosenbrock function as an example log-likelihood function for which we want to identify the best-fit point and map out the 1sigma and 2sigma confidence regions. The scan is performed using the Diver differential evolution scanner and takes 1-2 minutes when running with 1 MPI process. The scan output is written to the directory `runs/gambit_light_example_rosenbrock_scan`.
+This example performs a two-parameter scan that uses the (negative) Rosenbrock function as an example log-likelihood function for which we want to identify the best-fit point and map out the 1sigma and 2sigma confidence regions. The scan is performed using the Diver differential evolution scanner and should take around one minute when running with a single MPI process. The scan output is written to the directory `runs/gambit_light_example_rosenbrock_scan`.
 
 - Run GAMBIT scan:
 
