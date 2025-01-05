@@ -14,11 +14,6 @@ UserModel:
     prior_type: flat
     range: [-5.0, 10.0]
 
-  p3: 
-    name: x3
-    prior_type: flat
-    range: [-5.0, 10.0]
-
 
 UserLogLikes:
 
@@ -26,6 +21,9 @@ UserLogLikes:
     lang: python
     user_lib: gambit_light_interface/example_python/example_rosenbrock.py
     func_name: user_loglike
+    # Store some more output from the user_loglike function?
+    # output:
+    #   - py_user_loglike_rosenbrock_output_1
 
 
 Printer:
@@ -80,10 +78,10 @@ Scanner:
 
     diver:
       plugin: diver
-      NP: 200                             # Population size (individuals per generation)
-      convthresh: 1.e-4                   # Threshold for gen-level convergence: smoothed fractional improvement in the mean population value
+      NP: 1500                            # Population size (individuals per generation)
+      convthresh: 1.e-3                   # Threshold for gen-level convergence: smoothed fractional improvement in the mean population value
       jDE: true                           # Use self-adaptive choices for rand/1/bin parameters as per Brest et al 2006
-      lambdajDE: true                     # Use self-adaptive rand-to-best/1/bin parameters; based on Brest et al 2006
+      lambdajDE: false                    # Use self-adaptive rand-to-best/1/bin parameters; based on Brest et al 2006
       maxgen: 5000                        # Maximum number of generations per civilisation
       maxciv: 1                           # Maximum number of civilisations
       Cr: 0.9                             # Crossover factor
@@ -385,7 +383,7 @@ Logger:
 
 KeyValues:
 
-  default_output_path: "runs/gambit_light_example_3D_rosenbrock_scan"
+  default_output_path: "runs/gambit_light_example_rosenbrock_scan"
 
   debug: false
 
