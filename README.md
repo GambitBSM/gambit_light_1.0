@@ -12,22 +12,10 @@ Some features of GAMBIT-light:
   - Safe shutdown and resuming of aborted runs
   - Run configuration via a simple YAML file
 
-GAMBIT-light is a spin-off project from **GAMBIT** (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool for large-scale statistical fits in particle physics and astrophysics.
+GAMBIT-light is a spin-off project from **GAMBIT** (the Global And Modular BSM Inference Tool), https://gambitbsm.org/, a software tool for large-scale statistical fits in particle physics and astrophysics. If you use GAMBIT-light, please cite the papers listed in the Citation section below.
 
 
-Citation(s)
---
-
-Please cite the following GAMBIT papers if you use GAMBIT-light:
-
- - GAMBIT Collaboration: P. Athron, et al., **GAMBIT**: The Global and Modular Beyond-the-Standard-Model Inference Tool, Eur. Phys. J. C 77 (2017) 784, arXiv:1705.07908
- - GAMBIT Scanner Workgroup: G. D. Martinez, et al., Comparison of statistical sampling methods with **ScannerBit**, the GAMBIT scanning module, Eur. Phys. J. C 77 (2017) 761, arXiv:1705.07959
-
-GAMBIT-light contains interfaces to several external codes, in particular optimisation or sampling tools. Please cite as appropriate when you use those codes.
-
-
-
-Supported Compilers and Library Dependencies
+Supported compilers and library dependencies
 --
 
 GAMBIT-light is built using the CMake system. The following libraries and packages must be installed prior to configuration:
@@ -119,7 +107,7 @@ for a run with 4 MPI processes.
 
 
 
-Connecting your own target/likelihood function
+Connect your own target/likelihood function
 --
 
 For step-by-step instructions on how to connect your own Python/C/C++/Fortran code to GAMBIT-light, see the README files and example codes in the 
@@ -168,7 +156,7 @@ This example performs a two-parameter scan that uses the (negative) Rosenbrock f
 
   This should give a plot looking something like this:
   
-  <img src="example_plots/2D_profile__x1__x2__LogLike.png" alt="2D profile likelihood example plot" width="400"/>
+  <img src="example_results/2D_profile__x1__x2__LogLike.png" alt="2D profile likelihood example plot" width="400"/>
 
 
 Common issues
@@ -202,6 +190,18 @@ Common issues
   ```
 
 - **hdf5_v1 printer and the multinest scanner**: The multinest scanner currently currently cannot be used together with the hdf5_v1 printer.
+
+
+
+Citation
+--
+
+Please cite the following GAMBIT papers if you use GAMBIT-light:
+
+ - GAMBIT Collaboration: P. Athron, et al., **GAMBIT**: The Global and Modular Beyond-the-Standard-Model Inference Tool, Eur. Phys. J. C 77 (2017) 784, arXiv:1705.07908
+ - GAMBIT Scanner Workgroup: G. D. Martinez, et al., Comparison of statistical sampling methods with **ScannerBit**, the GAMBIT scanning module, Eur. Phys. J. C 77 (2017) 761, arXiv:1705.07959
+
+GAMBIT-light contains interfaces to several external codes, in particular optimisation or sampling tools. Please cite as appropriate when you use those codes.
 
 
 Licensing
