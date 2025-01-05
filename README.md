@@ -157,6 +157,9 @@ Common issues
     printer: hdf5_v1
   ```
 
+- **hdf5_v1 printer and the multinest scanner**: The multinest scanner currently currently cannot be used together with the hdf5_v1 printer.
+
+
 Licensing
 --
 
