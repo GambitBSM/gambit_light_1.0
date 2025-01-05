@@ -189,8 +189,9 @@ Common issues
     printer: hdf5_v1
   ```
 
-- **hdf5_v1 printer and the multinest scanner**: The multinest scanner currently currently cannot be used together with the hdf5_v1 printer.
+- **hdf5_v1 printer and the multinest scanner**: The multinest scanner currently cannot be used together with the hdf5_v1 printer.
 
+- **gambit plotting tools throwing errors about axis syntax**: Much older versions of matplotlib may not allow the syntax used to create profile likelihood plots. This would require upgrading the matplotlib version.
 
 
 Citation
