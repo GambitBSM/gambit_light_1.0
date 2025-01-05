@@ -101,7 +101,7 @@ Running GAMBIT-light
 A GAMBIT-light run is configured with a single YAML file. A fully commented example is provided in `yaml_files/gambit_light_example.yaml`. You can run GAMBIT-light with this example configuration by doing
 
 ```console
-./gambit -f yaml_files/gambit_light_example.yaml
+./gambit -rf yaml_files/gambit_light_example.yaml
 ```
 
 To see a complete list of command-line options, do 
@@ -112,7 +112,7 @@ To see a complete list of command-line options, do
 When using an MPI-parallelised scanner, start GAMBIT-light with `mpiexec` or `mpirun`, e.g.
 
 ```console
-mpiexec -np 4 ./gambit -f yaml_files/your_configuration_file.yaml
+mpiexec -np 4 ./gambit -rf yaml_files/your_configuration_file.yaml
 ```
 
 for a run with 4 MPI processes.
@@ -125,6 +125,50 @@ Connecting your own target/likelihood function
 For step-by-step instructions on how to connect your own Python/C/C++/Fortran code to GAMBIT-light, see the README files and example codes in the 
 `gambit_light_interface/example_*` directories.
 
+
+
+Get GAMBIT plotting tools
+--
+
+To download a set of Python plotting tools for making 1D/2D profile likelihood and posterior plots from GAMBIT and GAMBIT-light output files, do:
+
+```console
+cd build
+make get-gambit_plotting_tools
+cd ..
+```
+
+The plotting tools will be downloaded to a folder `gambit_plotting_tools`. You can either run your plotting scripts from this folder or pip install the package: 
+
+```console
+pip install ./gambit_plotting_tools
+```
+
+Fully worked example from scan to plotting
+--
+
+This example performs a two-parameter scan that uses the (negative) Rosenbrock function as an example log-likelihood function for which we want to identify the best-fit point and map out the 1sigma and 2sigma confidence regions. The scan is performed using the Diver differential evolution scanner and takes 1-2 minutes when running with 1 MPI process. The scan output is written to the directory `runs/gambit_light_example_rosenbrock_scan`.
+
+- Run GAMBIT scan:
+
+  ```console
+  ./gambit -rf yaml_files/gambit_light_example_rosenbrock_scan.yaml
+  ```
+
+- Download the GAMBIT plotting tools (see above).
+
+- Modify the beginning of the script `gambit_plotting_tools/example_gambit_light_2D_profile_like_hdf5.py` to point to your GAMBIT output file in `runs/gambit_light_example_rosenbrock_scan/samples/results.hdf5`.
+
+- Make a 2D profile likelihood plot:
+
+  ```console
+  cd gambit_plotting_tools
+  python example_gambit_light_2D_profile_like_hdf5.py
+  ```
+
+  This should give a plot looking something like this:
+  
+  <img src="example_plots/2D_profile__x1__x2__LogLike.png" alt="2D profile likelihood example plot" width="400"/>
 
 
 Common issues
